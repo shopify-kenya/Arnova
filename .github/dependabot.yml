@@ -15,10 +15,6 @@ updates:
       go-dependencies:
         patterns:
           - "*"
-    allow:
-      - dependency-type: "all"
-    ignore:
-      - dependency-type: "indirect"
 
   # PHP / Laravel (Composer)
   - package-ecosystem: "composer"
@@ -30,10 +26,6 @@ updates:
       php-dependencies:
         patterns:
           - "*"
-    allow:
-      - dependency-type: "all"
-    ignore:
-      - dependency-type: "indirect"
 
   # JavaScript / TypeScript
   - package-ecosystem: "npm"
@@ -45,10 +37,6 @@ updates:
       js-dependencies:
         patterns:
           - "*"
-    allow:
-      - dependency-type: "all"
-    ignore:
-      - dependency-type: "indirect"
 
   # Rust
   - package-ecosystem: "cargo"
@@ -60,10 +48,6 @@ updates:
       rust-dependencies:
         patterns:
           - "*"
-    allow:
-      - dependency-type: "all"
-    ignore:
-      - dependency-type: "indirect"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -72,45 +56,3 @@ updates:
       interval: "monthly"
     open-pull-requests-limit: 5
 
-  # Security updates (apply immediately)
-  - package-ecosystem: "gomod"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    allow:
-      - dependency-type: "direct"
-    ignore: []
-    security-updates-only: true
-
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    allow:
-      - dependency-type: "direct"
-    ignore: []
-    security-updates-only: true
-
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    allow:
-      - dependency-type: "direct"
-    ignore: []
-    security-updates-only: true
-
-  - package-ecosystem: "cargo"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    allow:
-      - dependency-type: "direct"
-    ignore: []
-    security-updates-only: true
-
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    security-updates-only: true
