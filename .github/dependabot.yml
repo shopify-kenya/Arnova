@@ -1,0 +1,116 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Go modules
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      go-dependencies:
+        patterns:
+          - "*"
+    allow:
+      - dependency-type: "all"
+    ignore:
+      - dependency-type: "indirect"
+
+  # PHP / Laravel (Composer)
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      php-dependencies:
+        patterns:
+          - "*"
+    allow:
+      - dependency-type: "all"
+    ignore:
+      - dependency-type: "indirect"
+
+  # JavaScript / TypeScript
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      js-dependencies:
+        patterns:
+          - "*"
+    allow:
+      - dependency-type: "all"
+    ignore:
+      - dependency-type: "indirect"
+
+  # Rust
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    groups:
+      rust-dependencies:
+        patterns:
+          - "*"
+    allow:
+      - dependency-type: "all"
+    ignore:
+      - dependency-type: "indirect"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+
+  # Security updates (apply immediately)
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "direct"
+    ignore: []
+    security-updates-only: true
+
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "direct"
+    ignore: []
+    security-updates-only: true
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "direct"
+    ignore: []
+    security-updates-only: true
+
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "direct"
+    ignore: []
+    security-updates-only: true
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    security-updates-only: true
