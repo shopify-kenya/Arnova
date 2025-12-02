@@ -37,11 +37,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # Next.js build files
-.next/*
+.next/
 out/
 next-env.d.ts
-static/
-static/*
 
 # Build files (generated)
 build/
