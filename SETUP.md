@@ -1,43 +1,59 @@
-# Django Shop Setup Guide
+# Arnova Shop Setup Guide
 
 ## Project Structure
 ```
 Arnova/
-├── manage.py           # Django management script
-├── settings.py         # Django settings
-├── urls.py            # URL routing
-├── wsgi.py            # WSGI application
-├── asgi.py            # ASGI application
-├── __init__.py        # Python package marker
-├── .env               # Environment variables
-├── requirements.txt   # Python dependencies
-├── setup_postgres.sh  # PostgreSQL setup script
-├── venv/              # Virtual environment
-└── db.sqlite3         # SQLite database (development)
+├── app/                    # Next.js pages (App Router)
+├── components/             # React components
+├── lib/                    # Utility libraries
+├── public/                 # Static assets
+├── templates/              # Django templates
+├── static/                 # Generated static files
+├── manage.py              # Django management script
+├── settings.py            # Django settings
+├── urls.py               # URL routing
+├── views.py              # Django views
+├── wsgi.py               # WSGI application
+├── .env                  # Environment variables
+├── requirements.txt      # Python dependencies
+├── package.json          # Node.js dependencies
+├── start.sh              # Development startup script
+├── Dockerfile            # Production container
+├── docker-compose.yml    # Multi-service deployment
+└── venv/                 # Virtual environment
 ```
 
 ## Quick Start
 
-### 1. Activate Virtual Environment
+### Option 1: Automated Setup (Recommended)
 ```bash
+./start.sh
+```
+
+### Option 2: Manual Setup
+```bash
+# 1. Create virtual environment
+python3 -m venv venv
 source venv/bin/activate
-# or
-./venv/bin/python manage.py [command]
-```
 
-### 2. Install Dependencies
-```bash
+# 2. Install dependencies
 pip install -r requirements.txt
-```
+npm install
 
-### 3. Run Migrations
-```bash
+# 3. Run migrations
 python manage.py migrate
+
+# 4. Build frontend
+npm run build
+
+# 5. Start servers
+python manage.py runserver 8000 &
+npm run dev
 ```
 
-### 4. Start Development Server
+### Option 3: Docker Deployment
 ```bash
-python manage.py runserver 8001
+docker-compose up --build
 ```
 
 ## Environment Configuration
@@ -79,10 +95,8 @@ python manage.py migrate
 
 ## Development Commands
 
+### Django Commands
 ```bash
-# Create new app
-python manage.py startapp [app_name]
-
 # Create migrations
 python manage.py makemigrations
 
@@ -97,6 +111,36 @@ python manage.py collectstatic
 
 # Run tests
 python manage.py test
+```
+
+### Frontend Commands
+```bash
+# Development server
+npm run dev
+
+# Production build
+npm run build
+
+# Start production server
+npm start
+
+# Lint code
+npm run lint
+```
+
+### Docker Commands
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
 ```
 
 ## Troubleshooting
