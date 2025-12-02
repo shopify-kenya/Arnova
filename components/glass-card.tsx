@@ -17,7 +17,7 @@ export function GlassCard({ children, className, hover = true, strong = false }:
   return (
     <motion.div
       className={cn(
-        "rounded-2xl",
+        "rounded-2xl acrylic-card",
         strong ? "glass-strong" : "glass",
         hover && "transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl",
         className,

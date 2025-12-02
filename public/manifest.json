@@ -37,5 +37,35 @@
     }
   ],
   "categories": ["shopping", "lifestyle"],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "/icon-512x512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/icon-512x512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Arrivals",
+      "short_name": "New",
+      "description": "Browse new arrivals",
+      "url": "/new-arrivals",
+      "icons": [{ "src": "/icon-192x192.jpg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sale Items",
+      "short_name": "Sale",
+      "description": "Browse sale items",
+      "url": "/sale",
+      "icons": [{ "src": "/icon-192x192.jpg", "sizes": "192x192" }]
+    }
+  ]
 }

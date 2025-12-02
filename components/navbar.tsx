@@ -49,13 +49,20 @@ export function Navbar() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
-              <motion.h1
-                className="font-serif text-3xl font-bold text-primary"
+              <motion.div
+                className="flex items-center space-x-2"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                Arnova
-              </motion.h1>
+                <img 
+                  src="/placeholder-logo.svg" 
+                  alt="Arnova Logo" 
+                  className="h-8 w-8"
+                />
+                <h1 className="font-serif text-3xl font-bold text-primary">
+                  Arnova
+                </h1>
+              </motion.div>
             </Link>
 
             {/* Desktop Navigation */}

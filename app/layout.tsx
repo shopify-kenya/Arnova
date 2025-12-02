@@ -21,8 +21,13 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon-192x192.jpg", sizes: "192x192", type: "image/jpeg" },
+      { url: "/icon-512x512.jpg", sizes: "512x512", type: "image/jpeg" }
+    ],
     apple: "/apple-touch-icon.jpg",
+    shortcut: "/favicon.svg"
   },
   appleWebApp: {
     capable: true,
@@ -50,6 +55,21 @@ export default function RootLayout({
   return (
     <html lang="en" className="antialiased" suppressHydrationWarning>
       <head>
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Arnova" />
+        <meta name="msapplication-TileImage" content="/icon-512x512.jpg" />
+        <meta name="msapplication-TileColor" content="#606c38" />
+        
+        <link rel="apple-touch-icon" href="/apple-touch-icon.jpg" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.jpg" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.jpg" />
+        
+        <link rel="apple-touch-startup-image" href="/icon-512x512.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" />
+        <link rel="apple-touch-startup-image" href="/icon-512x512.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
+        <link rel="apple-touch-startup-image" href="/icon-512x512.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
+        
         <script
           dangerouslySetInnerHTML={{
             __html: `

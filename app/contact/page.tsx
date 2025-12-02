@@ -61,7 +61,7 @@ export default function ContactPage() {
                 <div className="flex items-center gap-4">
                   <MapPin className="w-6 h-6 text-primary" />
                   <div>
-                    <h3 className="font-semibent">Address</h3>
+                    <h3 className="font-semibold">Address</h3>
                     <p className="text-muted-foreground">123 Fashion Street<br />New York, NY 10001</p>
                   </div>
                 </div>
