@@ -8,6 +8,7 @@ import Link from "next/link"
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import { ProtectedRoute } from "@/components/protected-route"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
@@ -200,8 +201,10 @@ function CartPageContent() {
 
 export default function CartPage() {
   return (
-    <CurrencyProvider>
-      <CartPageContent />
-    </CurrencyProvider>
+    <ProtectedRoute>
+      <CurrencyProvider>
+        <CartPageContent />
+      </CurrencyProvider>
+    </ProtectedRoute>
   )
 }

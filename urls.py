@@ -34,7 +34,8 @@ urlpatterns = [
     
     # Serve Next.js static files directly
     re_path(r'^_next/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'build', '_next')}),
-    re_path(r'^manifest.json$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public')}),
+    path('manifest.json', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'manifest.json'}),
+    path('service-worker.js', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'service-worker.js'}),
     
     # Catch-all for Next.js routes
     re_path(r'^.*$', views.index, name='index'),

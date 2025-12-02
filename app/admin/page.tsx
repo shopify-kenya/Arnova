@@ -10,6 +10,7 @@ import { Footer } from "@/components/footer"
 import { GlassCard } from "@/components/glass-card"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
+import { ProtectedRoute } from "@/components/protected-route"
 import Link from "next/link"
 
 export default function AdminDashboardPage() {
@@ -83,9 +84,10 @@ export default function AdminDashboardPage() {
   ]
 
   return (
-    <CurrencyProvider>
-      <div className="min-h-screen">
-        <Navbar />
+    <ProtectedRoute requireAdmin>
+      <CurrencyProvider>
+        <div className="min-h-screen">
+          <Navbar />
 
         <main className="container mx-auto px-4 py-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
@@ -164,8 +166,9 @@ export default function AdminDashboardPage() {
           </motion.div>
         </main>
 
-        <Footer />
-      </div>
-    </CurrencyProvider>
+          <Footer />
+        </div>
+      </CurrencyProvider>
+    </ProtectedRoute>
   )
 }

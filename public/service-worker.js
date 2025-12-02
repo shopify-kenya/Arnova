@@ -1,10 +1,18 @@
 // Arnova PWA Service Worker
-const CACHE_NAME = "arnova-v1"
-const STATIC_CACHE = "arnova-static-v1"
-const DYNAMIC_CACHE = "arnova-dynamic-v1"
+const CACHE_VERSION = "v2"
+const STATIC_CACHE = `arnova-static-${CACHE_VERSION}`
+const DYNAMIC_CACHE = `arnova-dynamic-${CACHE_VERSION}`
+const RUNTIME_CACHE = `arnova-runtime-${CACHE_VERSION}`
 
 // Assets to cache on install
-const STATIC_ASSETS = ["/", "/offline", "/manifest.json", "/icon-192x192.jpg", "/icon-512x512.jpg"]
+const STATIC_ASSETS = [
+  "/",
+  "/offline",
+  "/manifest.json",
+  "/icon-192x192.jpg",
+  "/icon-512x512.jpg",
+  "/apple-touch-icon.jpg"
+]
 
 // Install event - cache static assets
 self.addEventListener("install", (event) => {
@@ -23,10 +31,16 @@ self.addEventListener("activate", (event) => {
   console.log("[Service Worker] Activating...")
   event.waitUntil(
     caches.keys().then((cacheNames) => {
+      const validCaches = [STATIC_CACHE, DYNAMIC_CACHE, RUNTIME_CACHE]
       return Promise.all(
-        cacheNames.filter((name) => name !== STATIC_CACHE && name !== DYNAMIC_CACHE).map((name) => caches.delete(name)),
+        cacheNames
+          .filter((name) => !validCaches.includes(name))
+          .map((name) => {
+            console.log("[Service Worker] Deleting old cache:", name)
+            return caches.delete(name)
+          })
       )
-    }),
+    })
   )
   self.clients.claim()
 })
@@ -34,6 +48,7 @@ self.addEventListener("activate", (event) => {
 // Fetch event - serve from cache, fallback to network
 self.addEventListener("fetch", (event) => {
   const { request } = event
+  const url = new URL(request.url)
 
   // Skip non-GET requests
   if (request.method !== "GET") return
@@ -41,36 +56,65 @@ self.addEventListener("fetch", (event) => {
   // Skip chrome extensions and other protocols
   if (!request.url.startsWith("http")) return
 
+  // Skip API requests for now
+  if (url.pathname.startsWith("/api/")) return
+
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
+      // Return cached response if available
       if (cachedResponse) {
-        return cachedResponse
+        // For static assets, return cached version and update in background
+        if (url.pathname.includes("_next/") || url.pathname.includes(".js") || url.pathname.includes(".css")) {
+          return cachedResponse
+        }
       }
 
       return fetch(request)
         .then((response) => {
-          // Don't cache non-successful responses
-          if (!response || response.status !== 200 || response.type === "error") {
+          // Handle successful responses (200-299) and 304 Not Modified
+          if (response && (response.ok || response.status === 304)) {
+            // For 304 responses, return the cached version if available
+            if (response.status === 304 && cachedResponse) {
+              return cachedResponse
+            }
+
+            // Only cache successful responses (not 304)
+            if (response.ok && response.status === 200) {
+              const responseToCache = response.clone()
+              const cacheToUse = STATIC_ASSETS.includes(url.pathname) ? STATIC_CACHE : RUNTIME_CACHE
+              
+              caches.open(cacheToUse).then((cache) => {
+                cache.put(request, responseToCache)
+              })
+            }
+
             return response
           }
 
-          // Clone the response
-          const responseToCache = response.clone()
+          // For failed responses, return cached version if available
+          if (cachedResponse) {
+            return cachedResponse
+          }
 
-          // Cache dynamic content
-          caches.open(DYNAMIC_CACHE).then((cache) => {
-            cache.put(request, responseToCache)
-          })
-
-          return response
+          throw new Error(`Request failed with status ${response.status}`)
         })
-        .catch(() => {
+        .catch((error) => {
+          console.log("[Service Worker] Fetch failed:", error)
+          
+          // Return cached response if available
+          if (cachedResponse) {
+            return cachedResponse
+          }
+
           // Return offline page for navigation requests
           if (request.mode === "navigate") {
             return caches.match("/offline")
           }
+
+          // For other requests, return a basic response
+          return new Response("Offline", { status: 503, statusText: "Service Unavailable" })
         })
-    }),
+    })
   )
 })
 

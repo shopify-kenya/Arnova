@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-change-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = True  # Set to True for development
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] if DEBUG else []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0'] if DEBUG else []
 
 
 # Application definition
