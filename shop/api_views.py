@@ -132,6 +132,100 @@ def api_saved(request):
         SavedItem.objects.get_or_create(user=request.user, product=product)
         return JsonResponse({'success': True})
 
+@require_http_methods(["GET"])
+def api_product_detail(request, product_id):
+    try:
+        product = Product.objects.get(id=product_id)
+        data = {
+            'id': product.id,
+            'name': product.name,
+            'description': product.description,
+            'price': float(product.price),
+            'sale_price': float(product.sale_price) if product.sale_price else None,
+            'category': product.category.name,
+            'sizes': product.sizes,
+            'colors': product.colors,
+            'images': product.images,
+            'in_stock': product.in_stock,
+            'is_new': product.is_new,
+            'on_sale': product.on_sale,
+            'rating': float(product.rating),
+            'reviews': product.reviews
+        }
+        return JsonResponse({'product': data})
+    except Product.DoesNotExist:
+        return JsonResponse({'error': 'Product not found'}, status=404)
+
+@require_http_methods(["GET"])
+def api_categories(request):
+    categories = Category.objects.all()
+    data = [{
+        'id': cat.id,
+        'name': cat.name,
+        'slug': cat.slug
+    } for cat in categories]
+    return JsonResponse({'categories': data})
+
+@api_login_required
+@csrf_exempt
+def api_profile(request):
+    if request.method == 'GET':
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        data = {
+            'user': {
+                'id': request.user.id,
+                'username': request.user.username,
+                'email': request.user.email,
+                'first_name': request.user.first_name,
+                'last_name': request.user.last_name
+            },
+            'profile': {
+                'phone': profile.phone,
+                'address': profile.address,
+                'city': profile.city,
+                'country': profile.country,
+                'postal_code': profile.postal_code
+            }
+        }
+        return JsonResponse(data)
+    
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        
+        # Update user fields
+        if 'first_name' in data:
+            request.user.first_name = data['first_name']
+        if 'last_name' in data:
+            request.user.last_name = data['last_name']
+        request.user.save()
+        
+        # Update profile fields
+        for field in ['phone', 'address', 'city', 'country', 'postal_code']:
+            if field in data:
+                setattr(profile, field, data[field])
+        profile.save()
+        
+        return JsonResponse({'success': True})
+
+@api_login_required
+@require_http_methods(["GET"])
+def api_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    data = [{
+        'id': order.id,
+        'order_id': order.order_id,
+        'total_amount': float(order.total_amount),
+        'status': order.status,
+        'created_at': order.created_at.isoformat(),
+        'items': [{
+            'product_name': item.product.name,
+            'quantity': item.quantity,
+            'price': float(item.price)
+        } for item in order.items.all()]
+    } for order in orders]
+    return JsonResponse({'orders': data})
+
 @admin_required
 @require_http_methods(["GET"])
 def api_admin_orders(request):
@@ -145,3 +239,69 @@ def api_admin_orders(request):
         'created_at': order.created_at.isoformat()
     } for order in orders]
     return JsonResponse({'orders': data})
+
+@admin_required
+@csrf_exempt
+def api_admin_products(request):
+    if request.method == 'GET':
+        products = Product.objects.all()
+        data = [{
+            'id': p.id,
+            'name': p.name,
+            'price': float(p.price),
+            'category': p.category.name,
+            'in_stock': p.in_stock,
+            'created_at': p.created_at.isoformat()
+        } for p in products]
+        return JsonResponse({'products': data})
+    
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        category = Category.objects.get(id=data['category_id'])
+        product = Product.objects.create(
+            id=data['id'],
+            name=data['name'],
+            description=data['description'],
+            price=data['price'],
+            category=category,
+            sizes=data.get('sizes', []),
+            colors=data.get('colors', []),
+            images=data.get('images', [])
+        )
+        return JsonResponse({'success': True, 'product_id': product.id})
+
+@admin_required
+@require_http_methods(["GET"])
+def api_admin_users(request):
+    from django.contrib.auth.models import User
+    users = User.objects.all().order_by('-date_joined')
+    data = [{
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'is_staff': user.is_staff,
+        'date_joined': user.date_joined.isoformat()
+    } for user in users]
+    return JsonResponse({'users': data})
+
+@admin_required
+@require_http_methods(["GET"])
+def api_admin_analytics(request):
+    from django.db.models import Count, Sum
+    
+    total_orders = Order.objects.count()
+    total_revenue = Order.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    total_users = User.objects.count()
+    total_products = Product.objects.count()
+    
+    data = {
+        'total_orders': total_orders,
+        'total_revenue': float(total_revenue),
+        'total_users': total_users,
+        'total_products': total_products,
+        'recent_orders': Order.objects.count(),
+        'popular_products': Product.objects.annotate(
+            order_count=Count('orderitem')
+        ).order_by('-order_count')[:5].values('name', 'order_count')
+    }
+    return JsonResponse(data)
