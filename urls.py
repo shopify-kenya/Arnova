@@ -21,6 +21,6 @@ urlpatterns = [
     re_path(r'^.*$', views.index, name='index'),
 ]
 
-# Serve static files
-if settings.STATICFILES_DIRS and len(settings.STATICFILES_DIRS) > 0:
+# Serve static files in development
+if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
