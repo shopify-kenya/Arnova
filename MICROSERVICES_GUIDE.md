@@ -13,6 +13,7 @@ Arnova is designed to be split into independent microservices:
 5. **Payments Service** - Payment processing
 
 Each service:
+
 - Has its own database schema (or separate database)
 - Exposes REST APIs
 - Can be deployed independently
@@ -49,6 +50,7 @@ arnova-backend/
 ### 1. Products Service
 
 **Database Tables:**
+
 - products_product
 - products_productimage
 - products_productvariant
@@ -56,6 +58,7 @@ arnova-backend/
 - products_review
 
 **API Endpoints:**
+
 - GET /api/v1/products/
 - GET /api/v1/products/{id}/
 - POST /api/v1/products/ (admin)
@@ -74,11 +77,13 @@ PRODUCTS_DB_PORT=5432
 ### 2. Orders Service
 
 **Database Tables:**
+
 - orders_order
 - orders_orderitem
 - orders_orderhistory
 
 **API Endpoints:**
+
 - GET /api/v1/orders/
 - GET /api/v1/orders/{id}/
 - POST /api/v1/orders/
@@ -86,6 +91,7 @@ PRODUCTS_DB_PORT=5432
 - GET /api/v1/orders/{id}/track/
 
 **Dependencies:**
+
 - Products Service (to validate product availability)
 - Users Service (to get user details)
 - Payments Service (to process payments)
@@ -93,11 +99,13 @@ PRODUCTS_DB_PORT=5432
 ### 3. Users Service
 
 **Database Tables:**
+
 - auth_user (Django default)
 - users_profile
 - users_saveditem
 
 **API Endpoints:**
+
 - POST /api/v1/auth/register/
 - POST /api/v1/auth/login/
 - POST /api/v1/auth/refresh/
@@ -107,10 +115,12 @@ PRODUCTS_DB_PORT=5432
 ### 4. Cart Service
 
 **Database Tables:**
+
 - cart_cart
 - cart_cartitem
 
 **API Endpoints:**
+
 - GET /api/v1/cart/
 - POST /api/v1/cart/items/
 - PUT /api/v1/cart/items/{id}/
@@ -118,19 +128,23 @@ PRODUCTS_DB_PORT=5432
 - DELETE /api/v1/cart/clear/
 
 **Dependencies:**
+
 - Products Service (to get product details and prices)
 
 ### 5. Payments Service
 
 **Database Tables:**
+
 - payments_transaction
 
 **API Endpoints:**
+
 - POST /api/v1/payments/process/
 - GET /api/v1/payments/{id}/
 - POST /api/v1/payments/{id}/refund/
 
 **Dependencies:**
+
 - Orders Service (to update order payment status)
 
 ## Inter-Service Communication
@@ -138,7 +152,9 @@ PRODUCTS_DB_PORT=5432
 ### Option 1: Direct HTTP Calls
 
 \`\`\`python
+
 # orders/services.py
+
 import requests
 from django.conf import settings
 
@@ -150,14 +166,14 @@ class OrderService:
                 f"{settings.PRODUCTS_SERVICE_URL}/api/v1/products/{item['product_id']}/"
             )
             product = response.json()
-            
+
             # Validate stock
             if product['stock_quantity'] < item['quantity']:
                 raise ValueError(f"Insufficient stock for {product['name']}")
-        
+
         # Create order
         order = Order.objects.create(...)
-        
+
         # Update stock in Products Service
         for item in cart_items:
             requests.patch(
@@ -165,40 +181,43 @@ class OrderService:
                 json={'stock_quantity': product['stock_quantity'] - item['quantity']},
                 headers={'Authorization': f'Bearer {settings.SERVICE_TOKEN}'}
             )
-        
+
         return order
 \`\`\`
 
 ### Option 2: Message Queue (RabbitMQ/Redis)
 
 \`\`\`python
+
 # orders/services.py
+
 import pika
 
 class OrderService:
     def create_order(self, user_id, cart_items):
         order = Order.objects.create(...)
-        
+
         # Publish event to message queue
         connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
         channel = connection.channel()
         channel.queue_declare(queue='order_created')
-        
+
         message = {
             'order_id': order.id,
             'items': cart_items
         }
-        
+
         channel.basic_publish(
             exchange='',
             routing_key='order_created',
             body=json.dumps(message)
         )
-        
+
         connection.close()
         return order
 
 # products/consumers.py
+
 import pika
 import json
 
@@ -206,7 +225,7 @@ def consume_order_created():
     connection = pika.BlockingConnection(pika.ConnectionParameters('rabbitmq'))
     channel = connection.channel()
     channel.queue_declare(queue='order_created')
-    
+
     def callback(ch, method, properties, body):
         data = json.loads(body)
         # Update product stock
@@ -214,7 +233,7 @@ def consume_order_created():
             product = Product.objects.get(id=item['product_id'])
             product.stock_quantity -= item['quantity']
             product.save()
-    
+
     channel.basic_consume(queue='order_created', on_message_callback=callback, auto_ack=True)
     channel.start_consuming()
 \`\`\`
@@ -265,9 +284,9 @@ services:
     command: gunicorn orders.wsgi:application --bind 0.0.0.0:8002
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/arnova_db
-      - PRODUCTS_SERVICE_URL=http://products-service:8001
-      - USERS_SERVICE_URL=http://users-service:8003
-      - PAYMENTS_SERVICE_URL=http://payments-service:8005
+      - PRODUCTS_SERVICE_URL=<http://products-service:8001>
+      - USERS_SERVICE_URL=<http://users-service:8003>
+      - PAYMENTS_SERVICE_URL=<http://payments-service:8005>
     depends_on:
       - postgres
       - products-service
@@ -289,7 +308,7 @@ services:
     command: gunicorn cart.wsgi:application --bind 0.0.0.0:8004
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/arnova_db
-      - PRODUCTS_SERVICE_URL=http://products-service:8001
+      - PRODUCTS_SERVICE_URL=<http://products-service:8001>
       - REDIS_URL=redis://redis:6379/1
     depends_on:
       - postgres
@@ -304,7 +323,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/arnova_db
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - ORDERS_SERVICE_URL=http://orders-service:8002
+      - ORDERS_SERVICE_URL=<http://orders-service:8002>
     depends_on:
       - postgres
     networks:
@@ -401,6 +420,7 @@ http {
 ## Deployment
 
 ### Development
+
 \`\`\`bash
 docker-compose up --build
 \`\`\`
@@ -410,7 +430,9 @@ docker-compose up --build
 Create Kubernetes manifests for each service:
 
 \`\`\`yaml
+
 # products-deployment.yaml
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -437,6 +459,7 @@ spec:
               name: db-secrets
               key: database-url
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -445,7 +468,8 @@ spec:
   selector:
     app: products-service
   ports:
-  - port: 8001
+
+- port: 8001
     targetPort: 8001
 \`\`\`
 
@@ -463,7 +487,9 @@ kubectl apply -f payments-deployment.yaml
 Use centralized logging (ELK Stack) and monitoring (Prometheus + Grafana):
 
 \`\`\`yaml
+
 # docker-compose.monitoring.yml
+
 services:
   prometheus:
     image: prom/prometheus
@@ -510,4 +536,4 @@ services:
 
 ---
 
-**For questions:** devops@arnova.com
+**For questions:** <devops@arnova.com>

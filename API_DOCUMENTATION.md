@@ -1,7 +1,7 @@
 # Arnova E-commerce API Documentation
 
-**Version:** 1.0.0  
-**Base URL:** `https://api.arnova.com/api/v1/`  
+**Version:** 1.0.0
+**Base URL:** `https://api.arnova.com/api/v1/`
 **Authentication:** JWT Bearer Token
 
 ---
@@ -31,7 +31,7 @@
 \`\`\`json
 {
   "username": "johndoe",
-  "email": "john@example.com",
+  "email": "<john@example.com>",
   "password": "SecurePass123!",
   "first_name": "John",
   "last_name": "Doe",
@@ -50,7 +50,7 @@
 {
   "id": 1,
   "username": "johndoe",
-  "email": "john@example.com",
+  "email": "<john@example.com>",
   "first_name": "John",
   "last_name": "Doe",
   "profile": {
@@ -89,7 +89,7 @@
   "user": {
     "id": 1,
     "username": "johndoe",
-    "email": "john@example.com",
+    "email": "<john@example.com>",
     "first_name": "John",
     "last_name": "Doe",
     "profile": {
@@ -125,7 +125,7 @@
 
 ### Get Current User Profile
 
-**Endpoint:** `GET /auth/profile/`  
+**Endpoint:** `GET /auth/profile/`
 **Authentication:** Required
 
 **Response:** `200 OK`
@@ -133,7 +133,7 @@
 {
   "id": 1,
   "username": "johndoe",
-  "email": "john@example.com",
+  "email": "<john@example.com>",
   "first_name": "John",
   "last_name": "Doe",
   "profile": {
@@ -142,7 +142,7 @@
     "country_name": "United States",
     "preferred_currency": "USD",
     "preferred_language": "en-US",
-    "avatar_url": "https://cdn.arnova.com/avatars/johndoe.jpg",
+    "avatar_url": "<https://cdn.arnova.com/avatars/johndoe.jpg>",
     "date_of_birth": "1990-01-15"
   }
 }
@@ -152,7 +152,7 @@
 
 ### Update Profile
 
-**Endpoint:** `PUT /auth/profile/`  
+**Endpoint:** `PUT /auth/profile/`
 **Authentication:** Required
 
 **Request Body:**
@@ -179,6 +179,7 @@
 **Endpoint:** `GET /products/`
 
 **Query Parameters:**
+
 - `category` - Filter by category (clothing, shoes, bags, accessories)
 - `min_price` - Minimum price
 - `max_price` - Maximum price
@@ -198,7 +199,7 @@
 \`\`\`json
 {
   "count": 150,
-  "next": "https://api.arnova.com/api/v1/products/?page=2",
+  "next": "<https://api.arnova.com/api/v1/products/?page=2>",
   "previous": null,
   "results": [
     {
@@ -337,7 +338,7 @@
 
 ### Create Product (Admin Only)
 
-**Endpoint:** `POST /products/`  
+**Endpoint:** `POST /products/`
 **Authentication:** Required (Admin)
 
 **Request Body:**
@@ -381,6 +382,7 @@
 **Endpoint:** `GET /products/search/`
 
 **Query Parameters:**
+
 - `q` - Search query (searches name, description, brand, sku)
 - `category` - Filter by category
 - `page` - Page number
@@ -395,7 +397,7 @@
 
 ### Get Cart
 
-**Endpoint:** `GET /cart/`  
+**Endpoint:** `GET /cart/`
 **Authentication:** Required
 
 **Response:** `200 OK`
@@ -450,7 +452,7 @@
 
 ### Add Item to Cart
 
-**Endpoint:** `POST /cart/items/`  
+**Endpoint:** `POST /cart/items/`
 **Authentication:** Required
 
 **Request Body:**
@@ -470,7 +472,7 @@
     "id": 1,
     "name": "Premium Cotton T-Shirt",
     "price": "29.99",
-    "image": "https://cdn.arnova.com/products/tshirt-1.jpg"
+    "image": "<https://cdn.arnova.com/products/tshirt-1.jpg>"
   },
   "variant": {
     "id": 1,
@@ -487,7 +489,7 @@
 
 ### Update Cart Item
 
-**Endpoint:** `PUT /cart/items/{id}/`  
+**Endpoint:** `PUT /cart/items/{id}/`
 **Authentication:** Required
 
 **Request Body:**
@@ -503,7 +505,7 @@
 
 ### Remove Cart Item
 
-**Endpoint:** `DELETE /cart/items/{id}/`  
+**Endpoint:** `DELETE /cart/items/{id}/`
 **Authentication:** Required
 
 **Response:** `204 No Content`
@@ -512,7 +514,7 @@
 
 ### Clear Cart
 
-**Endpoint:** `DELETE /cart/clear/`  
+**Endpoint:** `DELETE /cart/clear/`
 **Authentication:** Required
 
 **Response:** `204 No Content`
@@ -523,7 +525,7 @@
 
 ### Get Saved Items
 
-**Endpoint:** `GET /saved/`  
+**Endpoint:** `GET /saved/`
 **Authentication:** Required
 
 **Response:** `200 OK`
@@ -554,7 +556,7 @@
 
 ### Add to Saved Items
 
-**Endpoint:** `POST /saved/`  
+**Endpoint:** `POST /saved/`
 **Authentication:** Required
 
 **Request Body:**
@@ -570,7 +572,7 @@
 
 ### Remove from Saved Items
 
-**Endpoint:** `DELETE /saved/{id}/`  
+**Endpoint:** `DELETE /saved/{id}/`
 **Authentication:** Required
 
 **Response:** `204 No Content`
@@ -579,7 +581,7 @@
 
 ### Move Saved Item to Cart
 
-**Endpoint:** `POST /saved/move-to-cart/{id}/`  
+**Endpoint:** `POST /saved/move-to-cart/{id}/`
 **Authentication:** Required
 
 **Request Body:**
@@ -598,10 +600,11 @@
 
 ### List Orders
 
-**Endpoint:** `GET /orders/`  
+**Endpoint:** `GET /orders/`
 **Authentication:** Required
 
 **Query Parameters:**
+
 - `status` - Filter by status
 - `page` - Page number
 
@@ -631,7 +634,7 @@
 
 ### Get Order Details
 
-**Endpoint:** `GET /orders/{id}/`  
+**Endpoint:** `GET /orders/{id}/`
 **Authentication:** Required
 
 **Response:** `200 OK`
@@ -642,17 +645,17 @@
   "status": "delivered",
   "payment_status": "paid",
   "fulfillment_status": "fulfilled",
-  
+
   "subtotal": "209.97",
   "shipping_cost": "10.00",
   "tax": "18.00",
   "discount": "0.00",
   "total": "237.97",
   "currency": "USD",
-  
+
   "shipping_address": {
     "name": "John Doe",
-    "email": "john@example.com",
+    "email": "<john@example.com>",
     "phone": "+1234567890",
     "address_line1": "123 Main St",
     "address_line2": "Apt 4B",
@@ -661,11 +664,11 @@
     "postal_code": "10001",
     "country": "United States"
   },
-  
+
   "payment_method": "credit_card",
   "tracking_number": "1Z999AA10123456784",
   "carrier": "UPS",
-  
+
   "items": [
     {
       "id": 1,
@@ -681,7 +684,7 @@
       "total_price": "59.98"
     }
   ],
-  
+
   "created_at": "2024-01-15T10:00:00Z",
   "shipped_at": "2024-01-17T08:00:00Z",
   "delivered_at": "2024-01-20T14:30:00Z"
@@ -692,7 +695,7 @@
 
 ### Create Order (Checkout)
 
-**Endpoint:** `POST /orders/`  
+**Endpoint:** `POST /orders/`
 **Authentication:** Required
 
 **Request Body:**
@@ -700,7 +703,7 @@
 {
   "shipping_address": {
     "name": "John Doe",
-    "email": "john@example.com",
+    "email": "<john@example.com>",
     "phone": "+1234567890",
     "address_line1": "123 Main St",
     "address_line2": "Apt 4B",
@@ -722,7 +725,7 @@
 
 ### Cancel Order
 
-**Endpoint:** `PUT /orders/{id}/cancel/`  
+**Endpoint:** `PUT /orders/{id}/cancel/`
 **Authentication:** Required
 
 **Request Body:**
@@ -738,7 +741,7 @@
 
 ### Track Order
 
-**Endpoint:** `GET /orders/{id}/track/`  
+**Endpoint:** `GET /orders/{id}/track/`
 **Authentication:** Required
 
 **Response:** `200 OK`
@@ -775,7 +778,7 @@
 
 ### Dashboard Statistics
 
-**Endpoint:** `GET /admin/dashboard/`  
+**Endpoint:** `GET /admin/dashboard/`
 **Authentication:** Required (Admin)
 
 **Response:** `200 OK`
@@ -800,10 +803,11 @@
 
 ### Manage Products
 
-**Endpoint:** `GET /admin/products/`  
+**Endpoint:** `GET /admin/products/`
 **Authentication:** Required (Admin)
 
 **Query Parameters:**
+
 - `search` - Search products
 - `category` - Filter by category
 - `status` - Filter by status (active, inactive, out_of_stock)
@@ -815,7 +819,7 @@
 
 ### Update Order Status
 
-**Endpoint:** `PUT /admin/orders/{id}/status/`  
+**Endpoint:** `PUT /admin/orders/{id}/status/`
 **Authentication:** Required (Admin)
 
 **Request Body:**
@@ -883,7 +887,7 @@ All list endpoints support pagination:
 \`\`\`json
 {
   "count": 150,
-  "next": "https://api.arnova.com/api/v1/products/?page=2",
+  "next": "<https://api.arnova.com/api/v1/products/?page=2>",
   "previous": null,
   "results": [...]
 }
@@ -908,5 +912,5 @@ Configure webhooks in admin dashboard.
 
 ---
 
-**For support:** api-support@arnova.com  
-**Documentation:** https://docs.arnova.com
+**For support:** <api-support@arnova.com>
+**Documentation:** <https://docs.arnova.com>

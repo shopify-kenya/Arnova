@@ -37,9 +37,16 @@ yarn-debug.log*
 yarn-error.log*
 
 # Next.js build files
-.next/
+.next/*
 out/
 next-env.d.ts
-
-# Static files (generated)
 static/
+static/*
+
+# Build files (generated)
+build/
+static/
+*.tsbuildinfo
+
+# Database
+db.sqlite3

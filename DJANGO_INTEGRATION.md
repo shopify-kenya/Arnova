@@ -3,6 +3,7 @@
 This document provides comprehensive instructions for integrating the Arnova Next.js frontend with a Django backend.
 
 ## Table of Contents
+
 1. [Architecture Overview](#architecture-overview)
 2. [Django Project Setup](#django-project-setup)
 3. [Database Schema (PostgreSQL)](#database-schema-postgresql)
@@ -18,12 +19,14 @@ This document provides comprehensive instructions for integrating the Arnova Nex
 ## Architecture Overview
 
 The Arnova platform uses a decoupled architecture:
+
 - **Frontend**: Next.js (this repository) - handles UI, routing, and client-side logic
 - **Backend**: Django REST Framework - handles business logic, database, and APIs
 - **Database**: PostgreSQL - stores all application data
 - **Communication**: RESTful APIs with JSON responses
 
 ### Technology Stack
+
 - Frontend: Next.js 14+, React 18+, TypeScript, Tailwind CSS v4
 - Backend: Django 4.2+, Django REST Framework, PostgreSQL 14+
 - Authentication: JWT tokens (djangorestframework-simplejwt)
@@ -36,20 +39,25 @@ The Arnova platform uses a decoupled architecture:
 ### 1. Create Django Project
 
 \`\`\`bash
+
 # Create virtual environment
+
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
+
 pip install django djangorestframework djangorestframework-simplejwt
 pip install psycopg2-binary pillow django-cors-headers django-filter
 pip install python-decouple gunicorn whitenoise
 
 # Create project
+
 django-admin startproject arnova_backend
 cd arnova_backend
 
 # Create apps for microservices
+
 python manage.py startapp products
 python manage.py startapp orders
 python manage.py startapp users
@@ -60,6 +68,7 @@ python manage.py startapp payments
 ### 2. Configure Settings (settings.py)
 
 \`\`\`python
+
 # arnova_backend/settings.py
 
 from decouple import config
@@ -73,13 +82,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',  # For SEO
-    
+
     # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
-    
+
     # Local apps (microservices)
     'products',
     'orders',
@@ -101,6 +110,7 @@ MIDDLEWARE = [
 ]
 
 # CORS Configuration
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://arnova.vercel.app",
@@ -109,6 +119,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 # Database Configuration
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -121,6 +132,7 @@ DATABASES = {
 }
 
 # REST Framework Configuration
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -138,6 +150,7 @@ REST_FRAMEWORK = {
 }
 
 # JWT Configuration
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -146,10 +159,12 @@ SIMPLE_JWT = {
 }
 
 # Media Files
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Static Files
+
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -284,7 +299,7 @@ CREATE TABLE orders_order (
     order_number VARCHAR(50) UNIQUE NOT NULL,
     user_id INTEGER REFERENCES auth_user(id) ON DELETE SET NULL,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded')),
-    
+
     -- Pricing
     subtotal DECIMAL(10, 2) NOT NULL,
     shipping_cost DECIMAL(10, 2) DEFAULT 0,
@@ -292,7 +307,7 @@ CREATE TABLE orders_order (
     discount DECIMAL(10, 2) DEFAULT 0,
     total DECIMAL(10, 2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'USD',
-    
+
     -- Shipping Information
     shipping_name VARCHAR(255) NOT NULL,
     shipping_email VARCHAR(255) NOT NULL,
@@ -303,7 +318,7 @@ CREATE TABLE orders_order (
     shipping_state VARCHAR(100),
     shipping_postal_code VARCHAR(20) NOT NULL,
     shipping_country VARCHAR(100) NOT NULL,
-    
+
     -- Billing Information
     billing_name VARCHAR(255),
     billing_email VARCHAR(255),
@@ -311,21 +326,21 @@ CREATE TABLE orders_order (
     billing_city VARCHAR(100),
     billing_postal_code VARCHAR(20),
     billing_country VARCHAR(100),
-    
+
     -- Payment
     payment_method VARCHAR(50),
     payment_status VARCHAR(20) DEFAULT 'pending',
     payment_id VARCHAR(255),
-    
+
     -- Tracking
     tracking_number VARCHAR(100),
     shipped_at TIMESTAMP,
     delivered_at TIMESTAMP,
-    
+
     -- Notes
     customer_notes TEXT,
     admin_notes TEXT,
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -379,9 +394,10 @@ CREATE INDEX idx_cart_session ON cart_cart(session_id);
 ## API Endpoints
 
 ### Base URL
+
 \`\`\`
-Development: http://localhost:8000/api/v1/
-Production: https://api.arnova.com/api/v1/
+Development: <http://localhost:8000/api/v1/>
+Production: <https://api.arnova.com/api/v1/>
 \`\`\`
 
 ### Authentication Endpoints
@@ -472,7 +488,7 @@ GET    /admin/analytics/        - Analytics data
 \`\`\`json
 {
   "count": 100,
-  "next": "http://api.arnova.com/api/v1/products/?page=2",
+  "next": "<http://api.arnova.com/api/v1/products/?page=2>",
   "previous": null,
   "results": [
     {
@@ -553,7 +569,7 @@ class Profile(models.Model):
         ('en-GB', 'English (UK)'),
         ('sw', 'Swahili'),
     ]
-    
+
     CURRENCY_CHOICES = [
         ('USD', 'US Dollar'),
         ('EUR', 'Euro'),
@@ -567,7 +583,7 @@ class Profile(models.Model):
         ('JPY', 'Japanese Yen'),
         ('CNY', 'Chinese Yuan'),
     ]
-    
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     phone_number = models.CharField(max_length=20, blank=True)
     country_code = models.CharField(max_length=10, blank=True)
@@ -578,7 +594,7 @@ class Profile(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"{self.user.username}'s Profile"
 \`\`\`
@@ -593,42 +609,42 @@ from .models import Profile
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['phone_number', 'country_code', 'country_name', 
-                  'preferred_currency', 'preferred_language', 'avatar_url', 
+        fields = ['phone_number', 'country_code', 'country_name',
+                  'preferred_currency', 'preferred_language', 'avatar_url',
                   'date_of_birth']
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
-    
+
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile']
         read_only_fields = ['id']
-    
+
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', {})
         profile = instance.profile
-        
+
         # Update user fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        
+
         # Update profile fields
         for attr, value in profile_data.items():
             setattr(profile, attr, value)
         profile.save()
-        
+
         return instance
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     profile = ProfileSerializer()
-    
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'first_name', 'last_name', 'profile']
-    
+
     def create(self, validated_data):
         profile_data = validated_data.pop('profile')
         user = User.objects.create_user(**validated_data)
@@ -641,22 +657,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 \`\`\`typescript
 // Update this file in your Next.js project
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '<http://localhost:8000/api/v1>'
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   const token = localStorage.getItem('access_token')
-  
+
   const headers = {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
     ...options.headers,
   }
-  
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers,
   })
-  
+
   if (response.status === 401) {
     // Token expired, try to refresh
     const refreshed = await refreshToken()
@@ -668,21 +684,21 @@ export async function apiRequest(endpoint: string, options: RequestInit = {}) {
       window.location.href = '/login'
     }
   }
-  
+
   return response.json()
 }
 
 async function refreshToken() {
   const refreshToken = localStorage.getItem('refresh_token')
   if (!refreshToken) return false
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/auth/refresh/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh: refreshToken }),
     })
-    
+
     if (response.ok) {
       const data = await response.json()
       localStorage.setItem('access_token', data.access)
@@ -691,7 +707,7 @@ async function refreshToken() {
   } catch (error) {
     console.error('Token refresh failed:', error)
   }
-  
+
   return false
 }
 \`\`\`
@@ -703,14 +719,17 @@ async function refreshToken() {
 ### Django Configuration for PWA
 
 \`\`\`python
+
 # settings.py
 
 # Serve PWA files
+
 STATICFILES_DIRS = [
     BASE_DIR / 'pwa',  # Create this directory for PWA files
 ]
 
 # Add to TEMPLATES
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -738,7 +757,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # ... other URLs
-    
+
     # PWA files
     path('manifest.json', TemplateView.as_view(
         template_name='manifest.json',
@@ -764,20 +783,20 @@ from .models import Product, Category
 class ProductSitemap(Sitemap):
     changefreq = "weekly"
     priority = 0.8
-    
+
     def items(self):
         return Product.objects.filter(is_active=True)
-    
+
     def lastmod(self, obj):
         return obj.updated_at
 
 class CategorySitemap(Sitemap):
     changefreq = "monthly"
     priority = 0.7
-    
+
     def items(self):
         return Category.objects.filter(is_active=True)
-    
+
     def lastmod(self, obj):
         return obj.created_at
 \`\`\`
@@ -836,9 +855,11 @@ Each Django app represents an independent microservice:
 ### Inter-Service Communication
 
 \`\`\`python
+
 # Example: Orders service calling Products service
 
 # orders/services.py
+
 import requests
 from django.conf import settings
 
@@ -849,21 +870,21 @@ class OrderService:
             product = self._get_product(item['product_id'])
             if product['stock_quantity'] < item['quantity']:
                 raise ValueError(f"Insufficient stock for {product['name']}")
-        
+
         # Create order
         order = Order.objects.create(...)
-        
+
         # Update product stock (call Products service)
         self._update_product_stock(cart_items)
-        
+
         return order
-    
+
     def _get_product(self, product_id):
         response = requests.get(
             f"{settings.PRODUCTS_SERVICE_URL}/api/v1/products/{product_id}/"
         )
         return response.json()
-    
+
     def _update_product_stock(self, cart_items):
         for item in cart_items:
             requests.patch(
@@ -875,7 +896,9 @@ class OrderService:
 ### Docker Compose for Microservices
 
 \`\`\`yaml
+
 # docker-compose.yml
+
 version: '3.8'
 
 services:
@@ -889,7 +912,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-  
+
   products_service:
     build: ./services/products
     command: gunicorn products.wsgi:application --bind 0.0.0.0:8001
@@ -901,7 +924,7 @@ services:
       - postgres
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/arnova_db
-  
+
   orders_service:
     build: ./services/orders
     command: gunicorn orders.wsgi:application --bind 0.0.0.0:8002
@@ -913,7 +936,7 @@ services:
       - postgres
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/arnova_db
-  
+
   users_service:
     build: ./services/users
     command: gunicorn users.wsgi:application --bind 0.0.0.0:8003
@@ -925,7 +948,7 @@ services:
       - postgres
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/arnova_db
-  
+
   cart_service:
     build: ./services/cart
     command: gunicorn cart.wsgi:application --bind 0.0.0.0:8004
@@ -937,7 +960,7 @@ services:
       - postgres
     environment:
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@postgres:5432/arnova_db
-  
+
   nginx:
     image: nginx:alpine
     volumes:
@@ -963,12 +986,15 @@ volumes:
 Create `.env` file:
 
 \`\`\`bash
+
 # Django
+
 SECRET_KEY=your-secret-key-here
 DEBUG=False
 ALLOWED_HOSTS=arnova.com,www.arnova.com,api.arnova.com
 
 # Database
+
 DB_NAME=arnova_db
 DB_USER=postgres
 DB_PASSWORD=your-db-password
@@ -976,25 +1002,30 @@ DB_HOST=localhost
 DB_PORT=5432
 
 # CORS
-CORS_ALLOWED_ORIGINS=https://arnova.com,https://www.arnova.com
+
+CORS_ALLOWED_ORIGINS=<https://arnova.com,https://www.arnova.com>
 
 # JWT
+
 JWT_SECRET_KEY=your-jwt-secret
 
 # Email (for password reset)
+
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_USER=<your-email@gmail.com>
 EMAIL_HOST_PASSWORD=your-email-password
 
 # AWS S3 (optional, for media files)
+
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
 AWS_STORAGE_BUCKET_NAME=arnova-media
 AWS_S3_REGION_NAME=us-east-1
 
 # Payment Gateway (Stripe, PayPal, etc.)
+
 STRIPE_SECRET_KEY=your-stripe-secret
 STRIPE_PUBLISHABLE_KEY=your-stripe-public
 \`\`\`
@@ -1018,17 +1049,17 @@ gunicorn arnova_backend.wsgi:application --bind 0.0.0.0:8000 --workers 4
 server {
     listen 80;
     server_name api.arnova.com;
-    
+
     location / {
-        proxy_pass http://127.0.0.1:8000;
+        proxy_pass <http://127.0.0.1:8000>;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
-    
+
     location /static/ {
         alias /path/to/staticfiles/;
     }
-    
+
     location /media/ {
         alias /path/to/media/;
     }
@@ -1045,11 +1076,13 @@ sudo certbot --nginx -d api.arnova.com
 ## Testing
 
 ### Run Tests
+
 \`\`\`bash
 python manage.py test
 \`\`\`
 
 ### Example Test (products/tests.py)
+
 \`\`\`python
 from django.test import TestCase
 from rest_framework.test import APIClient
@@ -1063,7 +1096,7 @@ class ProductAPITest(TestCase):
             price=29.99,
             category="clothing"
         )
-    
+
     def test_get_products(self):
         response = self.client.get('/api/v1/products/')
         self.assertEqual(response.status_code, 200)
@@ -1075,8 +1108,9 @@ class ProductAPITest(TestCase):
 ## Support
 
 For questions or issues with Django integration:
-1. Check Django documentation: https://docs.djangoproject.com/
-2. Check DRF documentation: https://www.django-rest-framework.org/
+
+1. Check Django documentation: <https://docs.djangoproject.com/>
+2. Check DRF documentation: <https://www.django-rest-framework.org/>
 3. Review this integration guide
 4. Contact the development team
 

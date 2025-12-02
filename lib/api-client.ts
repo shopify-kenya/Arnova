@@ -218,10 +218,13 @@ class ApiClient {
         if (refreshed) {
           // Retry request with new token
           const newToken = this.getAccessToken()
-          headers.Authorization = `Bearer ${newToken}`
+          const updatedHeaders = {
+            ...headers,
+            Authorization: `Bearer ${newToken}`
+          }
           response = await fetch(`${this.baseUrl}${endpoint}`, {
             ...options,
-            headers,
+            headers: updatedHeaders,
           })
         } else {
           // Redirect to login

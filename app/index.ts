@@ -1,3 +1,2 @@
 // Export all pages from this file
-export * from './Home'
-export * from './Shop'
+// Pages are handled by Next.js App Router

@@ -5,7 +5,15 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  distDir: 'static/dist'
+  distDir: 'build',
+  assetPrefix: '',
+  basePath: '',
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion']
+  }
 }
 
 module.exports = nextConfig

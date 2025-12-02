@@ -24,11 +24,7 @@ export const metadata: Metadata = {
     { media: "(prefers-color-scheme: light)", color: "#fefae0" },
     { media: "(prefers-color-scheme: dark)", color: "#1a1f12" },
   ],
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-  },
+  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.jpg",
