@@ -55,7 +55,7 @@ export function Navbar() {
                 transition={{ type: "spring", stiffness: 400 }}
               >
                 <img 
-                  src="/placeholder-logo.svg" 
+                  src="/placeholder-logo.png" 
                   alt="Arnova Logo" 
                   className="h-8 w-8"
                 />

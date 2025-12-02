@@ -42,6 +42,8 @@ urlpatterns = [
     re_path(r'^(?P<path>apple-touch-icon\.jpg)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public')}),
     path('favicon.svg', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'favicon.svg'}),
     path('favicon.ico', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'favicon.svg'}),
+    path('placeholder-logo.png', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'placeholder-logo.png'}),
+    path('placeholder-logo.svg', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'placeholder-logo.svg'}),
     
     # Catch-all for Next.js routes
     re_path(r'^.*$', views.index, name='index'),
