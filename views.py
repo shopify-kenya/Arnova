@@ -8,7 +8,7 @@ import os
 @cache_control(max_age=3600, public=True)
 def index(request):
     # Serve the Next.js exported index.html for all routes
-    nextjs_index = os.path.join(settings.STATICFILES_DIRS[0], 'index.html')
+    nextjs_index = os.path.join(settings.BASE_DIR, 'build', 'index.html')
     if os.path.exists(nextjs_index):
         with open(nextjs_index, 'r', encoding='utf-8') as f:
             response = HttpResponse(f.read(), content_type='text/html')
