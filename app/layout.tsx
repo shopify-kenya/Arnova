@@ -20,11 +20,6 @@ export const metadata: Metadata = {
     type: "website",
   },
   manifest: "/manifest.json",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fefae0" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1f12" },
-  ],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.jpg",
@@ -35,6 +30,16 @@ export const metadata: Metadata = {
     title: "Arnova",
   },
   generator: "v0.app",
+}
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fefae0" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1f12" },
+  ],
 }
 
 export default function RootLayout({

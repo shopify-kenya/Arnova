@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
 from shop import api_views
 import views
 
@@ -17,10 +18,10 @@ urlpatterns = [
     path('api/saved/', api_views.api_saved, name='api_saved'),
     path('api/admin/orders/', api_views.api_admin_orders, name='api_admin_orders'),
     
+    # Serve Next.js static files directly
+    re_path(r'^_next/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0] / '_next'}),
+    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0]}),
+    
     # Catch-all for Next.js routes
     re_path(r'^.*$', views.index, name='index'),
 ]
-
-# Serve static files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
