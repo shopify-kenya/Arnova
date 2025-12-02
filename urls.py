@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.views.static import serve
 from shop import api_views
 import views
+import os
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,8 +33,8 @@ urlpatterns = [
     path('api/admin/analytics/', api_views.api_admin_analytics, name='api_admin_analytics'),
     
     # Serve Next.js static files directly
-    re_path(r'^_next/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0] / '_next'}),
-    re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATICFILES_DIRS[0]}),
+    re_path(r'^_next/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'build', '_next')}),
+    re_path(r'^manifest.json$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public')}),
     
     # Catch-all for Next.js routes
     re_path(r'^.*$', views.index, name='index'),
