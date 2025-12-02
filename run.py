@@ -51,7 +51,10 @@ def main():
     if not run_command("python manage.py migrate", base_dir, use_venv=True):
         print("⚠️  Skipping migrations (may already be applied)")
     
-    # 5. Build Next.js app
+    # 5. Clean and build Next.js app
+    print("\n🧹 Cleaning build cache...")
+    run_command("rm -rf build .next", base_dir)
+    
     print("\n🏗️ Building Next.js frontend...")
     if not run_command("npm run build", base_dir):
         print("❌ Frontend build failed")

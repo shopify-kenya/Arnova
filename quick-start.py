@@ -13,7 +13,10 @@ def main():
     print("🚀 Quick Starting Arnova")
     print("=" * 30)
     
-    # 1. Build Next.js app
+    # 1. Clean and build Next.js app
+    print("\n🧹 Cleaning build cache...")
+    subprocess.run("rm -rf build .next", shell=True, cwd=base_dir)
+    
     print("\n🏗️ Building Next.js frontend...")
     try:
         result = subprocess.run("npm run build", shell=True, cwd=base_dir, check=True)
