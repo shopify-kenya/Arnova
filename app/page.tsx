@@ -45,7 +45,7 @@ export default function HomePage() {
             <div
               className="absolute inset-0 z-0"
               style={{
-                backgroundImage: "url(/placeholder.svg?height=1080&width=1920&query=luxury fashion hero background)",
+                backgroundImage: "url(/premium-clothing-fashion.jpg)",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -140,7 +140,7 @@ export default function HomePage() {
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                  backgroundImage: "url(/placeholder.svg?height=400&width=1200&query=fashion sale banner)",
+                  backgroundImage: "url(/tailored-blazer-jacket.jpg)",
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-transparent" />
