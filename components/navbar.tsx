@@ -19,6 +19,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useCart } from "@/components/cart-provider"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GlassCard } from "@/components/glass-card"
+import { PWAInstaller } from "@/components/pwa-installer"
 
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -124,27 +125,34 @@ export function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* PWA Install */}
+              <PWAInstaller />
+
               {/* Theme Toggle */}
               <ThemeToggle />
 
-              {/* Saved */}
-              <Link href="/saved">
-                <Button variant="ghost" size="icon">
-                  <Heart className="h-5 w-5" />
-                </Button>
-              </Link>
+              {/* Saved - Auth Required */}
+              {isAuthenticated && (
+                <Link href="/saved">
+                  <Button variant="ghost" size="icon">
+                    <Heart className="h-5 w-5" />
+                  </Button>
+                </Link>
+              )}
 
-              {/* Cart */}
-              <Link href="/cart">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="h-5 w-5" />
-                  {itemCount > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                      {itemCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
+              {/* Cart - Auth Required */}
+              {isAuthenticated && (
+                <Link href="/cart">
+                  <Button variant="ghost" size="icon" className="relative">
+                    <ShoppingCart className="h-5 w-5" />
+                    {itemCount > 0 && (
+                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                        {itemCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              )}
 
               {/* Profile */}
               <DropdownMenu>

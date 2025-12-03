@@ -42,14 +42,14 @@ export function AdminSidebar() {
     <motion.aside
       initial={{ x: -280 }}
       animate={{ x: 0 }}
-      className="fixed left-0 top-0 h-full w-72 z-50 bg-background/95 backdrop-blur-xl border-r border-border/50"
+      className="fixed left-0 top-0 h-full w-72 z-50 bg-background/95 backdrop-blur-xl border-r border-border/50 lg:w-72 md:w-64 sm:w-56"
     >
       <div className="flex flex-col h-full p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-              <img src="/placeholder-logo.png" alt="Arnova" className="h-6 w-6" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+              <img src="/placeholder-logo.png" alt="Arnova" className="h-8 w-8" />
             </div>
             <h1 className="font-bold text-xl">Arnova</h1>
           </Link>
