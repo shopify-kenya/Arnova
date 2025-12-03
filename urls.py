@@ -38,12 +38,7 @@ urlpatterns = [
     path('service-worker.js', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'service-worker.js'}),
     
     # Serve static assets from public directory
-    re_path(r'^(?P<path>icon-.*\.jpg)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public')}),
-    re_path(r'^(?P<path>apple-touch-icon\.jpg)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public')}),
-    path('favicon.svg', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'favicon.svg'}),
-    path('favicon.ico', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'favicon.svg'}),
-    path('placeholder-logo.png', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'placeholder-logo.png'}),
-    path('placeholder-logo.svg', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'placeholder-logo.svg'}),
+    re_path(r'^(?P<path>.*\.(jpg|png|svg))$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public')}),
     
     # Catch-all for Next.js routes
     re_path(r'^.*$', views.index, name='index'),
