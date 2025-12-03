@@ -56,8 +56,8 @@ self.addEventListener("fetch", (event) => {
   // Skip chrome extensions and other protocols
   if (!request.url.startsWith("http")) return
 
-  // Skip API requests for now
-  if (url.pathname.startsWith("/api/")) return
+  // Skip API requests and Django admin
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/")) return
 
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
@@ -71,32 +71,16 @@ self.addEventListener("fetch", (event) => {
 
       return fetch(request)
         .then((response) => {
-          // Handle successful responses (200-299) and 304 Not Modified
-          if (response && (response.ok || response.status === 304)) {
-            // For 304 responses, return the cached version if available
-            if (response.status === 304 && cachedResponse) {
-              return cachedResponse
-            }
-
-            // Only cache successful responses (not 304)
-            if (response.ok && response.status === 200) {
-              const responseToCache = response.clone()
-              const cacheToUse = STATIC_ASSETS.includes(url.pathname) ? STATIC_CACHE : RUNTIME_CACHE
-              
-              caches.open(cacheToUse).then((cache) => {
-                cache.put(request, responseToCache)
-              })
-            }
-
-            return response
+          // Only cache successful responses
+          if (response && response.ok) {
+            const responseToCache = response.clone()
+            const cacheToUse = STATIC_ASSETS.includes(url.pathname) ? STATIC_CACHE : RUNTIME_CACHE
+            
+            caches.open(cacheToUse).then((cache) => {
+              cache.put(request, responseToCache)
+            })
           }
-
-          // For failed responses, return cached version if available
-          if (cachedResponse) {
-            return cachedResponse
-          }
-
-          throw new Error(`Request failed with status ${response.status}`)
+          return response
         })
         .catch((error) => {
           console.log("[Service Worker] Fetch failed:", error)
