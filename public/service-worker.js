@@ -1,139 +1,107 @@
-// Arnova PWA Service Worker
-const CACHE_VERSION = "v2"
-const STATIC_CACHE = `arnova-static-${CACHE_VERSION}`
-const DYNAMIC_CACHE = `arnova-dynamic-${CACHE_VERSION}`
-const RUNTIME_CACHE = `arnova-runtime-${CACHE_VERSION}`
+const CACHE_NAME = "arnova-v2"
+const STATIC_CACHE = "arnova-static-v2"
+const DYNAMIC_CACHE = "arnova-dynamic-v2"
 
-// Assets to cache on install
 const STATIC_ASSETS = [
   "/",
-  "/offline",
   "/manifest.json",
   "/icon-192x192.jpg",
   "/icon-512x512.jpg",
   "/apple-touch-icon.jpg",
+  "/favicon.svg",
+  "/offline/",
 ]
 
-// Install event - cache static assets
+// Install event
 self.addEventListener("install", event => {
-  console.log("[Service Worker] Installing...")
   event.waitUntil(
-    caches.open(STATIC_CACHE).then(cache => {
-      console.log("[Service Worker] Caching static assets")
-      return cache.addAll(STATIC_ASSETS)
-    })
+    caches
+      .open(STATIC_CACHE)
+      .then(cache => {
+        console.log("Caching static assets")
+        return cache.addAll(STATIC_ASSETS)
+      })
+      .then(() => self.skipWaiting())
   )
-  self.skipWaiting()
 })
 
-// Activate event - clean up old caches
+// Activate event
 self.addEventListener("activate", event => {
-  console.log("[Service Worker] Activating...")
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      const validCaches = [STATIC_CACHE, DYNAMIC_CACHE, RUNTIME_CACHE]
-      return Promise.all(
-        cacheNames
-          .filter(name => !validCaches.includes(name))
-          .map(name => {
-            console.log("[Service Worker] Deleting old cache:", name)
-            return caches.delete(name)
+    caches
+      .keys()
+      .then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
+              console.log("Deleting old cache:", cacheName)
+              return caches.delete(cacheName)
+            }
           })
-      )
-    })
+        )
+      })
+      .then(() => self.clients.claim())
   )
-  self.clients.claim()
 })
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event
 self.addEventListener("fetch", event => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET requests
-  if (request.method !== "GET") return
-
-  // Skip chrome extensions and other protocols
-  if (!request.url.startsWith("http")) return
-
-  // Skip API requests and Django admin
-  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/"))
-    return
-
-  event.respondWith(
-    caches.match(request).then(cachedResponse => {
-      // Return cached response if available
-      if (cachedResponse) {
-        // For static assets, return cached version and update in background
-        if (
-          url.pathname.includes("_next/") ||
-          url.pathname.includes(".js") ||
-          url.pathname.includes(".css")
-        ) {
-          return cachedResponse
-        }
-      }
-
-      return fetch(request)
+  // Handle API requests
+  if (url.pathname.startsWith("/api/")) {
+    event.respondWith(
+      fetch(request)
         .then(response => {
-          // Only cache successful responses
-          if (response && response.ok) {
-            const responseToCache = response.clone()
-            const cacheToUse = STATIC_ASSETS.includes(url.pathname)
-              ? STATIC_CACHE
-              : RUNTIME_CACHE
-
-            caches.open(cacheToUse).then(cache => {
-              cache.put(request, responseToCache)
-            })
+          if (response.ok) {
+            const responseClone = response.clone()
+            caches
+              .open(DYNAMIC_CACHE)
+              .then(cache => cache.put(request, responseClone))
           }
           return response
         })
-        .catch(error => {
-          console.log("[Service Worker] Fetch failed:", error)
+        .catch(() => caches.match(request))
+    )
+    return
+  }
 
-          // Return cached response if available
-          if (cachedResponse) {
-            return cachedResponse
-          }
-
-          // Let navigation requests fail naturally - don't redirect to offline
-          throw error
+  // Handle navigation requests
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const responseClone = response.clone()
+          caches
+            .open(DYNAMIC_CACHE)
+            .then(cache => cache.put(request, responseClone))
+          return response
         })
+        .catch(() => {
+          return caches.match(request).then(cachedResponse => {
+            return cachedResponse || caches.match("/offline/")
+          })
+        })
+    )
+    return
+  }
+
+  // Handle other requests
+  event.respondWith(
+    caches.match(request).then(cachedResponse => {
+      if (cachedResponse) {
+        return cachedResponse
+      }
+      return fetch(request).then(response => {
+        if (response.ok && request.method === "GET") {
+          const responseClone = response.clone()
+          caches
+            .open(DYNAMIC_CACHE)
+            .then(cache => cache.put(request, responseClone))
+        }
+        return response
+      })
     })
   )
-})
-
-// Background sync for offline actions
-self.addEventListener("sync", event => {
-  console.log("[Service Worker] Background sync:", event.tag)
-  if (event.tag === "sync-cart") {
-    event.waitUntil(syncCart())
-  }
-})
-
-async function syncCart() {
-  // Sync cart data when back online
-  console.log("[Service Worker] Syncing cart data...")
-  // Implementation will be handled by Django backend
-}
-
-// Push notifications
-self.addEventListener("push", event => {
-  const data = event.data ? event.data.json() : {}
-  const title = data.title || "Arnova"
-  const options = {
-    body: data.body || "New notification from Arnova",
-    icon: "/icon-192x192.jpg",
-    badge: "/icon-192x192.jpg",
-    data: data.url || "/",
-  }
-
-  event.waitUntil(self.registration.showNotification(title, options))
-})
-
-// Notification click
-self.addEventListener("notificationclick", event => {
-  event.notification.close()
-  event.waitUntil(clients.openWindow(event.notification.data))
 })
