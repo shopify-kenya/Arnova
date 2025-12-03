@@ -90,13 +90,8 @@ self.addEventListener("fetch", (event) => {
             return cachedResponse
           }
 
-          // Return offline page for navigation requests
-          if (request.mode === "navigate") {
-            return caches.match("/offline")
-          }
-
-          // For other requests, return a basic response
-          return new Response("Offline", { status: 503, statusText: "Service Unavailable" })
+          // Let navigation requests fail naturally - don't redirect to offline
+          throw error
         })
     })
   )
