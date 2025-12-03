@@ -3,7 +3,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Navbar } from "@/components/navbar"
+import { NewArrivalsNavbar } from "@/components/new-arrivals-navbar"
 import { Footer } from "@/components/footer"
 import { ProductCard } from "@/components/product-card"
 import { ProductFilters, type FilterState } from "@/components/product-filters"
@@ -52,7 +52,7 @@ export default function NewArrivalsPage() {
   return (
     <CurrencyProvider>
       <div className="min-h-screen">
-        <Navbar />
+        <NewArrivalsNavbar />
 
         <main className="container mx-auto px-4 py-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>

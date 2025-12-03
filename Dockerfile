@@ -41,6 +41,8 @@ RUN apt-get update \
         postgresql-client \
         build-essential \
         libpq-dev \
+        openssl \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -51,10 +53,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Copy built frontend from previous stage
-COPY --from=frontend-builder /app/static/dist ./static/dist
+COPY --from=frontend-builder /app/build ./build
+COPY --from=frontend-builder /app/public ./public
 
-# Create static files directory
-RUN mkdir -p static/dist
+# Create necessary directories
+RUN mkdir -p staticfiles ssl
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
