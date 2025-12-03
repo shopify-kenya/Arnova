@@ -88,7 +88,7 @@ export default function AdminDashboardPage() {
         <div className="min-h-screen flex">
           <AdminSidebar />
 
-          <main className="flex-1 ml-64 p-8">
+          <main className="flex-1 ml-72 p-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="mb-8">
               <h1 className="font-serif text-5xl font-bold text-foreground mb-2">Admin Dashboard</h1>
