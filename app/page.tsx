@@ -114,9 +114,10 @@ export default function HomePage() {
                 >
                   <Link href={category.href}>
                     <GlassCard className="group overflow-hidden h-[400px] relative">
-                      <div
-                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                        style={{ backgroundImage: `url(${category.image})` }}
+                      <img
+                        src={category.image}
+                        alt={category.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-6">
