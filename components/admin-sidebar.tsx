@@ -3,7 +3,17 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
-import { BarChart3, Package, Users, ShoppingCart, Home, LogOut, Settings, Bell, Search } from "lucide-react"
+import {
+  BarChart3,
+  Package,
+  Users,
+  ShoppingCart,
+  Home,
+  LogOut,
+  Settings,
+  Bell,
+  Search,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/components/auth-provider"
@@ -14,9 +24,7 @@ export function AdminSidebar() {
   const { user, logout } = useAuth()
 
   const getNavigationByRole = (role: string) => {
-    const baseLinks = [
-      { href: "/admin", label: "Dashboard", icon: BarChart3 },
-    ]
+    const baseLinks = [{ href: "/admin", label: "Dashboard", icon: BarChart3 }]
 
     if (role === "admin") {
       return [
@@ -49,7 +57,11 @@ export function AdminSidebar() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-              <img src="/placeholder-logo.png" alt="Arnova" className="h-8 w-8" />
+              <img
+                src="/placeholder-logo.png"
+                alt="Arnova"
+                className="h-8 w-8"
+              />
             </div>
             <h1 className="font-bold text-xl">Arnova</h1>
           </Link>
@@ -64,9 +76,9 @@ export function AdminSidebar() {
         {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search..." 
-            className="pl-10 bg-muted/50 border-0 focus-visible:ring-1" 
+          <Input
+            placeholder="Search..."
+            className="pl-10 bg-muted/50 border-0 focus-visible:ring-1"
           />
         </div>
 
@@ -75,12 +87,17 @@ export function AdminSidebar() {
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
               <span className="text-sm font-semibold text-primary">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
+                {user?.firstName?.[0]}
+                {user?.lastName?.[0]}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm truncate">{user?.firstName} {user?.lastName}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              <p className="font-medium text-sm truncate">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email}
+              </p>
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mt-1">
                 {user?.role === "admin" ? "Administrator" : "User"}
               </span>
@@ -103,8 +120,8 @@ export function AdminSidebar() {
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     className={`w-full justify-start h-11 px-4 ${
-                      isActive 
-                        ? "bg-primary text-primary-foreground shadow-sm" 
+                      isActive
+                        ? "bg-primary text-primary-foreground shadow-sm"
                         : "hover:bg-muted/50"
                     }`}
                   >

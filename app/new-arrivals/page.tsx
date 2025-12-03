@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { NewArrivalsNavbar } from "@/components/new-arrivals-navbar"
@@ -9,7 +8,13 @@ import { ProductCard } from "@/components/product-card"
 import { ProductFilters, type FilterState } from "@/components/product-filters"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { getNewArrivals } from "@/lib/products"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function NewArrivalsPage() {
   const [sortBy, setSortBy] = useState("newest")
@@ -25,13 +30,23 @@ export default function NewArrivalsPage() {
   let products = getNewArrivals()
 
   // Apply filters
-  products = products.filter((product) => {
+  products = products.filter(product => {
     if (filters.inStock && !product.inStock) return false
     if (filters.onSale && !product.onSale) return false
-    if (filters.sizes.length > 0 && !product.sizes.some((s) => filters.sizes.includes(s))) return false
-    if (filters.colors.length > 0 && !product.colors.some((c) => filters.colors.includes(c))) return false
-    const price = product.onSale && product.salePrice ? product.salePrice : product.price
-    if (price < filters.priceRange[0] || price > filters.priceRange[1]) return false
+    if (
+      filters.sizes.length > 0 &&
+      !product.sizes.some(s => filters.sizes.includes(s))
+    )
+      return false
+    if (
+      filters.colors.length > 0 &&
+      !product.colors.some(c => filters.colors.includes(c))
+    )
+      return false
+    const price =
+      product.onSale && product.salePrice ? product.salePrice : product.price
+    if (price < filters.priceRange[0] || price > filters.priceRange[1])
+      return false
     return true
   })
 
@@ -55,10 +70,18 @@ export default function NewArrivalsPage() {
         <NewArrivalsNavbar />
 
         <main className="container mx-auto px-4 py-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <div className="mb-8">
-              <h1 className="font-serif text-5xl font-bold text-foreground mb-2">New Arrivals</h1>
-              <p className="text-muted-foreground">Discover our latest collection</p>
+              <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
+                New Arrivals
+              </h1>
+              <p className="text-muted-foreground">
+                Discover our latest collection
+              </p>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
@@ -70,15 +93,21 @@ export default function NewArrivalsPage() {
               {/* Products Grid */}
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-6">
-                  <p className="text-muted-foreground">{products.length} products</p>
+                  <p className="text-muted-foreground">
+                    {products.length} products
+                  </p>
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="w-[180px] glass">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent className="glass-strong">
                       <SelectItem value="newest">Newest</SelectItem>
-                      <SelectItem value="price-low">Price: Low to High</SelectItem>
-                      <SelectItem value="price-high">Price: High to Low</SelectItem>
+                      <SelectItem value="price-low">
+                        Price: Low to High
+                      </SelectItem>
+                      <SelectItem value="price-high">
+                        Price: High to Low
+                      </SelectItem>
                       <SelectItem value="rating">Highest Rated</SelectItem>
                     </SelectContent>
                   </Select>
@@ -86,13 +115,19 @@ export default function NewArrivalsPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map((product, index) => (
-                    <ProductCard key={product.id} product={product} index={index} />
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      index={index}
+                    />
                   ))}
                 </div>
 
                 {products.length === 0 && (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">No products found matching your filters.</p>
+                    <p className="text-muted-foreground">
+                      No products found matching your filters.
+                    </p>
                   </div>
                 )}
               </div>

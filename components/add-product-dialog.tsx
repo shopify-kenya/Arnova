@@ -1,6 +1,5 @@
 "use client"
 
-
 import type React from "react"
 
 import { useState } from "react"
@@ -9,7 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Dialog,
   DialogContent,
@@ -42,7 +47,7 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
     const files = e.target.files
     if (files) {
       const newImages: string[] = []
-      Array.from(files).forEach((file) => {
+      Array.from(files).forEach(file => {
         const reader = new FileReader()
         reader.onloadend = () => {
           newImages.push(reader.result as string)
@@ -96,8 +101,12 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-serif">Add New Product</DialogTitle>
-          <DialogDescription>Fill in the details to add a new product to your catalog</DialogDescription>
+          <DialogTitle className="text-2xl font-serif">
+            Add New Product
+          </DialogTitle>
+          <DialogDescription>
+            Fill in the details to add a new product to your catalog
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -108,7 +117,7 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
               placeholder="Premium Cotton T-Shirt"
               className="glass"
               required
@@ -120,7 +129,9 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={e =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               placeholder="Describe your product..."
               className="glass min-h-[100px]"
               rows={4}
@@ -137,7 +148,9 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
                 type="number"
                 step="0.01"
                 value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
                 placeholder="29.99"
                 className="glass"
                 required
@@ -150,7 +163,9 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               </Label>
               <Select
                 value={formData.category}
-                onValueChange={(value) => setFormData({ ...formData, category: value })}
+                onValueChange={value =>
+                  setFormData({ ...formData, category: value })
+                }
               >
                 <SelectTrigger className="glass">
                   <SelectValue placeholder="Select category" />
@@ -171,11 +186,15 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               <Input
                 id="sizes"
                 value={formData.sizes}
-                onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, sizes: e.target.value })
+                }
                 placeholder="XS, S, M, L, XL"
                 className="glass"
               />
-              <p className="text-xs text-muted-foreground">Comma-separated values</p>
+              <p className="text-xs text-muted-foreground">
+                Comma-separated values
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -183,11 +202,15 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               <Input
                 id="colors"
                 value={formData.colors}
-                onChange={(e) => setFormData({ ...formData, colors: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, colors: e.target.value })
+                }
                 placeholder="Black, White, Blue"
                 className="glass"
               />
-              <p className="text-xs text-muted-foreground">Comma-separated values</p>
+              <p className="text-xs text-muted-foreground">
+                Comma-separated values
+              </p>
             </div>
           </div>
 
@@ -197,7 +220,9 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               id="stock"
               type="number"
               value={formData.stock}
-              onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+              onChange={e =>
+                setFormData({ ...formData, stock: e.target.value })
+              }
               placeholder="100"
               className="glass"
             />
@@ -216,8 +241,12 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               />
               <label htmlFor="images" className="cursor-pointer">
                 <Upload className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground mb-1">Click to upload product images</p>
-                <p className="text-xs text-muted-foreground">PNG, JPG, WEBP up to 10MB</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Click to upload product images
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  PNG, JPG, WEBP up to 10MB
+                </p>
               </label>
             </div>
 
@@ -244,7 +273,11 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Cancel
             </Button>
             <Button type="submit">Add Product</Button>

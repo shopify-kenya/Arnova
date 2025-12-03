@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
@@ -77,11 +76,31 @@ function AdminOrdersContent() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { variant: "outline" as const, icon: Clock, color: "text-yellow-500" },
-      processing: { variant: "default" as const, icon: Package, color: "text-blue-500" },
-      shipped: { variant: "default" as const, icon: Package, color: "text-purple-500" },
-      delivered: { variant: "default" as const, icon: CheckCircle, color: "text-green-500" },
-      cancelled: { variant: "destructive" as const, icon: XCircle, color: "text-red-500" },
+      pending: {
+        variant: "outline" as const,
+        icon: Clock,
+        color: "text-yellow-500",
+      },
+      processing: {
+        variant: "default" as const,
+        icon: Package,
+        color: "text-blue-500",
+      },
+      shipped: {
+        variant: "default" as const,
+        icon: Package,
+        color: "text-purple-500",
+      },
+      delivered: {
+        variant: "default" as const,
+        icon: CheckCircle,
+        color: "text-green-500",
+      },
+      cancelled: {
+        variant: "destructive" as const,
+        icon: XCircle,
+        color: "text-red-500",
+      },
     }
 
     const config = statusConfig[status as keyof typeof statusConfig]
@@ -100,9 +119,15 @@ function AdminOrdersContent() {
       <Navbar />
 
       <main className="container mx-auto px-4 py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="mb-8">
-            <h1 className="font-serif text-5xl font-bold text-foreground mb-2">Orders</h1>
+            <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
+              Orders
+            </h1>
             <p className="text-muted-foreground">Manage customer orders</p>
           </div>
 
@@ -111,13 +136,27 @@ function AdminOrdersContent() {
               <table className="w-full">
                 <thead className="border-b border-border">
                   <tr>
-                    <th className="text-left p-4 font-semibold text-foreground">Order ID</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Customer</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Date</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Items</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Total</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Status</th>
-                    <th className="text-right p-4 font-semibold text-foreground">Actions</th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Order ID
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Customer
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Date
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Items
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Total
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Status
+                    </th>
+                    <th className="text-right p-4 font-semibold text-foreground">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -130,22 +169,32 @@ function AdminOrdersContent() {
                       className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
                     >
                       <td className="p-4">
-                        <p className="font-medium text-foreground">{order.id}</p>
+                        <p className="font-medium text-foreground">
+                          {order.id}
+                        </p>
                       </td>
                       <td className="p-4">
                         <div>
-                          <p className="font-medium text-foreground">{order.customer}</p>
-                          <p className="text-sm text-muted-foreground">{order.email}</p>
+                          <p className="font-medium text-foreground">
+                            {order.customer}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {order.email}
+                          </p>
                         </div>
                       </td>
                       <td className="p-4">
-                        <p className="text-foreground">{new Date(order.date).toLocaleDateString()}</p>
+                        <p className="text-foreground">
+                          {new Date(order.date).toLocaleDateString()}
+                        </p>
                       </td>
                       <td className="p-4">
                         <p className="text-foreground">{order.items} items</p>
                       </td>
                       <td className="p-4">
-                        <p className="font-medium text-foreground">{formatPrice(order.total)}</p>
+                        <p className="font-medium text-foreground">
+                          {formatPrice(order.total)}
+                        </p>
                       </td>
                       <td className="p-4">{getStatusBadge(order.status)}</td>
                       <td className="p-4">
@@ -153,7 +202,9 @@ function AdminOrdersContent() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => toast.success("View order details coming soon")}
+                            onClick={() =>
+                              toast.success("View order details coming soon")
+                            }
                           >
                             View Details
                           </Button>

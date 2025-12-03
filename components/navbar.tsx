@@ -2,7 +2,15 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { ShoppingCart, Heart, User, Menu, Search, Globe, DollarSign } from "lucide-react"
+import {
+  ShoppingCart,
+  Heart,
+  User,
+  Menu,
+  Search,
+  Globe,
+  DollarSign,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -55,9 +63,9 @@ export function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <img 
-                  src="/placeholder-logo.png" 
-                  alt="Arnova Logo" 
+                <img
+                  src="/placeholder-logo.png"
+                  alt="Arnova Logo"
                   className="h-8 w-8"
                 />
                 <h1 className="font-serif text-3xl font-bold text-primary">
@@ -68,7 +76,7 @@ export function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden items-center space-x-8 lg:flex">
-              {navLinks.map((link) => (
+              {navLinks.map(link => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -99,9 +107,15 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="glass-strong">
-                  <DropdownMenuItem onClick={() => setLanguage("en-US")}>English (US)</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLanguage("en-GB")}>English (UK)</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLanguage("sw")}>Kiswahili</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage("en-US")}>
+                    English (US)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage("en-GB")}>
+                    English (UK)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage("sw")}>
+                    Kiswahili
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -112,12 +126,17 @@ export function Navbar() {
                     <DollarSign className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="glass-strong max-h-[300px] overflow-y-auto">
-                  {currencies.map((curr) => (
+                <DropdownMenuContent
+                  align="end"
+                  className="glass-strong max-h-[300px] overflow-y-auto"
+                >
+                  {currencies.map(curr => (
                     <DropdownMenuItem
                       key={curr.code}
                       onClick={() => setCurrency(curr)}
-                      className={currency.code === curr.code ? "bg-primary/10" : ""}
+                      className={
+                        currency.code === curr.code ? "bg-primary/10" : ""
+                      }
                     >
                       {curr.symbol} {curr.code} - {curr.name}
                     </DropdownMenuItem>
@@ -168,7 +187,9 @@ export function Navbar() {
                         <p className="text-sm font-medium">
                           {user?.firstName} {user?.lastName}
                         </p>
-                        <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user?.email}
+                        </p>
                       </div>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
@@ -183,7 +204,9 @@ export function Navbar() {
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={logout}>Sign Out</DropdownMenuItem>
+                      <DropdownMenuItem onClick={logout}>
+                        Sign Out
+                      </DropdownMenuItem>
                     </>
                   ) : (
                     <>
@@ -207,7 +230,7 @@ export function Navbar() {
                 </SheetTrigger>
                 <SheetContent side="right" className="glass-strong w-[300px]">
                   <div className="flex flex-col space-y-4 mt-8">
-                    {navLinks.map((link) => (
+                    {navLinks.map(link => (
                       <Link
                         key={link.href}
                         href={link.href}
@@ -232,7 +255,11 @@ export function Navbar() {
                 exit={{ opacity: 0, height: 0 }}
                 className="mt-4"
               >
-                <Input type="search" placeholder={t("common.search")} className="w-full glass" />
+                <Input
+                  type="search"
+                  placeholder={t("common.search")}
+                  className="w-full glass"
+                />
               </motion.div>
             )}
           </AnimatePresence>

@@ -1,19 +1,34 @@
 "use client"
 
-
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { UserIcon, Mail, Phone, MapPin, Calendar, Shield, LogOut, Camera, Upload } from "lucide-react"
+import {
+  UserIcon,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  LogOut,
+  Camera,
+  Upload,
+} from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
@@ -89,7 +104,7 @@ export default function ProfilePage() {
 
   if (!user) return null
 
-  const selectedCountry = countries.find((c) => c.code === user.country)
+  const selectedCountry = countries.find(c => c.code === user.country)
 
   return (
     <CurrencyProvider>
@@ -98,10 +113,18 @@ export default function ProfilePage() {
 
         <main className="container mx-auto px-4 py-20">
           <div className="max-w-4xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <div className="mb-8">
-                <h1 className="font-serif text-5xl font-bold text-foreground mb-2">My Profile</h1>
-                <p className="text-muted-foreground">Manage your account settings and preferences</p>
+                <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
+                  My Profile
+                </h1>
+                <p className="text-muted-foreground">
+                  Manage your account settings and preferences
+                </p>
               </div>
 
               <Tabs defaultValue="profile" className="space-y-6">
@@ -147,7 +170,9 @@ export default function ProfilePage() {
                           </h2>
                           <p className="text-muted-foreground flex items-center gap-2">
                             <Shield className="h-4 w-4" />
-                            {user.role === "admin" ? "Administrator" : "Customer"}
+                            {user.role === "admin"
+                              ? "Administrator"
+                              : "Customer"}
                           </p>
                           <Button
                             variant="ghost"
@@ -160,7 +185,10 @@ export default function ProfilePage() {
                           </Button>
                         </div>
                       </div>
-                      <Button variant={isEditing ? "outline" : "default"} onClick={() => setIsEditing(!isEditing)}>
+                      <Button
+                        variant={isEditing ? "outline" : "default"}
+                        onClick={() => setIsEditing(!isEditing)}
+                      >
                         {isEditing ? "Cancel" : "Edit Profile"}
                       </Button>
                     </div>
@@ -174,7 +202,12 @@ export default function ProfilePage() {
                             <Input
                               id="firstName"
                               value={formData.firstName}
-                              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                              onChange={e =>
+                                setFormData({
+                                  ...formData,
+                                  firstName: e.target.value,
+                                })
+                              }
                               className="pl-10 glass"
                               disabled={!isEditing}
                             />
@@ -188,7 +221,12 @@ export default function ProfilePage() {
                             <Input
                               id="lastName"
                               value={formData.lastName}
-                              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                              onChange={e =>
+                                setFormData({
+                                  ...formData,
+                                  lastName: e.target.value,
+                                })
+                              }
                               className="pl-10 glass"
                               disabled={!isEditing}
                             />
@@ -203,7 +241,12 @@ export default function ProfilePage() {
                           <Input
                             id="email"
                             value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            onChange={e =>
+                              setFormData({
+                                ...formData,
+                                email: e.target.value,
+                              })
+                            }
                             className="pl-10 glass"
                             disabled={!isEditing}
                           />
@@ -217,16 +260,23 @@ export default function ProfilePage() {
                           {isEditing ? (
                             <Select
                               value={formData.country}
-                              onValueChange={(value) => setFormData({ ...formData, country: value })}
+                              onValueChange={value =>
+                                setFormData({ ...formData, country: value })
+                              }
                             >
                               <SelectTrigger className="pl-10 glass">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="glass-strong max-h-[300px]">
-                                {countries.map((country) => (
-                                  <SelectItem key={country.code} value={country.code}>
+                                {countries.map(country => (
+                                  <SelectItem
+                                    key={country.code}
+                                    value={country.code}
+                                  >
                                     <span className="flex items-center gap-2">
-                                      <span className="text-lg">{country.flag}</span>
+                                      <span className="text-lg">
+                                        {country.flag}
+                                      </span>
                                       {country.name}
                                     </span>
                                   </SelectItem>
@@ -235,7 +285,11 @@ export default function ProfilePage() {
                             </Select>
                           ) : (
                             <Input
-                              value={selectedCountry ? `${selectedCountry.flag} ${selectedCountry.name}` : ""}
+                              value={
+                                selectedCountry
+                                  ? `${selectedCountry.flag} ${selectedCountry.name}`
+                                  : ""
+                              }
                               className="pl-10 glass"
                               disabled
                             />
@@ -250,7 +304,12 @@ export default function ProfilePage() {
                           <Input
                             id="phone"
                             value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            onChange={e =>
+                              setFormData({
+                                ...formData,
+                                phone: e.target.value,
+                              })
+                            }
                             className="pl-10 glass"
                             disabled={!isEditing}
                           />
@@ -262,7 +321,9 @@ export default function ProfilePage() {
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                           <Input
-                            value={new Date(user.createdAt).toLocaleDateString()}
+                            value={new Date(
+                              user.createdAt
+                            ).toLocaleDateString()}
                             className="pl-10 glass"
                             disabled
                           />
@@ -270,7 +331,11 @@ export default function ProfilePage() {
                       </div>
 
                       {isEditing && (
-                        <Button onClick={handleSave} className="w-full" size="lg">
+                        <Button
+                          onClick={handleSave}
+                          className="w-full"
+                          size="lg"
+                        >
                           Save Changes
                         </Button>
                       )}
@@ -280,17 +345,25 @@ export default function ProfilePage() {
 
                 <TabsContent value="orders">
                   <GlassCard className="p-8" strong>
-                    <h3 className="text-2xl font-bold text-foreground mb-4">Order History</h3>
-                    <p className="text-muted-foreground">You haven't placed any orders yet.</p>
+                    <h3 className="text-2xl font-bold text-foreground mb-4">
+                      Order History
+                    </h3>
+                    <p className="text-muted-foreground">
+                      You haven't placed any orders yet.
+                    </p>
                   </GlassCard>
                 </TabsContent>
 
                 <TabsContent value="security">
                   <GlassCard className="p-8" strong>
-                    <h3 className="text-2xl font-bold text-foreground mb-6">Security Settings</h3>
+                    <h3 className="text-2xl font-bold text-foreground mb-6">
+                      Security Settings
+                    </h3>
                     <div className="space-y-6">
                       <div>
-                        <h4 className="font-semibold text-foreground mb-2">Change Password</h4>
+                        <h4 className="font-semibold text-foreground mb-2">
+                          Change Password
+                        </h4>
                         <p className="text-sm text-muted-foreground mb-4">
                           Update your password to keep your account secure
                         </p>
@@ -298,8 +371,12 @@ export default function ProfilePage() {
                       </div>
 
                       <div className="pt-6 border-t border-border">
-                        <h4 className="font-semibold text-foreground mb-2">Sign Out</h4>
-                        <p className="text-sm text-muted-foreground mb-4">Sign out of your account on this device</p>
+                        <h4 className="font-semibold text-foreground mb-2">
+                          Sign Out
+                        </h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Sign out of your account on this device
+                        </p>
                         <Button variant="destructive" onClick={handleLogout}>
                           <LogOut className="mr-2 h-4 w-4" />
                           Sign Out

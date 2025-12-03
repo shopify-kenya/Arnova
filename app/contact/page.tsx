@@ -62,7 +62,11 @@ export default function ContactPage() {
                   <MapPin className="w-6 h-6 text-primary" />
                   <div>
                     <h3 className="font-semibold">Address</h3>
-                    <p className="text-muted-foreground">123 Fashion Street<br />New York, NY 10001</p>
+                    <p className="text-muted-foreground">
+                      123 Fashion Street
+                      <br />
+                      New York, NY 10001
+                    </p>
                   </div>
                 </div>
               </GlassCard>

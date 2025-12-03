@@ -13,30 +13,38 @@ export default function CareersPage() {
       title: "Senior Frontend Developer",
       department: "Engineering",
       location: "Remote",
-      type: "Full-time"
+      type: "Full-time",
     },
     {
       title: "Fashion Designer",
       department: "Design",
       location: "New York, NY",
-      type: "Full-time"
+      type: "Full-time",
     },
     {
       title: "Marketing Manager",
       department: "Marketing",
       location: "Los Angeles, CA",
-      type: "Full-time"
-    }
+      type: "Full-time",
+    },
   ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto"
+        >
           <div className="text-center mb-12">
-            <h1 className="font-serif text-4xl font-bold mb-4">Join Our Team</h1>
-            <p className="text-muted-foreground">Build the future of fashion with us</p>
+            <h1 className="font-serif text-4xl font-bold mb-4">
+              Join Our Team
+            </h1>
+            <p className="text-muted-foreground">
+              Build the future of fashion with us
+            </p>
           </div>
 
           <GlassCard className="p-8 mb-8">
@@ -45,17 +53,23 @@ export default function CareersPage() {
               <div className="text-center">
                 <Users className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-semibold mb-2">Great Team</h3>
-                <p className="text-sm text-muted-foreground">Work with passionate, talented people</p>
+                <p className="text-sm text-muted-foreground">
+                  Work with passionate, talented people
+                </p>
               </div>
               <div className="text-center">
                 <Clock className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-semibold mb-2">Work-Life Balance</h3>
-                <p className="text-sm text-muted-foreground">Flexible hours and remote options</p>
+                <p className="text-sm text-muted-foreground">
+                  Flexible hours and remote options
+                </p>
               </div>
               <div className="text-center">
                 <MapPin className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-semibold mb-2">Global Impact</h3>
-                <p className="text-sm text-muted-foreground">Shape fashion for customers worldwide</p>
+                <p className="text-sm text-muted-foreground">
+                  Shape fashion for customers worldwide
+                </p>
               </div>
             </div>
           </GlassCard>

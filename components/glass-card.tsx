@@ -1,6 +1,5 @@
 "use client"
 
-
 import type React from "react"
 
 import { motion } from "framer-motion"
@@ -13,14 +12,20 @@ interface GlassCardProps {
   strong?: boolean
 }
 
-export function GlassCard({ children, className, hover = true, strong = false }: GlassCardProps) {
+export function GlassCard({
+  children,
+  className,
+  hover = true,
+  strong = false,
+}: GlassCardProps) {
   return (
     <motion.div
       className={cn(
         "rounded-2xl acrylic-card",
         strong ? "glass-strong" : "glass",
-        hover && "transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl",
-        className,
+        hover &&
+          "transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl",
+        className
       )}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

@@ -1,6 +1,5 @@
 "use client"
 
-
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 
@@ -31,7 +30,9 @@ interface CurrencyContextType {
   formatPrice: (price: number) => string
 }
 
-const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined)
+const CurrencyContext = createContext<CurrencyContextType | undefined>(
+  undefined
+)
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>(currencies[0])
@@ -39,7 +40,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem("arnova-currency")
     if (stored) {
-      const found = currencies.find((c) => c.code === stored)
+      const found = currencies.find(c => c.code === stored)
       if (found) setCurrencyState(found)
     }
   }, [])
@@ -54,7 +55,11 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     return `${currency.symbol}${converted.toFixed(2)}`
   }
 
-  return <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>{children}</CurrencyContext.Provider>
+  return (
+    <CurrencyContext.Provider value={{ currency, setCurrency, formatPrice }}>
+      {children}
+    </CurrencyContext.Provider>
+  )
 }
 
 export function useCurrency() {

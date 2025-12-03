@@ -1,6 +1,5 @@
 "use client"
 
-
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { CartItem } from "@/lib/cart"
@@ -10,7 +9,12 @@ interface CartContextType {
   cart: CartItem[]
   addItem: (item: CartItem) => void
   removeItem: (productId: string, size: string, color: string) => void
-  updateQuantity: (productId: string, size: string, color: string, quantity: number) => void
+  updateQuantity: (
+    productId: string,
+    size: string,
+    color: string,
+    quantity: number
+  ) => void
   clearCart: () => void
   total: number
   itemCount: number
@@ -29,10 +33,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (item: CartItem) => {
     const existingIndex = cart.findIndex(
-      (i) =>
+      i =>
         i.product.id === item.product.id &&
         i.selectedSize === item.selectedSize &&
-        i.selectedColor === item.selectedColor,
+        i.selectedColor === item.selectedColor
     )
 
     let newCart: CartItem[]
@@ -49,15 +53,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeItem = (productId: string, size: string, color: string) => {
     const newCart = cart.filter(
-      (item) => !(item.product.id === productId && item.selectedSize === size && item.selectedColor === color),
+      item =>
+        !(
+          item.product.id === productId &&
+          item.selectedSize === size &&
+          item.selectedColor === color
+        )
     )
     setCart(newCart)
     saveCart(newCart)
   }
 
-  const updateQuantity = (productId: string, size: string, color: string, quantity: number) => {
-    const newCart = cart.map((item) => {
-      if (item.product.id === productId && item.selectedSize === size && item.selectedColor === color) {
+  const updateQuantity = (
+    productId: string,
+    size: string,
+    color: string,
+    quantity: number
+  ) => {
+    const newCart = cart.map(item => {
+      if (
+        item.product.id === productId &&
+        item.selectedSize === size &&
+        item.selectedColor === color
+      ) {
         return { ...item, quantity }
       }
       return item

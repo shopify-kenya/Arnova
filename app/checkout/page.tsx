@@ -1,6 +1,5 @@
 "use client"
 
-
 import type React from "react"
 
 import { useState, useEffect } from "react"
@@ -13,7 +12,13 @@ import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
 import { useCart } from "@/components/cart-provider"
@@ -53,7 +58,7 @@ function CheckoutPageContent() {
       return
     }
     if (user) {
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -69,7 +74,7 @@ function CheckoutPageContent() {
     setIsProcessing(true)
 
     // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
     setIsProcessing(false)
     setOrderComplete(true)
@@ -92,15 +97,22 @@ function CheckoutPageContent() {
           >
             <GlassCard className="p-12" strong>
               <CheckCircle className="h-24 w-24 mx-auto mb-6 text-green-500" />
-              <h1 className="font-serif text-4xl font-bold text-foreground mb-4">Order Confirmed!</h1>
+              <h1 className="font-serif text-4xl font-bold text-foreground mb-4">
+                Order Confirmed!
+              </h1>
               <p className="text-muted-foreground mb-8">
-                Thank you for your purchase. We've sent a confirmation email to {user?.email}
+                Thank you for your purchase. We've sent a confirmation email to{" "}
+                {user?.email}
               </p>
               <div className="flex gap-4 justify-center">
                 <Button size="lg" onClick={() => router.push("/orders")}>
                   View Orders
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => router.push("/")}>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => router.push("/")}
+                >
                   Continue Shopping
                 </Button>
               </div>
@@ -120,9 +132,15 @@ function CheckoutPageContent() {
     <div className="min-h-screen">
       <Navbar />
       <main className="container mx-auto px-4 py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="mb-8">
-            <h1 className="font-serif text-5xl font-bold text-foreground mb-2">Checkout</h1>
+            <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
+              Checkout
+            </h1>
             <p className="text-muted-foreground">Complete your purchase</p>
           </div>
 
@@ -134,7 +152,9 @@ function CheckoutPageContent() {
                 <GlassCard className="p-6" strong>
                   <div className="flex items-center gap-2 mb-6">
                     <MapPin className="h-6 w-6 text-primary" />
-                    <h2 className="text-2xl font-bold text-foreground">Shipping Information</h2>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      Shipping Information
+                    </h2>
                   </div>
 
                   <div className="space-y-4">
@@ -144,7 +164,12 @@ function CheckoutPageContent() {
                         <Input
                           id="firstName"
                           value={formData.firstName}
-                          onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                          onChange={e =>
+                            setFormData({
+                              ...formData,
+                              firstName: e.target.value,
+                            })
+                          }
                           required
                           className="glass"
                         />
@@ -154,7 +179,12 @@ function CheckoutPageContent() {
                         <Input
                           id="lastName"
                           value={formData.lastName}
-                          onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                          onChange={e =>
+                            setFormData({
+                              ...formData,
+                              lastName: e.target.value,
+                            })
+                          }
                           required
                           className="glass"
                         />
@@ -167,7 +197,9 @@ function CheckoutPageContent() {
                         id="email"
                         type="email"
                         value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        onChange={e =>
+                          setFormData({ ...formData, email: e.target.value })
+                        }
                         required
                         className="glass"
                       />
@@ -179,7 +211,9 @@ function CheckoutPageContent() {
                         id="phone"
                         type="tel"
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={e =>
+                          setFormData({ ...formData, phone: e.target.value })
+                        }
                         required
                         className="glass"
                       />
@@ -190,7 +224,9 @@ function CheckoutPageContent() {
                       <Input
                         id="address"
                         value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        onChange={e =>
+                          setFormData({ ...formData, address: e.target.value })
+                        }
                         required
                         className="glass"
                       />
@@ -202,7 +238,9 @@ function CheckoutPageContent() {
                         <Input
                           id="city"
                           value={formData.city}
-                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          onChange={e =>
+                            setFormData({ ...formData, city: e.target.value })
+                          }
                           required
                           className="glass"
                         />
@@ -212,7 +250,9 @@ function CheckoutPageContent() {
                         <Input
                           id="state"
                           value={formData.state}
-                          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                          onChange={e =>
+                            setFormData({ ...formData, state: e.target.value })
+                          }
                           required
                           className="glass"
                         />
@@ -225,7 +265,12 @@ function CheckoutPageContent() {
                         <Input
                           id="zipCode"
                           value={formData.zipCode}
-                          onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
+                          onChange={e =>
+                            setFormData({
+                              ...formData,
+                              zipCode: e.target.value,
+                            })
+                          }
                           required
                           className="glass"
                         />
@@ -234,14 +279,19 @@ function CheckoutPageContent() {
                         <Label htmlFor="country">Country</Label>
                         <Select
                           value={formData.country}
-                          onValueChange={(value) => setFormData({ ...formData, country: value })}
+                          onValueChange={value =>
+                            setFormData({ ...formData, country: value })
+                          }
                         >
                           <SelectTrigger className="glass">
                             <SelectValue placeholder="Select country" />
                           </SelectTrigger>
                           <SelectContent className="glass-strong max-h-[300px]">
-                            {countries.map((country) => (
-                              <SelectItem key={country.code} value={country.code}>
+                            {countries.map(country => (
+                              <SelectItem
+                                key={country.code}
+                                value={country.code}
+                              >
                                 {country.flag} {country.name}
                               </SelectItem>
                             ))}
@@ -256,7 +306,9 @@ function CheckoutPageContent() {
                 <GlassCard className="p-6" strong>
                   <div className="flex items-center gap-2 mb-6">
                     <CreditCard className="h-6 w-6 text-primary" />
-                    <h2 className="text-2xl font-bold text-foreground">Payment Information</h2>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      Payment Information
+                    </h2>
                   </div>
 
                   <div className="space-y-4">
@@ -266,7 +318,12 @@ function CheckoutPageContent() {
                         id="cardNumber"
                         placeholder="1234 5678 9012 3456"
                         value={formData.cardNumber}
-                        onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            cardNumber: e.target.value,
+                          })
+                        }
                         required
                         className="glass"
                       />
@@ -279,7 +336,12 @@ function CheckoutPageContent() {
                           id="cardExpiry"
                           placeholder="MM/YY"
                           value={formData.cardExpiry}
-                          onChange={(e) => setFormData({ ...formData, cardExpiry: e.target.value })}
+                          onChange={e =>
+                            setFormData({
+                              ...formData,
+                              cardExpiry: e.target.value,
+                            })
+                          }
                           required
                           className="glass"
                         />
@@ -290,7 +352,12 @@ function CheckoutPageContent() {
                           id="cardCvc"
                           placeholder="123"
                           value={formData.cardCvc}
-                          onChange={(e) => setFormData({ ...formData, cardCvc: e.target.value })}
+                          onChange={e =>
+                            setFormData({
+                              ...formData,
+                              cardCvc: e.target.value,
+                            })
+                          }
                           required
                           className="glass"
                         />
@@ -303,20 +370,28 @@ function CheckoutPageContent() {
               {/* Order Summary */}
               <div className="lg:col-span-1">
                 <GlassCard className="p-6 sticky top-24" strong>
-                  <h2 className="font-serif text-2xl font-bold text-foreground mb-6">Order Summary</h2>
+                  <h2 className="font-serif text-2xl font-bold text-foreground mb-6">
+                    Order Summary
+                  </h2>
 
                   <div className="space-y-3 mb-6 max-h-[300px] overflow-y-auto">
-                    {cart.map((item) => (
-                      <div key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`} className="flex gap-3">
+                    {cart.map(item => (
+                      <div
+                        key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`}
+                        className="flex gap-3"
+                      >
                         <img
                           src={item.product.images[0] || "/placeholder.svg"}
                           alt={item.product.name}
                           className="w-16 h-16 object-cover rounded"
                         />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.name}</p>
+                          <p className="text-sm font-medium text-foreground line-clamp-1">
+                            {item.product.name}
+                          </p>
                           <p className="text-xs text-muted-foreground">
-                            {item.selectedColor} • {item.selectedSize} • Qty: {item.quantity}
+                            {item.selectedColor} • {item.selectedSize} • Qty:{" "}
+                            {item.quantity}
                           </p>
                         </div>
                       </div>
@@ -344,7 +419,12 @@ function CheckoutPageContent() {
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg" disabled={isProcessing}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={isProcessing}
+                  >
                     {isProcessing ? "Processing..." : "Place Order"}
                     {!isProcessing && <ArrowRight className="ml-2 h-5 w-5" />}
                   </Button>

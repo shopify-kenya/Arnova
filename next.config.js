@@ -1,21 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  output: "export",
   trailingSlash: true,
   images: {
-    unoptimized: true
+    unoptimized: true,
   },
-  distDir: 'build',
-  assetPrefix: '',
-  basePath: '',
+  distDir: "build",
+  assetPrefix: "",
+  basePath: "",
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion']
+    optimizePackageImports: ["lucide-react", "framer-motion"],
   },
-  allowedDevOrigins: ['127.0.0.1', 'localhost'],
-  webpack: (config) => {
+  allowedDevOrigins: ["127.0.0.1", "localhost"],
+  webpack: config => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
@@ -24,7 +24,7 @@ const nextConfig = {
       crypto: false,
     }
     return config
-  }
+  },
 }
 
 module.exports = nextConfig

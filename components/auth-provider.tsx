@@ -1,10 +1,13 @@
 "use client"
 
-
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 import type { User } from "@/lib/auth"
-import { getCurrentUser, setCurrentUser as saveUser, logout as performLogout } from "@/lib/auth"
+import {
+  getCurrentUser,
+  setCurrentUser as saveUser,
+  logout as performLogout,
+} from "@/lib/auth"
 
 interface AuthContextType {
   user: User | null
@@ -34,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     performLogout()
     setUserState(null)
-    window.location.href = '/'
+    window.location.href = "/"
   }
 
   if (!mounted) {

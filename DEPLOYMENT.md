@@ -3,10 +3,13 @@
 ## 🚀 Quick Start
 
 ### Development (Automated)
+
 ```bash
 ./start.sh
 ```
+
 This script will:
+
 - Install all dependencies
 - Run migrations
 - Build the frontend
@@ -14,6 +17,7 @@ This script will:
 - Start both Django (port 8000) and Next.js (port 3000) servers
 
 ### Production (Docker)
+
 ```bash
 docker-compose up --build
 ```
@@ -41,6 +45,7 @@ docker-compose up --build
 ## 🔧 Environment Variables
 
 Create `.env` file:
+
 ```env
 DB_NAME=arnova_db
 DB_USER=arnova_user
@@ -54,6 +59,7 @@ DEBUG=true
 ## 📦 Manual Setup
 
 ### Backend Setup
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -64,6 +70,7 @@ python manage.py runserver 8000
 ```
 
 ### Frontend Setup
+
 ```bash
 npm install
 npm run build
@@ -73,17 +80,20 @@ npm run dev
 ## 🐳 Docker Deployment
 
 ### Single Container
+
 ```bash
 docker build -t arnova-shop .
 docker run -p 8000:8000 arnova-shop
 ```
 
 ### Multi-Service (Recommended)
+
 ```bash
 docker-compose up -d
 ```
 
 Services:
+
 - **Web**: Django + Next.js app
 - **Database**: PostgreSQL
 - **Nginx**: Reverse proxy & static files
@@ -98,6 +108,7 @@ Services:
 ## 📱 PWA Features
 
 The app includes a PWA manifest for mobile installation:
+
 - Offline support
 - App-like experience
 - Push notifications ready
@@ -130,6 +141,7 @@ The app includes a PWA manifest for mobile installation:
 ## 🆘 Troubleshooting
 
 ### Port Conflicts
+
 ```bash
 # Kill processes on ports
 sudo lsof -ti:3000 | xargs kill -9
@@ -137,6 +149,7 @@ sudo lsof -ti:8000 | xargs kill -9
 ```
 
 ### Database Issues
+
 ```bash
 # Reset database
 python manage.py flush
@@ -144,6 +157,7 @@ python manage.py migrate
 ```
 
 ### Build Issues
+
 ```bash
 # Clean builds
 rm -rf .next node_modules

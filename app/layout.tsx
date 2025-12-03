@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   title: "Arnova - Premium Fashion & Accessories",
   description:
     "Discover premium clothing, shoes, bags, and accessories at Arnova. Shop the latest collections with worldwide shipping.",
-  keywords: "fashion, clothing, shoes, bags, accessories, premium fashion, online shopping",
+  keywords:
+    "fashion, clothing, shoes, bags, accessories, premium fashion, online shopping",
   authors: [{ name: "Arnova" }],
   openGraph: {
     title: "Arnova - Premium Fashion & Accessories",
@@ -24,10 +25,10 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/icon-192x192.jpg", sizes: "192x192", type: "image/jpeg" },
-      { url: "/icon-512x512.jpg", sizes: "512x512", type: "image/jpeg" }
+      { url: "/icon-512x512.jpg", sizes: "512x512", type: "image/jpeg" },
     ],
     apple: "/apple-touch-icon.jpg",
-    shortcut: "/favicon.svg"
+    shortcut: "/favicon.svg",
   },
   appleWebApp: {
     capable: true,
@@ -61,15 +62,27 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Arnova" />
         <meta name="msapplication-TileImage" content="/icon-512x512.jpg" />
         <meta name="msapplication-TileColor" content="#606c38" />
-        
+
         <link rel="apple-touch-icon" href="/apple-touch-icon.jpg" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.jpg" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.jpg" />
-        
-        <link rel="apple-touch-startup-image" href="/icon-512x512.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" />
-        <link rel="apple-touch-startup-image" href="/icon-512x512.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
-        <link rel="apple-touch-startup-image" href="/icon-512x512.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
-        
+
+        <link
+          rel="apple-touch-startup-image"
+          href="/icon-512x512.jpg"
+          media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+        />
+        <link
+          rel="apple-touch-startup-image"
+          href="/icon-512x512.jpg"
+          media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+        />
+        <link
+          rel="apple-touch-startup-image"
+          href="/icon-512x512.jpg"
+          media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
+        />
+
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -85,7 +98,12 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <LanguageProvider>
             <CurrencyProvider>
               <AuthProvider>

@@ -10,7 +10,11 @@ export default function SizeGuidePage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto"
+        >
           <div className="text-center mb-12">
             <h1 className="font-serif text-4xl font-bold mb-4">Size Guide</h1>
             <p className="text-muted-foreground">Find your perfect fit</p>

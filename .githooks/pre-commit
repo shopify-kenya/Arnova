@@ -1,0 +1,28 @@
+#!/bin/bash
+# Pre-commit hook to format files and run checks
+
+echo "Running pre-commit checks..."
+
+# Format files
+echo "Formatting files..."
+npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md}" 2>/dev/null || echo "Prettier not available"
+
+# Check if there are any changes after formatting
+if ! git diff --quiet; then
+    echo "Files were formatted. Please review and commit again."
+    exit 1
+fi
+
+# Run basic checks
+echo "Running basic file checks..."
+
+# Check for trailing whitespace in staged files
+if git diff --cached --check; then
+    echo "Trailing whitespace check passed"
+else
+    echo "Please fix trailing whitespace"
+    exit 1
+fi
+
+echo "Pre-commit checks passed"
+exit 0

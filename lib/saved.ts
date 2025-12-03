@@ -16,7 +16,7 @@ export function saveSavedProducts(products: Product[]) {
 
 export function addToSaved(product: Product) {
   const saved = getSavedProducts()
-  if (!saved.find((p) => p.id === product.id)) {
+  if (!saved.find(p => p.id === product.id)) {
     saved.push(product)
     saveSavedProducts(saved)
   }
@@ -24,11 +24,11 @@ export function addToSaved(product: Product) {
 
 export function removeFromSaved(productId: string) {
   const saved = getSavedProducts()
-  const filtered = saved.filter((p) => p.id !== productId)
+  const filtered = saved.filter(p => p.id !== productId)
   saveSavedProducts(filtered)
 }
 
 export function isProductSaved(productId: string): boolean {
   const saved = getSavedProducts()
-  return saved.some((p) => p.id === productId)
+  return saved.some(p => p.id === productId)
 }

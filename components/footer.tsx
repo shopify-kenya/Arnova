@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Facebook, Instagram, Twitter, Mail } from "lucide-react"
@@ -40,9 +40,12 @@ export function Footer() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             {/* Brand */}
             <div>
-              <h2 className="font-serif text-3xl font-bold text-primary mb-4">Arnova</h2>
+              <h2 className="font-serif text-3xl font-bold text-primary mb-4">
+                Arnova
+              </h2>
               <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                Premium fashion and accessories for the modern individual. Quality craftsmanship meets timeless design.
+                Premium fashion and accessories for the modern individual.
+                Quality craftsmanship meets timeless design.
               </p>
               <div className="flex space-x-4">
                 <motion.a
@@ -86,7 +89,7 @@ export function Footer() {
             <div>
               <h3 className="font-semibold text-foreground mb-4">Shop</h3>
               <ul className="space-y-2">
-                {footerLinks.shop.map((link) => (
+                {footerLinks.shop.map(link => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
@@ -101,9 +104,11 @@ export function Footer() {
 
             {/* Customer Service */}
             <div>
-              <h3 className="font-semibold text-foreground mb-4">Customer Service</h3>
+              <h3 className="font-semibold text-foreground mb-4">
+                Customer Service
+              </h3>
               <ul className="space-y-2">
-                {footerLinks.customer.map((link) => (
+                {footerLinks.customer.map(link => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
@@ -120,7 +125,7 @@ export function Footer() {
             <div>
               <h3 className="font-semibold text-foreground mb-4">Company</h3>
               <ul className="space-y-2">
-                {footerLinks.company.map((link) => (
+                {footerLinks.company.map(link => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
@@ -135,7 +140,9 @@ export function Footer() {
           </div>
 
           <div className="mt-12 pt-8 border-t border-border text-center">
-            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Arnova. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Arnova. All rights reserved.
+            </p>
           </div>
         </div>
       </GlassCard>

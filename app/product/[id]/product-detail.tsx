@@ -3,7 +3,15 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Heart, ShoppingCart, Star, ChevronLeft, Minus, Plus, Check } from "lucide-react"
+import {
+  Heart,
+  ShoppingCart,
+  Star,
+  ChevronLeft,
+  Minus,
+  Plus,
+  Check,
+} from "lucide-react"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -20,7 +28,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
   const { addItem } = useCart()
   const { isAuthenticated } = useAuth()
 
-  const product = products.find((p) => p.id === productId)
+  const product = products.find(p => p.id === productId)
 
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedSize, setSelectedSize] = useState("")
@@ -96,7 +104,11 @@ export default function ProductDetail({ productId }: { productId: string }) {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Image Gallery */}
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <GlassCard className="overflow-hidden mb-4">
               <div className="aspect-square relative">
                 <img
@@ -105,10 +117,14 @@ export default function ProductDetail({ productId }: { productId: string }) {
                   className="w-full h-full object-cover"
                 />
                 {product.isNew && (
-                  <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">New</Badge>
+                  <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
+                    New
+                  </Badge>
                 )}
                 {product.onSale && (
-                  <Badge className="absolute top-4 right-4 bg-accent text-accent-foreground">Sale</Badge>
+                  <Badge className="absolute top-4 right-4 bg-accent text-accent-foreground">
+                    Sale
+                  </Badge>
                 )}
               </div>
             </GlassCard>
@@ -120,7 +136,9 @@ export default function ProductDetail({ productId }: { productId: string }) {
                   key={index}
                   onClick={() => setSelectedImage(index)}
                   className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === index ? "border-primary scale-95" : "border-transparent hover:border-muted"
+                    selectedImage === index
+                      ? "border-primary scale-95"
+                      : "border-transparent hover:border-muted"
                   }`}
                 >
                   <img
@@ -134,7 +152,11 @@ export default function ProductDetail({ productId }: { productId: string }) {
           </motion.div>
 
           {/* Product Info */}
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <GlassCard className="p-6">
               <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
 
@@ -143,35 +165,51 @@ export default function ProductDetail({ productId }: { productId: string }) {
                   <Star className="h-5 w-5 fill-current text-yellow-500" />
                   <span className="font-medium">{product.rating}</span>
                 </div>
-                <span className="text-muted-foreground">({product.reviews} reviews)</span>
+                <span className="text-muted-foreground">
+                  ({product.reviews} reviews)
+                </span>
               </div>
 
               <div className="flex items-center gap-3 mb-6">
                 {product.onSale && product.salePrice ? (
                   <>
-                    <span className="text-3xl font-bold text-accent">{formatPrice(product.salePrice)}</span>
-                    <span className="text-xl text-muted-foreground line-through">{formatPrice(product.price)}</span>
+                    <span className="text-3xl font-bold text-accent">
+                      {formatPrice(product.salePrice)}
+                    </span>
+                    <span className="text-xl text-muted-foreground line-through">
+                      {formatPrice(product.price)}
+                    </span>
                     <Badge className="bg-accent text-accent-foreground">
-                      {Math.round(((product.price - product.salePrice) / product.price) * 100)}% OFF
+                      {Math.round(
+                        ((product.price - product.salePrice) / product.price) *
+                          100
+                      )}
+                      % OFF
                     </Badge>
                   </>
                 ) : (
-                  <span className="text-3xl font-bold">{formatPrice(product.price)}</span>
+                  <span className="text-3xl font-bold">
+                    {formatPrice(product.price)}
+                  </span>
                 )}
               </div>
 
-              <p className="text-muted-foreground mb-6">{product.description}</p>
+              <p className="text-muted-foreground mb-6">
+                {product.description}
+              </p>
 
               {/* Size Selection */}
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">Size</label>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((size) => (
+                  {product.sizes.map(size => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
                       className={`px-4 py-2 rounded-lg border-2 transition-all ${
-                        selectedSize === size ? "border-primary bg-primary/10" : "border-muted hover:border-primary/50"
+                        selectedSize === size
+                          ? "border-primary bg-primary/10"
+                          : "border-muted hover:border-primary/50"
                       }`}
                     >
                       {size}
@@ -184,7 +222,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-2">Color</label>
                 <div className="flex flex-wrap gap-2">
-                  {product.colors.map((color) => (
+                  {product.colors.map(color => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
@@ -203,7 +241,9 @@ export default function ProductDetail({ productId }: { productId: string }) {
 
               {/* Quantity */}
               <div className="mb-6">
-                <label className="block text-sm font-medium mb-2">Quantity</label>
+                <label className="block text-sm font-medium mb-2">
+                  Quantity
+                </label>
                 <div className="flex items-center gap-3">
                   <Button
                     variant="outline"
@@ -213,7 +253,9 @@ export default function ProductDetail({ productId }: { productId: string }) {
                   >
                     <Minus className="h-4 w-4" />
                   </Button>
-                  <span className="text-xl font-medium w-12 text-center">{quantity}</span>
+                  <span className="text-xl font-medium w-12 text-center">
+                    {quantity}
+                  </span>
                   <Button
                     variant="outline"
                     size="icon"
@@ -234,12 +276,19 @@ export default function ProductDetail({ productId }: { productId: string }) {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <Button className="flex-1" size="lg" onClick={handleAddToCart} disabled={!product.inStock}>
+                <Button
+                  className="flex-1"
+                  size="lg"
+                  onClick={handleAddToCart}
+                  disabled={!product.inStock}
+                >
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Add to Cart
                 </Button>
                 <Button variant="outline" size="lg" onClick={handleSave}>
-                  <Heart className={`h-5 w-5 ${isSaved ? "fill-current text-red-500" : ""}`} />
+                  <Heart
+                    className={`h-5 w-5 ${isSaved ? "fill-current text-red-500" : ""}`}
+                  />
                 </Button>
               </div>
             </GlassCard>

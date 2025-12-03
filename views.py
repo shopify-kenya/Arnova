@@ -1,22 +1,25 @@
-from django.http import HttpResponse
+import os
+
 from django.conf import settings
+from django.http import HttpResponse
 from django.views.decorators.cache import cache_control
 from django.views.decorators.gzip import gzip_page
-import os
+
 
 @gzip_page
 @cache_control(max_age=3600, public=True)
 def index(request):
     # Serve the Next.js exported index.html for all routes
-    nextjs_index = os.path.join(settings.BASE_DIR, 'build', 'index.html')
+    nextjs_index = os.path.join(settings.BASE_DIR, "build", "index.html")
     if os.path.exists(nextjs_index):
-        with open(nextjs_index, 'r', encoding='utf-8') as f:
-            response = HttpResponse(f.read(), content_type='text/html')
-            response['Cache-Control'] = 'public, max-age=3600'
+        with open(nextjs_index, "r", encoding="utf-8") as f:
+            response = HttpResponse(f.read(), content_type="text/html")
+            response["Cache-Control"] = "public, max-age=3600"
             return response
-    
+
     # Fallback if no Next.js build exists
-    return HttpResponse('''
+    return HttpResponse(
+        """
     <!DOCTYPE html>
     <html>
     <head>
@@ -31,4 +34,6 @@ def index(request):
         </div>
     </body>
     </html>
-    ''', content_type='text/html')
+    """,
+        content_type="text/html",
+    )

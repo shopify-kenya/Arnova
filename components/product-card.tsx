@@ -1,6 +1,5 @@
 "use client"
 
-
 import type React from "react"
 
 import { useState, useEffect } from "react"
@@ -97,39 +96,68 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
             <div className="absolute top-3 left-3 flex flex-col gap-2">
-              {product.isNew && <Badge className="bg-primary text-primary-foreground">New</Badge>}
-              {product.onSale && <Badge className="bg-accent text-accent-foreground">Sale</Badge>}
+              {product.isNew && (
+                <Badge className="bg-primary text-primary-foreground">
+                  New
+                </Badge>
+              )}
+              {product.onSale && (
+                <Badge className="bg-accent text-accent-foreground">Sale</Badge>
+              )}
             </div>
             <div className="absolute top-3 right-3 flex flex-col gap-2">
-              <Button size="icon" variant="secondary" className="rounded-full glass-strong" onClick={handleSave}>
-                <Heart className={`h-4 w-4 ${isSaved ? "fill-current text-red-500" : ""}`} />
+              <Button
+                size="icon"
+                variant="secondary"
+                className="rounded-full glass-strong"
+                onClick={handleSave}
+              >
+                <Heart
+                  className={`h-4 w-4 ${isSaved ? "fill-current text-red-500" : ""}`}
+                />
               </Button>
             </div>
             <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button size="icon" className="rounded-full" onClick={handleAddToCart}>
+              <Button
+                size="icon"
+                className="rounded-full"
+                onClick={handleAddToCart}
+              >
                 <ShoppingCart className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
           <div className="p-4">
-            <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
-            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{product.description}</p>
+            <h3 className="font-semibold text-foreground mb-1 line-clamp-1">
+              {product.name}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+              {product.description}
+            </p>
 
             <div className="flex items-center gap-1 mb-2">
               <Star className="h-4 w-4 fill-current text-yellow-500" />
               <span className="text-sm font-medium">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">({product.reviews})</span>
+              <span className="text-sm text-muted-foreground">
+                ({product.reviews})
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
               {product.onSale && product.salePrice ? (
                 <>
-                  <span className="text-lg font-bold text-accent">{formatPrice(product.salePrice)}</span>
-                  <span className="text-sm text-muted-foreground line-through">{formatPrice(product.price)}</span>
+                  <span className="text-lg font-bold text-accent">
+                    {formatPrice(product.salePrice)}
+                  </span>
+                  <span className="text-sm text-muted-foreground line-through">
+                    {formatPrice(product.price)}
+                  </span>
                 </>
               ) : (
-                <span className="text-lg font-bold text-foreground">{formatPrice(product.price)}</span>
+                <span className="text-lg font-bold text-foreground">
+                  {formatPrice(product.price)}
+                </span>
               )}
             </div>
           </div>

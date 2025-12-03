@@ -11,9 +11,15 @@ export default function ReturnsPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <Navbar />
       <main className="container mx-auto px-4 py-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto"
+        >
           <div className="text-center mb-12">
-            <h1 className="font-serif text-4xl font-bold mb-4">Returns & Exchanges</h1>
+            <h1 className="font-serif text-4xl font-bold mb-4">
+              Returns & Exchanges
+            </h1>
             <p className="text-muted-foreground">Easy returns within 30 days</p>
           </div>
 
@@ -38,8 +44,12 @@ export default function ReturnsPage() {
           <GlassCard className="p-8">
             <h2 className="font-semibold text-2xl mb-6">Return Policy</h2>
             <div className="prose prose-neutral dark:prose-invert max-w-none">
-              <p>We want you to be completely satisfied with your purchase. If you're not happy with your order, you can return it within 30 days of delivery.</p>
-              
+              <p>
+                We want you to be completely satisfied with your purchase. If
+                you're not happy with your order, you can return it within 30
+                days of delivery.
+              </p>
+
               <h3>Return Conditions</h3>
               <ul>
                 <li>Items must be in original condition with tags attached</li>
@@ -57,7 +67,11 @@ export default function ReturnsPage() {
               </ol>
 
               <h3>Refund Processing</h3>
-              <p>Refunds are processed within 5-7 business days after we receive your return. The refund will be credited to your original payment method.</p>
+              <p>
+                Refunds are processed within 5-7 business days after we receive
+                your return. The refund will be credited to your original
+                payment method.
+              </p>
             </div>
           </GlassCard>
         </motion.div>

@@ -84,110 +84,139 @@ export default function LoginPage() {
         </Link>
 
         <main className="w-full max-w-md px-4">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <GlassCard className="p-8" strong>
-                <div className="text-center mb-8">
-                  <h1 className="font-serif text-4xl font-bold text-foreground mb-2">Welcome Back</h1>
-                  <p className="text-muted-foreground">Sign in to your Arnova account</p>
-                </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <GlassCard className="p-8" strong>
+              <div className="text-center mb-8">
+                <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
+                  Welcome Back
+                </h1>
+                <p className="text-muted-foreground">
+                  Sign in to your Arnova account
+                </p>
+              </div>
 
-                {errors.general && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="bg-destructive/10 text-destructive mb-4 rounded-md p-3 text-sm"
-                  >
-                    {errors.general}
+              {errors.general && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="bg-destructive/10 text-destructive mb-4 rounded-md p-3 text-sm"
+                >
+                  {errors.general}
+                </motion.div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email">
+                    Email <span className="text-destructive">*</span>
+                  </Label>
+                  <motion.div whileFocus="focus" variants={inputVariants}>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        className="pl-10 glass focus:border-primary/50 focus:ring-primary/20"
+                        disabled={isLoading}
+                        required
+                      />
+                    </div>
+                    <InputError message={errors.email} />
                   </motion.div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">
-                      Email <span className="text-destructive">*</span>
-                    </Label>
-                    <motion.div whileFocus="focus" variants={inputVariants}>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="you@example.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="pl-10 glass focus:border-primary/50 focus:ring-primary/20"
-                          disabled={isLoading}
-                          required
-                        />
-                      </div>
-                      <InputError message={errors.email} />
-                    </motion.div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password">
-                      Password <span className="text-destructive">*</span>
-                    </Label>
-                    <motion.div whileFocus="focus" variants={inputVariants}>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
-                        <Input
-                          id="password"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="pl-10 pr-10 glass focus:border-primary/50 focus:ring-primary/20"
-                          disabled={isLoading}
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
-                        >
-                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                        </button>
-                      </div>
-                      <InputError message={errors.password} />
-                    </motion.div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm">
-                    <Link href="/forgot-password" className="text-primary hover:underline">
-                      Forgot password?
-                    </Link>
-                  </div>
-
-                  <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                        Signing in...
-                      </>
-                    ) : (
-                      <>
-                        Sign In
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </>
-                    )}
-                  </Button>
-                </form>
-
-                <div className="mt-6 text-center text-sm">
-                  <p className="text-muted-foreground">
-                    Don't have an account?{" "}
-                    <Link href="/register" className="text-primary font-medium hover:underline">
-                      Sign up
-                    </Link>
-                  </p>
                 </div>
 
-                <div className="mt-8 p-4 glass rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-2 font-semibold">Demo Accounts:</p>
-                  <p className="text-xs text-muted-foreground">Admin: admin@arnova.com / password123</p>
-                  <p className="text-xs text-muted-foreground">Buyer: buyer@example.com / password123</p>
+                <div className="space-y-2">
+                  <Label htmlFor="password">
+                    Password <span className="text-destructive">*</span>
+                  </Label>
+                  <motion.div whileFocus="focus" variants={inputVariants}>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        className="pl-10 pr-10 glass focus:border-primary/50 focus:ring-primary/20"
+                        disabled={isLoading}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    <InputError message={errors.password} />
+                  </motion.div>
                 </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <Link
+                    href="/forgot-password"
+                    className="text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center text-sm">
+                <p className="text-muted-foreground">
+                  Don't have an account?{" "}
+                  <Link
+                    href="/register"
+                    className="text-primary font-medium hover:underline"
+                  >
+                    Sign up
+                  </Link>
+                </p>
+              </div>
+
+              <div className="mt-8 p-4 glass rounded-lg">
+                <p className="text-xs text-muted-foreground mb-2 font-semibold">
+                  Demo Accounts:
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Admin: admin@arnova.com / password123
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Buyer: buyer@example.com / password123
+                </p>
+              </div>
             </GlassCard>
           </motion.div>
         </main>

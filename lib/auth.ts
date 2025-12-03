@@ -53,7 +53,7 @@ export function setCurrentUser(user: User | null) {
 
 export function login(email: string, password: string): User | null {
   // Mock login - Replace with actual API call
-  const user = mockUsers.find((u) => u.email === email)
+  const user = mockUsers.find(u => u.email === email)
   if (user && password === "password123") {
     setCurrentUser(user)
     return user

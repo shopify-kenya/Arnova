@@ -1,13 +1,18 @@
 "use client"
 
-
 import { useState } from "react"
 import { SlidersHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import { GlassCard } from "@/components/glass-card"
 
 interface ProductFiltersProps {
@@ -23,8 +28,30 @@ export interface FilterState {
   isNew: boolean
 }
 
-const sizes = ["XS", "S", "M", "L", "XL", "XXL", "7", "8", "9", "10", "11", "12"]
-const colors = ["Black", "White", "Navy", "Gray", "Brown", "Tan", "Cream", "Camel"]
+const sizes = [
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+]
+const colors = [
+  "Black",
+  "White",
+  "Navy",
+  "Gray",
+  "Brown",
+  "Tan",
+  "Cream",
+  "Camel",
+]
 
 export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
   const [filters, setFilters] = useState<FilterState>({
@@ -71,7 +98,9 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
         <Label className="mb-3 block">Price Range</Label>
         <Slider
           value={filters.priceRange}
-          onValueChange={(value) => updateFilters({ priceRange: value as [number, number] })}
+          onValueChange={value =>
+            updateFilters({ priceRange: value as [number, number] })
+          }
           max={500}
           step={10}
           className="mb-2"
@@ -90,7 +119,9 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
             <Checkbox
               id="inStock"
               checked={filters.inStock}
-              onCheckedChange={(checked) => updateFilters({ inStock: checked as boolean })}
+              onCheckedChange={checked =>
+                updateFilters({ inStock: checked as boolean })
+              }
             />
             <Label htmlFor="inStock" className="cursor-pointer">
               In Stock Only
@@ -100,7 +131,9 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
             <Checkbox
               id="onSale"
               checked={filters.onSale}
-              onCheckedChange={(checked) => updateFilters({ onSale: checked as boolean })}
+              onCheckedChange={checked =>
+                updateFilters({ onSale: checked as boolean })
+              }
             />
             <Label htmlFor="onSale" className="cursor-pointer">
               On Sale
@@ -110,7 +143,9 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
             <Checkbox
               id="isNew"
               checked={filters.isNew}
-              onCheckedChange={(checked) => updateFilters({ isNew: checked as boolean })}
+              onCheckedChange={checked =>
+                updateFilters({ isNew: checked as boolean })
+              }
             />
             <Label htmlFor="isNew" className="cursor-pointer">
               New Arrivals
@@ -123,14 +158,14 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
       <div>
         <Label className="mb-3 block">Sizes</Label>
         <div className="grid grid-cols-4 gap-2">
-          {sizes.map((size) => (
+          {sizes.map(size => (
             <Button
               key={size}
               variant={filters.sizes.includes(size) ? "default" : "outline"}
               size="sm"
               onClick={() => {
                 const newSizes = filters.sizes.includes(size)
-                  ? filters.sizes.filter((s) => s !== size)
+                  ? filters.sizes.filter(s => s !== size)
                   : [...filters.sizes, size]
                 updateFilters({ sizes: newSizes })
               }}
@@ -145,13 +180,15 @@ export function ProductFilters({ onFilterChange }: ProductFiltersProps) {
       <div>
         <Label className="mb-3 block">Colors</Label>
         <div className="grid grid-cols-2 gap-2">
-          {colors.map((color) => (
+          {colors.map(color => (
             <div key={color} className="flex items-center space-x-2">
               <Checkbox
                 id={color}
                 checked={filters.colors.includes(color)}
-                onCheckedChange={(checked) => {
-                  const newColors = checked ? [...filters.colors, color] : filters.colors.filter((c) => c !== color)
+                onCheckedChange={checked => {
+                  const newColors = checked
+                    ? [...filters.colors, color]
+                    : filters.colors.filter(c => c !== color)
                   updateFilters({ colors: newColors })
                 }}
               />

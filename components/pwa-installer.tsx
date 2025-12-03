@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Download, X } from "lucide-react"
@@ -13,7 +12,8 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function PWAInstaller() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
 
   useEffect(() => {

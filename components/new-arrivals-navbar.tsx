@@ -3,7 +3,15 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ShoppingCart, Heart, User, Menu, Search, ArrowLeft, Filter } from "lucide-react"
+import {
+  ShoppingCart,
+  Heart,
+  User,
+  Menu,
+  Search,
+  ArrowLeft,
+  Filter,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -35,8 +43,12 @@ export function NewArrivalsNavbar() {
                 </Button>
               </Link>
               <div>
-                <h1 className="font-serif text-2xl font-bold text-primary">New Arrivals</h1>
-                <p className="text-sm text-muted-foreground">Latest fashion trends</p>
+                <h1 className="font-serif text-2xl font-bold text-primary">
+                  New Arrivals
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Latest fashion trends
+                </p>
               </div>
             </div>
 
@@ -44,8 +56,8 @@ export function NewArrivalsNavbar() {
             <div className="hidden md:flex flex-1 max-w-md mx-8">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search new arrivals..." 
+                <Input
+                  placeholder="Search new arrivals..."
                   className="pl-10 glass"
                 />
               </div>
@@ -113,8 +125,8 @@ export function NewArrivalsNavbar() {
             >
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search new arrivals..." 
+                <Input
+                  placeholder="Search new arrivals..."
                   className="pl-10 glass"
                 />
               </div>

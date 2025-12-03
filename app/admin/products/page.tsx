@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
@@ -32,9 +31,9 @@ function AdminProductsContent() {
   if (!isAdmin) return null
 
   const filteredProducts = mockProducts.filter(
-    (product) =>
+    product =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase()),
+      product.category.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
@@ -42,11 +41,19 @@ function AdminProductsContent() {
       <Navbar />
 
       <main className="container mx-auto px-4 py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="font-serif text-5xl font-bold text-foreground mb-2">Products</h1>
-              <p className="text-muted-foreground">Manage your product catalog</p>
+              <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
+                Products
+              </h1>
+              <p className="text-muted-foreground">
+                Manage your product catalog
+              </p>
             </div>
             <AddProductDialog />
           </div>
@@ -58,7 +65,7 @@ function AdminProductsContent() {
                 type="search"
                 placeholder="Search products..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="pl-10 glass"
               />
             </div>
@@ -69,12 +76,24 @@ function AdminProductsContent() {
               <table className="w-full">
                 <thead className="border-b border-border">
                   <tr>
-                    <th className="text-left p-4 font-semibold text-foreground">Product</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Category</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Price</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Stock</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Status</th>
-                    <th className="text-right p-4 font-semibold text-foreground">Actions</th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Product
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Category
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Price
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Stock
+                    </th>
+                    <th className="text-left p-4 font-semibold text-foreground">
+                      Status
+                    </th>
+                    <th className="text-right p-4 font-semibold text-foreground">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -94,8 +113,12 @@ function AdminProductsContent() {
                             className="w-12 h-12 object-cover rounded"
                           />
                           <div>
-                            <p className="font-medium text-foreground">{product.name}</p>
-                            <p className="text-sm text-muted-foreground">ID: {product.id}</p>
+                            <p className="font-medium text-foreground">
+                              {product.name}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              ID: {product.id}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -104,21 +127,31 @@ function AdminProductsContent() {
                       </td>
                       <td className="p-4">
                         <div>
-                          <p className="font-medium text-foreground">{formatPrice(product.price)}</p>
+                          <p className="font-medium text-foreground">
+                            {formatPrice(product.price)}
+                          </p>
                           {product.onSale && product.salePrice && (
-                            <p className="text-sm text-accent">{formatPrice(product.salePrice)}</p>
+                            <p className="text-sm text-accent">
+                              {formatPrice(product.salePrice)}
+                            </p>
                           )}
                         </div>
                       </td>
                       <td className="p-4">
-                        <Badge variant={product.inStock ? "default" : "destructive"}>
+                        <Badge
+                          variant={product.inStock ? "default" : "destructive"}
+                        >
                           {product.inStock ? "In Stock" : "Out of Stock"}
                         </Badge>
                       </td>
                       <td className="p-4">
                         <div className="flex gap-2">
-                          {product.isNew && <Badge className="bg-primary">New</Badge>}
-                          {product.onSale && <Badge className="bg-accent">Sale</Badge>}
+                          {product.isNew && (
+                            <Badge className="bg-primary">New</Badge>
+                          )}
+                          {product.onSale && (
+                            <Badge className="bg-accent">Sale</Badge>
+                          )}
                         </div>
                       </td>
                       <td className="p-4">
@@ -126,7 +159,9 @@ function AdminProductsContent() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            onClick={() => toast.success("Edit functionality coming soon")}
+                            onClick={() =>
+                              toast.success("Edit functionality coming soon")
+                            }
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -134,7 +169,9 @@ function AdminProductsContent() {
                             size="icon"
                             variant="ghost"
                             className="text-destructive"
-                            onClick={() => toast.success("Delete functionality coming soon")}
+                            onClick={() =>
+                              toast.success("Delete functionality coming soon")
+                            }
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

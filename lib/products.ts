@@ -21,7 +21,8 @@ export const mockProducts: Product[] = [
   {
     id: "cl-001",
     name: "Premium Cotton T-Shirt",
-    description: "Soft, breathable cotton t-shirt with a modern fit. Perfect for everyday wear.",
+    description:
+      "Soft, breathable cotton t-shirt with a modern fit. Perfect for everyday wear.",
     price: 45.0,
     category: "clothing",
     subcategory: "t-shirts",
@@ -37,7 +38,8 @@ export const mockProducts: Product[] = [
   {
     id: "cl-002",
     name: "Tailored Blazer",
-    description: "Elegant blazer with a tailored fit. Perfect for professional settings.",
+    description:
+      "Elegant blazer with a tailored fit. Perfect for professional settings.",
     price: 189.0,
     category: "clothing",
     subcategory: "jackets",
@@ -53,7 +55,8 @@ export const mockProducts: Product[] = [
   {
     id: "cl-003",
     name: "Slim Fit Jeans",
-    description: "Classic slim fit jeans with stretch comfort. A wardrobe essential.",
+    description:
+      "Classic slim fit jeans with stretch comfort. A wardrobe essential.",
     price: 79.0,
     salePrice: 59.0,
     category: "clothing",
@@ -70,7 +73,8 @@ export const mockProducts: Product[] = [
   {
     id: "cl-004",
     name: "Cashmere Sweater",
-    description: "Luxurious cashmere sweater with a relaxed fit. Ultimate comfort and style.",
+    description:
+      "Luxurious cashmere sweater with a relaxed fit. Ultimate comfort and style.",
     price: 159.0,
     category: "clothing",
     subcategory: "sweaters",
@@ -88,7 +92,8 @@ export const mockProducts: Product[] = [
   {
     id: "sh-001",
     name: "Leather Sneakers",
-    description: "Premium leather sneakers with cushioned sole. Style meets comfort.",
+    description:
+      "Premium leather sneakers with cushioned sole. Style meets comfort.",
     price: 129.0,
     category: "shoes",
     subcategory: "sneakers",
@@ -104,7 +109,8 @@ export const mockProducts: Product[] = [
   {
     id: "sh-002",
     name: "Oxford Dress Shoes",
-    description: "Classic oxford shoes in genuine leather. Perfect for formal occasions.",
+    description:
+      "Classic oxford shoes in genuine leather. Perfect for formal occasions.",
     price: 179.0,
     salePrice: 139.0,
     category: "shoes",
@@ -121,7 +127,8 @@ export const mockProducts: Product[] = [
   {
     id: "sh-003",
     name: "Running Shoes",
-    description: "High-performance running shoes with advanced cushioning technology.",
+    description:
+      "High-performance running shoes with advanced cushioning technology.",
     price: 149.0,
     category: "shoes",
     subcategory: "athletic",
@@ -139,7 +146,8 @@ export const mockProducts: Product[] = [
   {
     id: "bg-001",
     name: "Leather Tote Bag",
-    description: "Spacious leather tote bag with multiple compartments. Perfect for work or travel.",
+    description:
+      "Spacious leather tote bag with multiple compartments. Perfect for work or travel.",
     price: 199.0,
     category: "bags",
     subcategory: "totes",
@@ -155,7 +163,8 @@ export const mockProducts: Product[] = [
   {
     id: "bg-002",
     name: "Canvas Backpack",
-    description: "Durable canvas backpack with laptop compartment. Style and functionality combined.",
+    description:
+      "Durable canvas backpack with laptop compartment. Style and functionality combined.",
     price: 89.0,
     salePrice: 69.0,
     category: "bags",
@@ -172,7 +181,8 @@ export const mockProducts: Product[] = [
   {
     id: "bg-003",
     name: "Crossbody Bag",
-    description: "Compact crossbody bag in premium leather. Perfect for everyday essentials.",
+    description:
+      "Compact crossbody bag in premium leather. Perfect for everyday essentials.",
     price: 119.0,
     category: "bags",
     subcategory: "crossbody",
@@ -190,7 +200,8 @@ export const mockProducts: Product[] = [
   {
     id: "ac-001",
     name: "Leather Belt",
-    description: "Classic leather belt with brushed metal buckle. A timeless accessory.",
+    description:
+      "Classic leather belt with brushed metal buckle. A timeless accessory.",
     price: 59.0,
     category: "accessories",
     subcategory: "belts",
@@ -206,7 +217,8 @@ export const mockProducts: Product[] = [
   {
     id: "ac-002",
     name: "Wool Scarf",
-    description: "Soft wool scarf with elegant pattern. Perfect for cold weather.",
+    description:
+      "Soft wool scarf with elegant pattern. Perfect for cold weather.",
     price: 69.0,
     salePrice: 49.0,
     category: "accessories",
@@ -223,7 +235,8 @@ export const mockProducts: Product[] = [
   {
     id: "ac-003",
     name: "Leather Wallet",
-    description: "Slim leather wallet with RFID protection. Secure and stylish.",
+    description:
+      "Slim leather wallet with RFID protection. Secure and stylish.",
     price: 79.0,
     category: "accessories",
     subcategory: "wallets",
@@ -239,7 +252,8 @@ export const mockProducts: Product[] = [
   {
     id: "ac-004",
     name: "Sunglasses",
-    description: "Premium sunglasses with UV protection. Classic design meets modern technology.",
+    description:
+      "Premium sunglasses with UV protection. Classic design meets modern technology.",
     price: 149.0,
     category: "accessories",
     subcategory: "eyewear",
@@ -255,28 +269,28 @@ export const mockProducts: Product[] = [
 ]
 
 export function getProductsByCategory(category: string): Product[] {
-  return mockProducts.filter((p) => p.category === category)
+  return mockProducts.filter(p => p.category === category)
 }
 
 export function getNewArrivals(): Product[] {
-  return mockProducts.filter((p) => p.isNew)
+  return mockProducts.filter(p => p.isNew)
 }
 
 export function getSaleProducts(): Product[] {
-  return mockProducts.filter((p) => p.onSale)
+  return mockProducts.filter(p => p.onSale)
 }
 
 export function getProductById(id: string): Product | undefined {
-  return mockProducts.find((p) => p.id === id)
+  return mockProducts.find(p => p.id === id)
 }
 
 export function searchProducts(query: string): Product[] {
   const lowerQuery = query.toLowerCase()
   return mockProducts.filter(
-    (p) =>
+    p =>
       p.name.toLowerCase().includes(lowerQuery) ||
       p.description.toLowerCase().includes(lowerQuery) ||
-      p.category.toLowerCase().includes(lowerQuery),
+      p.category.toLowerCase().includes(lowerQuery)
   )
 }
 

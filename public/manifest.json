@@ -58,14 +58,18 @@
       "short_name": "New",
       "description": "Browse new arrivals",
       "url": "/new-arrivals",
-      "icons": [{ "src": "/icon-192x192.jpg", "sizes": "192x192", "type": "image/jpeg" }]
+      "icons": [
+        { "src": "/icon-192x192.jpg", "sizes": "192x192", "type": "image/jpeg" }
+      ]
     },
     {
       "name": "Sale Items",
       "short_name": "Sale",
       "description": "Browse sale items",
       "url": "/sale",
-      "icons": [{ "src": "/icon-192x192.jpg", "sizes": "192x192", "type": "image/jpeg" }]
+      "icons": [
+        { "src": "/icon-192x192.jpg", "sizes": "192x192", "type": "image/jpeg" }
+      ]
     }
   ]
 }

@@ -24,10 +24,10 @@ export function saveCart(cart: CartItem[]) {
 export function addToCart(item: CartItem) {
   const cart = getCart()
   const existingIndex = cart.findIndex(
-    (i) =>
+    i =>
       i.product.id === item.product.id &&
       i.selectedSize === item.selectedSize &&
-      i.selectedColor === item.selectedColor,
+      i.selectedColor === item.selectedColor
   )
 
   if (existingIndex >= 0) {
@@ -42,14 +42,29 @@ export function addToCart(item: CartItem) {
 export function removeFromCart(productId: string, size: string, color: string) {
   const cart = getCart()
   const filtered = cart.filter(
-    (item) => !(item.product.id === productId && item.selectedSize === size && item.selectedColor === color),
+    item =>
+      !(
+        item.product.id === productId &&
+        item.selectedSize === size &&
+        item.selectedColor === color
+      )
   )
   saveCart(filtered)
 }
 
-export function updateCartItemQuantity(productId: string, size: string, color: string, quantity: number) {
+export function updateCartItemQuantity(
+  productId: string,
+  size: string,
+  color: string,
+  quantity: number
+) {
   const cart = getCart()
-  const item = cart.find((i) => i.product.id === productId && i.selectedSize === size && i.selectedColor === color)
+  const item = cart.find(
+    i =>
+      i.product.id === productId &&
+      i.selectedSize === size &&
+      i.selectedColor === color
+  )
   if (item) {
     item.quantity = quantity
     saveCart(cart)
@@ -63,7 +78,10 @@ export function clearCart() {
 
 export function getCartTotal(cart: CartItem[]): number {
   return cart.reduce((total, item) => {
-    const price = item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price
+    const price =
+      item.product.onSale && item.product.salePrice
+        ? item.product.salePrice
+        : item.product.price
     return total + price * item.quantity
   }, 0)
 }

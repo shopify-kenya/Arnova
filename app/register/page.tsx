@@ -5,21 +5,46 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Mail, Lock, UserIcon, Phone, MapPin, ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react"
+import {
+  Mail,
+  Lock,
+  UserIcon,
+  Phone,
+  MapPin,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  LoaderCircle,
+} from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import InputError from "@/components/ui/input-error"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
 import { register } from "@/lib/auth"
 import { countries } from "@/lib/countries"
-import { validateEmail, validatePhone, validatePassword, getPasswordValidationMessage, getPasswordConfirmationMessage } from "@/lib/validation"
-import { getCurrencyByCountry, getCountryFromPhone } from "@/lib/currency-detection"
+import {
+  validateEmail,
+  validatePhone,
+  validatePassword,
+  getPasswordValidationMessage,
+  getPasswordConfirmationMessage,
+} from "@/lib/validation"
+import {
+  getCurrencyByCountry,
+  getCountryFromPhone,
+} from "@/lib/currency-detection"
 import { useCurrency, currencies } from "@/components/currency-provider"
 import { toast } from "sonner"
 
@@ -48,7 +73,7 @@ export default function RegisterPage() {
     country: "",
     password: "",
     confirmPassword: "",
-    general: ""
+    general: "",
   })
   const [passwordError, setPasswordError] = useState("")
   const [confirmPasswordError, setConfirmPasswordError] = useState("")
@@ -56,7 +81,7 @@ export default function RegisterPage() {
   // Progress bar calculation
   useEffect(() => {
     const fields = Object.values(formData)
-    const filled = fields.filter((value) => value.trim() !== "").length
+    const filled = fields.filter(value => value.trim() !== "").length
     const calculateProgress = Math.round((filled / 7) * 100)
     setProgress(calculateProgress)
   }, [formData])
@@ -70,10 +95,11 @@ export default function RegisterPage() {
       country: "",
       password: "",
       confirmPassword: "",
-      general: ""
+      general: "",
     }
 
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required"
+    if (!formData.firstName.trim())
+      newErrors.firstName = "First name is required"
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required"
     if (!formData.email.trim()) {
       newErrors.email = "Email is required"
@@ -86,14 +112,14 @@ export default function RegisterPage() {
       newErrors.phone = "Please enter a valid phone number"
     }
     if (!formData.country) newErrors.country = "Please select your country"
-    
+
     const passwordValidation = validatePassword(formData.password)
     if (!formData.password) {
       newErrors.password = "Password is required"
     } else if (!passwordValidation.isValid) {
       newErrors.password = getPasswordValidationMessage(formData.password)
     }
-    
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "Please confirm your password"
     } else if (formData.password !== formData.confirmPassword) {
@@ -114,7 +140,10 @@ export default function RegisterPage() {
     }
 
     if (formData.confirmPassword) {
-      const confirmMessage = getPasswordConfirmationMessage(password, formData.confirmPassword)
+      const confirmMessage = getPasswordConfirmationMessage(
+        password,
+        formData.confirmPassword
+      )
       setConfirmPasswordError(confirmMessage)
     }
   }
@@ -122,7 +151,10 @@ export default function RegisterPage() {
   const handlePasswordConfirmationChange = (confirmation: string) => {
     setFormData({ ...formData, confirmPassword: confirmation })
     if (confirmation) {
-      const message = getPasswordConfirmationMessage(formData.password, confirmation)
+      const message = getPasswordConfirmationMessage(
+        formData.password,
+        confirmation
+      )
       setConfirmPasswordError(message)
     } else {
       setConfirmPasswordError("")
@@ -138,7 +170,7 @@ export default function RegisterPage() {
 
   const handlePhoneChange = (phone: string) => {
     setFormData({ ...formData, phone })
-    if (phone.startsWith('+') && !formData.country) {
+    if (phone.startsWith("+") && !formData.country) {
       const detectedCountry = getCountryFromPhone(phone)
       setFormData({ ...formData, phone, country: detectedCountry })
       const currencyCode = getCurrencyByCountry(detectedCountry)
@@ -149,11 +181,20 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validate()) return
 
     setIsLoading(true)
-    setErrors({ firstName: "", lastName: "", email: "", phone: "", country: "", password: "", confirmPassword: "", general: "" })
+    setErrors({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      country: "",
+      password: "",
+      confirmPassword: "",
+      general: "",
+    })
 
     try {
       const user = register({
@@ -186,11 +227,19 @@ export default function RegisterPage() {
 
         <main className="container mx-auto px-4 py-20">
           <div className="max-w-2xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               <GlassCard className="p-8" strong>
                 <div className="text-center mb-8">
-                  <h1 className="font-serif text-4xl font-bold text-foreground mb-2">Create Account</h1>
-                  <p className="text-muted-foreground">Join Arnova and start shopping</p>
+                  <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
+                    Create Account
+                  </h1>
+                  <p className="text-muted-foreground">
+                    Join Arnova and start shopping
+                  </p>
                 </div>
 
                 {/* Progress Bar */}
@@ -227,7 +276,12 @@ export default function RegisterPage() {
                             type="text"
                             placeholder="John"
                             value={formData.firstName}
-                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                            onChange={e =>
+                              setFormData({
+                                ...formData,
+                                firstName: e.target.value,
+                              })
+                            }
                             className="pl-10 glass focus:border-primary/50 focus:ring-primary/20"
                             disabled={isLoading}
                             required
@@ -249,7 +303,12 @@ export default function RegisterPage() {
                             type="text"
                             placeholder="Doe"
                             value={formData.lastName}
-                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                            onChange={e =>
+                              setFormData({
+                                ...formData,
+                                lastName: e.target.value,
+                              })
+                            }
                             className="pl-10 glass focus:border-primary/50 focus:ring-primary/20"
                             disabled={isLoading}
                             required
@@ -272,7 +331,9 @@ export default function RegisterPage() {
                           type="email"
                           placeholder="you@example.com"
                           value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          onChange={e =>
+                            setFormData({ ...formData, email: e.target.value })
+                          }
                           className="pl-10 glass focus:border-primary/50 focus:ring-primary/20"
                           disabled={isLoading}
                           required
@@ -298,10 +359,15 @@ export default function RegisterPage() {
                             <SelectValue placeholder="Select your country" />
                           </SelectTrigger>
                           <SelectContent className="glass-strong max-h-[300px]">
-                            {countries.map((country) => (
-                              <SelectItem key={country.code} value={country.code}>
+                            {countries.map(country => (
+                              <SelectItem
+                                key={country.code}
+                                value={country.code}
+                              >
                                 <span className="flex items-center gap-2">
-                                  <span className="text-lg">{country.flag}</span>
+                                  <span className="text-lg">
+                                    {country.flag}
+                                  </span>
                                   {country.name}
                                 </span>
                               </SelectItem>
@@ -325,7 +391,7 @@ export default function RegisterPage() {
                           type="tel"
                           placeholder="+1 234 567 8900"
                           value={formData.phone}
-                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          onChange={e => handlePhoneChange(e.target.value)}
                           className="pl-10 glass focus:border-primary/50 focus:ring-primary/20"
                           disabled={isLoading}
                           required
@@ -348,7 +414,7 @@ export default function RegisterPage() {
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={formData.password}
-                            onChange={(e) => handlePasswordChange(e.target.value)}
+                            onChange={e => handlePasswordChange(e.target.value)}
                             className="pl-10 pr-10 glass focus:border-primary/50 focus:ring-primary/20"
                             disabled={isLoading}
                             required
@@ -358,16 +424,23 @@ export default function RegisterPage() {
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none z-10"
                           >
-                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
                           </button>
                         </div>
-                        <InputError message={errors.password || passwordError} />
+                        <InputError
+                          message={errors.password || passwordError}
+                        />
                       </motion.div>
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="confirmPassword">
-                        Confirm Password <span className="text-destructive">*</span>
+                        Confirm Password{" "}
+                        <span className="text-destructive">*</span>
                       </Label>
                       <motion.div whileFocus="focus" variants={inputVariants}>
                         <div className="relative">
@@ -377,25 +450,42 @@ export default function RegisterPage() {
                             type={showConfirmPassword ? "text" : "password"}
                             placeholder="••••••••"
                             value={formData.confirmPassword}
-                            onChange={(e) => handlePasswordConfirmationChange(e.target.value)}
+                            onChange={e =>
+                              handlePasswordConfirmationChange(e.target.value)
+                            }
                             className="pl-10 pr-10 glass focus:border-primary/50 focus:ring-primary/20"
                             disabled={isLoading}
                             required
                           />
                           <button
                             type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            onClick={() =>
+                              setShowConfirmPassword(!showConfirmPassword)
+                            }
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none z-10"
                           >
-                            {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
                           </button>
                         </div>
-                        <InputError message={errors.confirmPassword || confirmPasswordError} />
+                        <InputError
+                          message={
+                            errors.confirmPassword || confirmPasswordError
+                          }
+                        />
                       </motion.div>
                     </div>
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={isLoading}
+                  >
                     {isLoading ? (
                       <>
                         <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
@@ -413,7 +503,10 @@ export default function RegisterPage() {
                 <div className="mt-6 text-center text-sm">
                   <p className="text-muted-foreground">
                     Already have an account?{" "}
-                    <Link href="/login" className="text-primary font-medium hover:underline">
+                    <Link
+                      href="/login"
+                      className="text-primary font-medium hover:underline"
+                    >
                       Sign in
                     </Link>
                   </p>

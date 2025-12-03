@@ -1,7 +1,8 @@
 // Arnova E-commerce API Client
 // Frontend integration for Django REST API
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
 
 // ============================================================================
 // Types
@@ -197,7 +198,10 @@ class ApiClient {
   }
 
   // Make API request
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
     const token = this.getAccessToken()
 
     const headers: HeadersInit = {
@@ -220,7 +224,7 @@ class ApiClient {
           const newToken = this.getAccessToken()
           const updatedHeaders = {
             ...headers,
-            Authorization: `Bearer ${newToken}`
+            Authorization: `Bearer ${newToken}`,
           }
           response = await fetch(`${this.baseUrl}${endpoint}`, {
             ...options,
@@ -269,14 +273,16 @@ class ApiClient {
     first_name: string
     last_name: string
     profile: Partial<UserProfile>
-  }): Promise<ApiResponse<{ user: User; tokens: { access: string; refresh: string } }>> {
-    const response = await this.request<{ user: User; tokens: { access: string; refresh: string } }>(
-      "/auth/register/",
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      },
-    )
+  }): Promise<
+    ApiResponse<{ user: User; tokens: { access: string; refresh: string } }>
+  > {
+    const response = await this.request<{
+      user: User
+      tokens: { access: string; refresh: string }
+    }>("/auth/register/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
 
     if (response.data) {
       this.setTokens(response.data.tokens.access, response.data.tokens.refresh)
@@ -287,9 +293,13 @@ class ApiClient {
 
   async login(
     username: string,
-    password: string,
+    password: string
   ): Promise<ApiResponse<{ user: User; access: string; refresh: string }>> {
-    const response = await this.request<{ user: User; access: string; refresh: string }>("/auth/login/", {
+    const response = await this.request<{
+      user: User
+      access: string
+      refresh: string
+    }>("/auth/login/", {
       method: "POST",
       body: JSON.stringify({ username, password }),
     })
@@ -334,7 +344,9 @@ class ApiClient {
     page?: number
     page_size?: number
   }): Promise<ApiResponse<PaginatedResponse<Product>>> {
-    const queryString = params ? "?" + new URLSearchParams(params as any).toString() : ""
+    const queryString = params
+      ? "?" + new URLSearchParams(params as any).toString()
+      : ""
     return this.request<PaginatedResponse<Product>>(`/products/${queryString}`)
   }
 
@@ -342,10 +354,15 @@ class ApiClient {
     return this.request<Product>(`/products/${id}/`)
   }
 
-  async searchProducts(query: string, category?: string): Promise<ApiResponse<PaginatedResponse<Product>>> {
+  async searchProducts(
+    query: string,
+    category?: string
+  ): Promise<ApiResponse<PaginatedResponse<Product>>> {
     const params = new URLSearchParams({ q: query })
     if (category) params.append("category", category)
-    return this.request<PaginatedResponse<Product>>(`/products/search/?${params}`)
+    return this.request<PaginatedResponse<Product>>(
+      `/products/search/?${params}`
+    )
   }
 
   // ============================================================================
@@ -356,7 +373,11 @@ class ApiClient {
     return this.request<Cart>("/cart/")
   }
 
-  async addToCart(productId: number, variantId?: number, quantity = 1): Promise<ApiResponse<CartItem>> {
+  async addToCart(
+    productId: number,
+    variantId?: number,
+    quantity = 1
+  ): Promise<ApiResponse<CartItem>> {
     return this.request<CartItem>("/cart/items/", {
       method: "POST",
       body: JSON.stringify({
@@ -367,7 +388,10 @@ class ApiClient {
     })
   }
 
-  async updateCartItem(itemId: number, quantity: number): Promise<ApiResponse<CartItem>> {
+  async updateCartItem(
+    itemId: number,
+    quantity: number
+  ): Promise<ApiResponse<CartItem>> {
     return this.request<CartItem>(`/cart/items/${itemId}/`, {
       method: "PUT",
       body: JSON.stringify({ quantity }),
@@ -390,11 +414,17 @@ class ApiClient {
   // Saved Items
   // ============================================================================
 
-  async getSavedItems(): Promise<ApiResponse<PaginatedResponse<{ id: number; product: Product }>>> {
-    return this.request<PaginatedResponse<{ id: number; product: Product }>>("/saved/")
+  async getSavedItems(): Promise<
+    ApiResponse<PaginatedResponse<{ id: number; product: Product }>>
+  > {
+    return this.request<PaginatedResponse<{ id: number; product: Product }>>(
+      "/saved/"
+    )
   }
 
-  async addToSaved(productId: number): Promise<ApiResponse<{ id: number; product: Product }>> {
+  async addToSaved(
+    productId: number
+  ): Promise<ApiResponse<{ id: number; product: Product }>> {
     return this.request<{ id: number; product: Product }>("/saved/", {
       method: "POST",
       body: JSON.stringify({ product_id: productId }),
@@ -411,8 +441,13 @@ class ApiClient {
   // Orders
   // ============================================================================
 
-  async getOrders(params?: { status?: string; page?: number }): Promise<ApiResponse<PaginatedResponse<Order>>> {
-    const queryString = params ? "?" + new URLSearchParams(params as any).toString() : ""
+  async getOrders(params?: {
+    status?: string
+    page?: number
+  }): Promise<ApiResponse<PaginatedResponse<Order>>> {
+    const queryString = params
+      ? "?" + new URLSearchParams(params as any).toString()
+      : ""
     return this.request<PaginatedResponse<Order>>(`/orders/${queryString}`)
   }
 

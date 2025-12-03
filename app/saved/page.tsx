@@ -1,6 +1,5 @@
 "use client"
 
-
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -45,8 +44,12 @@ export default function SavedPage() {
             >
               <GlassCard className="p-12" strong>
                 <Heart className="h-24 w-24 mx-auto mb-6 text-muted-foreground" />
-                <h1 className="font-serif text-4xl font-bold text-foreground mb-4">No Saved Items</h1>
-                <p className="text-muted-foreground mb-8">Save your favorite items to view them here</p>
+                <h1 className="font-serif text-4xl font-bold text-foreground mb-4">
+                  No Saved Items
+                </h1>
+                <p className="text-muted-foreground mb-8">
+                  Save your favorite items to view them here
+                </p>
                 <Link href="/new-arrivals">
                   <Button size="lg">
                     <ShoppingBag className="mr-2 h-5 w-5" />
@@ -67,13 +70,21 @@ export default function SavedPage() {
       <div className="min-h-screen">
         <Navbar />
         <main className="container mx-auto px-4 py-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
                 <Heart className="h-10 w-10 text-primary" />
-                <h1 className="font-serif text-5xl font-bold text-foreground">Saved Items</h1>
+                <h1 className="font-serif text-5xl font-bold text-foreground">
+                  Saved Items
+                </h1>
               </div>
-              <p className="text-muted-foreground">{savedProducts.length} items saved</p>
+              <p className="text-muted-foreground">
+                {savedProducts.length} items saved
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -11,31 +11,31 @@ const STATIC_ASSETS = [
   "/manifest.json",
   "/icon-192x192.jpg",
   "/icon-512x512.jpg",
-  "/apple-touch-icon.jpg"
+  "/apple-touch-icon.jpg",
 ]
 
 // Install event - cache static assets
-self.addEventListener("install", (event) => {
+self.addEventListener("install", event => {
   console.log("[Service Worker] Installing...")
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
+    caches.open(STATIC_CACHE).then(cache => {
       console.log("[Service Worker] Caching static assets")
       return cache.addAll(STATIC_ASSETS)
-    }),
+    })
   )
   self.skipWaiting()
 })
 
 // Activate event - clean up old caches
-self.addEventListener("activate", (event) => {
+self.addEventListener("activate", event => {
   console.log("[Service Worker] Activating...")
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(cacheNames => {
       const validCaches = [STATIC_CACHE, DYNAMIC_CACHE, RUNTIME_CACHE]
       return Promise.all(
         cacheNames
-          .filter((name) => !validCaches.includes(name))
-          .map((name) => {
+          .filter(name => !validCaches.includes(name))
+          .map(name => {
             console.log("[Service Worker] Deleting old cache:", name)
             return caches.delete(name)
           })
@@ -46,7 +46,7 @@ self.addEventListener("activate", (event) => {
 })
 
 // Fetch event - serve from cache, fallback to network
-self.addEventListener("fetch", (event) => {
+self.addEventListener("fetch", event => {
   const { request } = event
   const url = new URL(request.url)
 
@@ -57,34 +57,41 @@ self.addEventListener("fetch", (event) => {
   if (!request.url.startsWith("http")) return
 
   // Skip API requests and Django admin
-  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/")) return
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/"))
+    return
 
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
+    caches.match(request).then(cachedResponse => {
       // Return cached response if available
       if (cachedResponse) {
         // For static assets, return cached version and update in background
-        if (url.pathname.includes("_next/") || url.pathname.includes(".js") || url.pathname.includes(".css")) {
+        if (
+          url.pathname.includes("_next/") ||
+          url.pathname.includes(".js") ||
+          url.pathname.includes(".css")
+        ) {
           return cachedResponse
         }
       }
 
       return fetch(request)
-        .then((response) => {
+        .then(response => {
           // Only cache successful responses
           if (response && response.ok) {
             const responseToCache = response.clone()
-            const cacheToUse = STATIC_ASSETS.includes(url.pathname) ? STATIC_CACHE : RUNTIME_CACHE
-            
-            caches.open(cacheToUse).then((cache) => {
+            const cacheToUse = STATIC_ASSETS.includes(url.pathname)
+              ? STATIC_CACHE
+              : RUNTIME_CACHE
+
+            caches.open(cacheToUse).then(cache => {
               cache.put(request, responseToCache)
             })
           }
           return response
         })
-        .catch((error) => {
+        .catch(error => {
           console.log("[Service Worker] Fetch failed:", error)
-          
+
           // Return cached response if available
           if (cachedResponse) {
             return cachedResponse
@@ -98,7 +105,7 @@ self.addEventListener("fetch", (event) => {
 })
 
 // Background sync for offline actions
-self.addEventListener("sync", (event) => {
+self.addEventListener("sync", event => {
   console.log("[Service Worker] Background sync:", event.tag)
   if (event.tag === "sync-cart") {
     event.waitUntil(syncCart())
@@ -112,7 +119,7 @@ async function syncCart() {
 }
 
 // Push notifications
-self.addEventListener("push", (event) => {
+self.addEventListener("push", event => {
   const data = event.data ? event.data.json() : {}
   const title = data.title || "Arnova"
   const options = {
@@ -126,7 +133,7 @@ self.addEventListener("push", (event) => {
 })
 
 // Notification click
-self.addEventListener("notificationclick", (event) => {
+self.addEventListener("notificationclick", event => {
   event.notification.close()
   event.waitUntil(clients.openWindow(event.notification.data))
 })
