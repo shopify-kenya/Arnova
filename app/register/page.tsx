@@ -19,11 +19,14 @@ import { useAuth } from "@/components/auth-provider"
 import { register } from "@/lib/auth"
 import { countries } from "@/lib/countries"
 import { validateEmail, validatePhone, validatePassword, getPasswordValidationMessage, getPasswordConfirmationMessage } from "@/lib/validation"
+import { getCurrencyByCountry, getCountryFromPhone } from "@/lib/currency-detection"
+import { useCurrency, currencies } from "@/components/currency-provider"
 import { toast } from "sonner"
 
 export default function RegisterPage() {
   const router = useRouter()
   const { setUser } = useAuth()
+  const { setCurrency } = useCurrency()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -123,6 +126,24 @@ export default function RegisterPage() {
       setConfirmPasswordError(message)
     } else {
       setConfirmPasswordError("")
+    }
+  }
+
+  const handleCountryChange = (countryCode: string) => {
+    setFormData({ ...formData, country: countryCode })
+    const currencyCode = getCurrencyByCountry(countryCode)
+    const currency = currencies.find(c => c.code === currencyCode)
+    if (currency) setCurrency(currency)
+  }
+
+  const handlePhoneChange = (phone: string) => {
+    setFormData({ ...formData, phone })
+    if (phone.startsWith('+') && !formData.country) {
+      const detectedCountry = getCountryFromPhone(phone)
+      setFormData({ ...formData, phone, country: detectedCountry })
+      const currencyCode = getCurrencyByCountry(detectedCountry)
+      const currency = currencies.find(c => c.code === currencyCode)
+      if (currency) setCurrency(currency)
     }
   }
 
@@ -270,7 +291,7 @@ export default function RegisterPage() {
                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
                         <Select
                           value={formData.country}
-                          onValueChange={(value) => setFormData({ ...formData, country: value })}
+                          onValueChange={handleCountryChange}
                           disabled={isLoading}
                         >
                           <SelectTrigger className="pl-10 glass focus:border-primary/50 focus:ring-primary/20">
@@ -304,7 +325,7 @@ export default function RegisterPage() {
                           type="tel"
                           placeholder="+1 234 567 8900"
                           value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
                           className="pl-10 glass focus:border-primary/50 focus:ring-primary/20"
                           disabled={isLoading}
                           required
