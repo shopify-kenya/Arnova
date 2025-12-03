@@ -17,19 +17,19 @@ export default function HomePage() {
     {
       title: t("nav.clothing"),
       href: "/clothing",
-      image: "/premium-clothing-fashion.jpg",
+      image: "/premium-cotton-t-shirt.png",
       icon: Sparkles,
     },
     {
       title: t("nav.shoes"),
       href: "/shoes",
-      image: "/luxury-shoes-footwear.jpg",
+      image: "/premium-leather-sneakers.jpg",
       icon: TrendingUp,
     },
     {
       title: t("nav.bags"),
       href: "/bags",
-      image: "/designer-bags-accessories.jpg",
+      image: "/leather-tote-bag.png",
       icon: Tag,
     },
   ]
@@ -45,7 +45,7 @@ export default function HomePage() {
             <div
               className="absolute inset-0 z-0"
               style={{
-                backgroundImage: "url(/premium-clothing-fashion.jpg)",
+                backgroundImage: "url(/soft-cashmere-sweater.png)",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }}
@@ -140,7 +140,7 @@ export default function HomePage() {
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
-                  backgroundImage: "url(/tailored-blazer-jacket.jpg)",
+                  backgroundImage: "url(/slim-fit-denim-jeans.jpg)",
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-background/95 to-transparent" />
