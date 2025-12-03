@@ -32,14 +32,12 @@ urlpatterns = [
     path('api/admin/users/', api_views.api_admin_users, name='api_admin_users'),
     path('api/admin/analytics/', api_views.api_admin_analytics, name='api_admin_analytics'),
     
-    # Serve Next.js static files directly
+    # Serve static assets BEFORE catch-all
     re_path(r'^_next/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'build', '_next')}),
     path('manifest.json', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'manifest.json'}),
     path('service-worker.js', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public'), 'path': 'service-worker.js'}),
-    
-    # Serve static assets from public directory
     re_path(r'^(?P<path>.*\.(jpg|png|svg))$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'public')}),
     
-    # Catch-all for Next.js routes
+    # Catch-all for Next.js routes (MUST BE LAST)
     re_path(r'^.*$', views.index, name='index'),
 ]

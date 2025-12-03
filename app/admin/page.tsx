@@ -5,8 +5,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Package, ShoppingCart, Users, TrendingUp, DollarSign } from "lucide-react"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
+import { AdminSidebar } from "@/components/admin-sidebar"
 import { GlassCard } from "@/components/glass-card"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
@@ -86,11 +85,11 @@ export default function AdminDashboardPage() {
   return (
     <ProtectedRoute requireAdmin>
       <CurrencyProvider>
-        <div className="min-h-screen">
-          <Navbar />
+        <div className="min-h-screen flex">
+          <AdminSidebar />
 
-        <main className="container mx-auto px-4 py-12">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <main className="flex-1 ml-64 p-8">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="mb-8">
               <h1 className="font-serif text-5xl font-bold text-foreground mb-2">Admin Dashboard</h1>
               <p className="text-muted-foreground">Manage your e-commerce platform</p>
@@ -163,10 +162,8 @@ export default function AdminDashboardPage() {
                 ))}
               </div>
             </GlassCard>
-          </motion.div>
-        </main>
-
-          <Footer />
+            </motion.div>
+          </main>
         </div>
       </CurrencyProvider>
     </ProtectedRoute>

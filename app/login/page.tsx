@@ -6,8 +6,7 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
+import { Home } from "lucide-react"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -30,26 +29,26 @@ export default function LoginPage() {
 
   const validate = () => {
     const newErrors = { email: "", password: "", general: "" }
-    
+
     if (!email.trim()) {
       newErrors.email = "Email is required"
     } else if (!validateEmail(email)) {
       newErrors.email = "Please enter a valid email address"
     }
-    
+
     if (!password.trim()) {
       newErrors.password = "Password is required"
     }
-    
+
     setErrors(newErrors)
     return !newErrors.email && !newErrors.password
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validate()) return
-    
+
     setIsLoading(true)
     setErrors({ email: "", password: "", general: "" })
 
@@ -76,12 +75,16 @@ export default function LoginPage() {
 
   return (
     <CurrencyProvider>
-      <div className="min-h-screen">
-        <Navbar />
+      <div className="min-h-screen flex items-center justify-center relative">
+        <Link href="/" className="absolute top-4 left-4">
+          <Button variant="ghost" size="sm">
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
+        </Link>
 
-        <main className="container mx-auto px-4 py-20">
-          <div className="max-w-md mx-auto">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <main className="w-full max-w-md px-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <GlassCard className="p-8" strong>
                 <div className="text-center mb-8">
                   <h1 className="font-serif text-4xl font-bold text-foreground mb-2">Welcome Back</h1>
@@ -105,7 +108,7 @@ export default function LoginPage() {
                     </Label>
                     <motion.div whileFocus="focus" variants={inputVariants}>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
                         <Input
                           id="email"
                           type="email"
@@ -127,7 +130,7 @@ export default function LoginPage() {
                     </Label>
                     <motion.div whileFocus="focus" variants={inputVariants}>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
                         <Input
                           id="password"
                           type={showPassword ? "text" : "password"}
@@ -185,12 +188,9 @@ export default function LoginPage() {
                   <p className="text-xs text-muted-foreground">Admin: admin@arnova.com / password123</p>
                   <p className="text-xs text-muted-foreground">Buyer: buyer@example.com / password123</p>
                 </div>
-              </GlassCard>
-            </motion.div>
-          </div>
+            </GlassCard>
+          </motion.div>
         </main>
-
-        <Footer />
       </div>
     </CurrencyProvider>
   )
