@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { Heart, ShoppingCart, Star } from "lucide-react"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
@@ -90,10 +91,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       <Link href={`/product/${product.id}`}>
         <GlassCard className="group overflow-hidden h-full">
           <div className="relative aspect-square overflow-hidden">
-            <img
+            <Image
               src={product.images[0] || "/placeholder.svg"}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
             <div className="absolute top-3 left-3 flex flex-col gap-2">
               {product.isNew && (

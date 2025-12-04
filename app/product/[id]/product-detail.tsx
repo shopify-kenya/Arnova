@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import {
   Heart,
   ShoppingCart,
@@ -111,10 +112,11 @@ export default function ProductDetail({ productId }: { productId: string }) {
           >
             <GlassCard className="overflow-hidden mb-4">
               <div className="aspect-square relative">
-                <img
+                <Image
                   src={product.images[selectedImage] || "/placeholder.svg"}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                 />
                 {product.isNew && (
                   <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
@@ -141,9 +143,11 @@ export default function ProductDetail({ productId }: { productId: string }) {
                       : "border-transparent hover:border-muted"
                   }`}
                 >
-                  <img
+                  <Image
                     src={image || "/placeholder.svg"}
                     alt={`${product.name} ${index + 1}`}
+                    width={80}
+                    height={80}
                     className="w-full h-full object-cover"
                   />
                 </button>

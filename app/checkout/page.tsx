@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { CreditCard, MapPin, ArrowRight, CheckCircle } from "lucide-react"
@@ -380,9 +381,11 @@ function CheckoutPageContent() {
                         key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}`}
                         className="flex gap-3"
                       >
-                        <img
+                        <Image
                           src={item.product.images[0] || "/placeholder.svg"}
                           alt={item.product.name}
+                          width={64}
+                          height={64}
                           className="w-16 h-16 object-cover rounded"
                         />
                         <div className="flex-1">

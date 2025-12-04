@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -104,9 +105,11 @@ function CartPageContent() {
                   >
                     <GlassCard className="p-4">
                       <div className="flex gap-4">
-                        <img
+                        <Image
                           src={item.product.images[0] || "/placeholder.svg"}
                           alt={item.product.name}
+                          width={96}
+                          height={96}
                           className="w-24 h-24 object-cover rounded-lg"
                         />
                         <div className="flex-1">

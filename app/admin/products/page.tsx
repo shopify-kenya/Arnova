@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { Edit, Trash2, Search } from "lucide-react"
 import { Navbar } from "@/components/navbar"
@@ -107,9 +108,11 @@ function AdminProductsContent() {
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <img
+                          <Image
                             src={product.images[0] || "/placeholder.svg"}
                             alt={product.name}
+                            width={48}
+                            height={48}
                             className="w-12 h-12 object-cover rounded"
                           />
                           <div>

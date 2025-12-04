@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import {
@@ -141,10 +142,11 @@ export default function ProfilePage() {
                         <div className="relative group">
                           <div className="h-20 w-20 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
                             {profileImage ? (
-                              <img
+                              <Image
                                 src={profileImage || "/placeholder.svg"}
                                 alt="Profile"
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                               />
                             ) : (
                               <UserIcon className="h-10 w-10 text-primary" />

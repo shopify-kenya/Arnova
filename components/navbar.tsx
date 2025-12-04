@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   ShoppingCart,
@@ -63,9 +64,11 @@ export function Navbar() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <img
+                <Image
                   src="/placeholder-logo.png"
                   alt="Arnova Logo"
+                  width={32}
+                  height={32}
                   className="h-8 w-8"
                 />
                 <h1 className="font-serif text-3xl font-bold text-primary">

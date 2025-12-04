@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import {
   BarChart3,
   Package,
@@ -57,9 +58,11 @@ export function AdminSidebar() {
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-              <img
+              <Image
                 src="/placeholder-logo.png"
                 alt="Arnova"
+                width={32}
+                height={32}
                 className="h-8 w-8"
               />
             </div>

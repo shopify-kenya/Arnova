@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import Image from "next/image"
 import { X, Upload, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -254,9 +255,11 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               <div className="grid grid-cols-4 gap-4 mt-4">
                 {images.map((image, index) => (
                   <div key={index} className="relative group">
-                    <img
+                    <Image
                       src={image || "/placeholder.svg"}
                       alt={`Product ${index + 1}`}
+                      width={96}
+                      height={96}
                       className="w-full h-24 object-cover rounded-lg"
                     />
                     <button

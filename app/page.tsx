@@ -2,6 +2,7 @@
 import React from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowRight, Sparkles, TrendingUp, Tag } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -124,10 +125,11 @@ export default function HomePage() {
                 >
                   <Link href={category.href}>
                     <GlassCard className="group overflow-hidden h-[400px] relative">
-                      <img
+                      <Image
                         src={category.image}
                         alt={category.title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-6">
