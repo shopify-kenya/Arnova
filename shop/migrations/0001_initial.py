@@ -70,7 +70,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("order_id", models.CharField(max_length=20, unique=True)),
-                ("total_amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("total_amount", models.DecimalField(
+                    decimal_places=2, max_digits=10)),
                 (
                     "status",
                     models.CharField(
@@ -102,7 +103,8 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.CharField(max_length=20, primary_key=True, serialize=False),
+                    models.CharField(
+                        max_length=20, primary_key=True, serialize=False),
                 ),
                 ("name", models.CharField(max_length=200)),
                 ("description", models.TextField()),
@@ -121,7 +123,8 @@ class Migration(migrations.Migration):
                 ("on_sale", models.BooleanField(default=False)),
                 (
                     "rating",
-                    models.DecimalField(decimal_places=1, default=0.0, max_digits=3),
+                    models.DecimalField(
+                        decimal_places=1, default=0.0, max_digits=3),
                 ),
                 ("reviews", models.PositiveIntegerField(default=0)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),

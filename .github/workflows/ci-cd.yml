@@ -71,8 +71,7 @@ jobs:
       run: npm ci
 
     - name: Lint Next.js code
-      run: |
-        npm run lint
+      run: npm run lint
 
     - name: Build Next.js application
       run: npm run build

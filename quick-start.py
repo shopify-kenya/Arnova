@@ -116,7 +116,8 @@ def main():
 
     print("\nBuilding Next.js frontend...")
     try:
-        result = subprocess.run("npm run build", shell=True, cwd=base_dir, check=True)
+        result = subprocess.run(
+            "npm run build", shell=True, cwd=base_dir, check=True)
         print("Frontend built successfully")
     except subprocess.CalledProcessError:
         print("Frontend build failed")
@@ -144,7 +145,8 @@ def main():
         if ssl_enabled:
             subprocess.run("python run_https.py", shell=True, cwd=base_dir)
         else:
-            subprocess.run("python manage.py runserver", shell=True, cwd=base_dir)
+            subprocess.run("python manage.py runserver",
+                           shell=True, cwd=base_dir)
     except KeyboardInterrupt:
         print("\nShutting down Arnova...")
 

@@ -35,7 +35,8 @@ def run_https_server():
         content = f.read()
 
     if "'django_extensions'," not in content:
-        content = content.replace("'shop',", "'shop',\n    'django_extensions',")
+        content = content.replace(
+            "'shop',", "'shop',\n    'django_extensions',")
         with open(settings_file, "w") as f:
             f.write(content)
         print("Added django_extensions to INSTALLED_APPS")

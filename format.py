@@ -10,7 +10,8 @@ from pathlib import Path
 def format_python_files():
     """Format Python files using autopep8 (built-in alternative)"""
     base_dir = Path(__file__).parent
-    python_files = [f for f in base_dir.rglob("*.py") if not str(f).startswith(".")]
+    python_files = [f for f in base_dir.rglob(
+        "*.py") if not str(f).startswith(".")]
 
     if not python_files:
         print("No Python files found")
@@ -20,8 +21,11 @@ def format_python_files():
 
     # Basic formatting using autopep8 if available
     try:
-        subprocess.run(["python3", "-m", "autopep8", "--in-place", "--recursive", "."],
-                      cwd=base_dir, check=True)
+        subprocess.run(
+            ["python3", "-m", "autopep8", "--in-place", "--recursive", "."],
+            cwd=base_dir,
+            check=True,
+        )
         print("Python formatting completed")
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -35,18 +39,23 @@ def format_js_files():
 
     # Check if prettier is available
     try:
-        subprocess.run(["npx", "prettier", "--version"],
-                      cwd=base_dir, check=True, capture_output=True)
+        subprocess.run(
+            ["npx", "prettier", "--version"],
+            cwd=base_dir,
+            check=True,
+            capture_output=True,
+        )
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("Prettier not found, skipping JS/TS formatting")
         return True
 
     # Format JS/TS files
     try:
-        subprocess.run([
-            "npx", "prettier", "--write",
-            "**/*.{js,jsx,ts,tsx,json,css,md}"
-        ], cwd=base_dir, check=True)
+        subprocess.run(
+            ["npx", "prettier", "--write", "**/*.{js,jsx,ts,tsx,json,css,md}"],
+            cwd=base_dir,
+            check=True,
+        )
         print("Prettier formatting completed")
         return True
     except subprocess.CalledProcessError:
