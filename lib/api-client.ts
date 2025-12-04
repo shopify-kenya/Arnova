@@ -345,7 +345,7 @@ class ApiClient {
     page_size?: number
   }): Promise<ApiResponse<PaginatedResponse<Product>>> {
     const queryString = params
-      ? "?" + new URLSearchParams(params as any).toString()
+      ? "?" + new URLSearchParams(params as Record<string, string>).toString()
       : ""
     return this.request<PaginatedResponse<Product>>(`/products/${queryString}`)
   }
@@ -446,7 +446,7 @@ class ApiClient {
     page?: number
   }): Promise<ApiResponse<PaginatedResponse<Order>>> {
     const queryString = params
-      ? "?" + new URLSearchParams(params as any).toString()
+      ? "?" + new URLSearchParams(params as Record<string, string>).toString()
       : ""
     return this.request<PaginatedResponse<Order>>(`/orders/${queryString}`)
   }

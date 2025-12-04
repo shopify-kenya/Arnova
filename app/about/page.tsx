@@ -33,8 +33,8 @@ export default function AboutPage() {
             </p>
             <p className="text-muted-foreground leading-relaxed">
               From our carefully selected fabrics to our attention to detail in
-              every stitch, we're committed to delivering exceptional quality
-              that stands the test of time.
+              every stitch, we&apos;re committed to delivering exceptional
+              quality that stands the test of time.
             </p>
           </GlassCard>
 

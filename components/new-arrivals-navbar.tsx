@@ -7,14 +7,12 @@ import {
   ShoppingCart,
   Heart,
   User,
-  Menu,
   Search,
   ArrowLeft,
   Filter,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useAuth } from "@/components/auth-provider"
 import { useCart } from "@/components/cart-provider"
 import { ThemeToggle } from "@/components/theme-toggle"

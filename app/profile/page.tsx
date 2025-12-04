@@ -349,7 +349,7 @@ export default function ProfilePage() {
                       Order History
                     </h3>
                     <p className="text-muted-foreground">
-                      You haven't placed any orders yet.
+                      You haven&apos;t placed any orders yet.
                     </p>
                   </GlassCard>
                 </TabsContent>

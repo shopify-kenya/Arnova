@@ -19,7 +19,7 @@ export function ProtectedRoute({
   requireAdmin = false,
   redirectTo = "/login",
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isAdmin, user } = useAuth()
+  const { isAuthenticated, isAdmin } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function ProtectedRoute({
               Admin Access Required
             </h1>
             <p className="text-muted-foreground mb-6">
-              You don't have permission to access this page.
+              You don&apos;t have permission to access this page.
             </p>
             <Button onClick={() => router.push("/")} className="w-full">
               Go Home

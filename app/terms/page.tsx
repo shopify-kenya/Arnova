@@ -35,21 +35,22 @@ export default function TermsPage() {
               <h2>Use License</h2>
               <p>
                 Permission is granted to temporarily download one copy of the
-                materials on Arnova's website for personal, non-commercial
+                materials on Arnova&apos;s website for personal, non-commercial
                 transitory viewing only.
               </p>
 
               <h2>Disclaimer</h2>
               <p>
-                The materials on Arnova's website are provided on an 'as is'
-                basis. Arnova makes no warranties, expressed or implied.
+                The materials on Arnova&apos;s website are provided on an
+                &apos;as is&apos; basis. Arnova makes no warranties, expressed
+                or implied.
               </p>
 
               <h2>Limitations</h2>
               <p>
                 In no event shall Arnova or its suppliers be liable for any
                 damages arising out of the use or inability to use the materials
-                on Arnova's website.
+                on Arnova&apos;s website.
               </p>
 
               <h2>Governing Law</h2>

@@ -101,8 +101,8 @@ function CheckoutPageContent() {
                 Order Confirmed!
               </h1>
               <p className="text-muted-foreground mb-8">
-                Thank you for your purchase. We've sent a confirmation email to{" "}
-                {user?.email}
+                Thank you for your purchase. We&apos;ve sent a confirmation
+                email to {user?.email}
               </p>
               <div className="flex gap-4 justify-center">
                 <Button size="lg" onClick={() => router.push("/orders")}>

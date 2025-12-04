@@ -1,10 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Download, X } from "lucide-react"
+import { Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { GlassCard } from "@/components/glass-card"
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -39,10 +37,6 @@ export function PWAInstaller() {
     }
 
     setDeferredPrompt(null)
-    setShowInstallPrompt(false)
-  }
-
-  const handleDismiss = () => {
     setShowInstallPrompt(false)
   }
 

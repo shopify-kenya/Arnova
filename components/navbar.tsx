@@ -32,7 +32,7 @@ import { PWAInstaller } from "@/components/pwa-installer"
 export function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { t, language, setLanguage } = useLanguage()
+  const { t, setLanguage } = useLanguage()
   const { currency, setCurrency } = useCurrency()
   const { user, logout, isAuthenticated, isAdmin } = useAuth()
   const { itemCount } = useCart()

@@ -1,5 +1,4 @@
 "use client"
-import { useEffect } from "react"
 import { motion } from "framer-motion"
 import { Shield, User } from "lucide-react"
 import { Navbar } from "@/components/navbar"

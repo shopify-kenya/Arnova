@@ -46,8 +46,8 @@ export default function ReturnsPage() {
             <div className="prose prose-neutral dark:prose-invert max-w-none">
               <p>
                 We want you to be completely satisfied with your purchase. If
-                you're not happy with your order, you can return it within 30
-                days of delivery.
+                you&apos;re not happy with your order, you can return it within
+                30 days of delivery.
               </p>
 
               <h3>Return Conditions</h3>

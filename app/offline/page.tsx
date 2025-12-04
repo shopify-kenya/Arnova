@@ -24,11 +24,11 @@ export default function OfflinePage() {
           </motion.div>
 
           <h1 className="font-podkova text-3xl font-bold mb-4">
-            You're Offline
+            You&apos;re Offline
           </h1>
           <p className="text-muted-foreground mb-6">
-            It looks like you've lost your internet connection. Please check
-            your network and try again.
+            It looks like you&apos;ve lost your internet connection. Please
+            check your network and try again.
           </p>
 
           <Button onClick={() => window.location.reload()} className="w-full">

@@ -1,4 +1,3 @@
-const CACHE_NAME = "arnova-v2"
 const STATIC_CACHE = "arnova-static-v2"
 const DYNAMIC_CACHE = "arnova-dynamic-v2"
 
