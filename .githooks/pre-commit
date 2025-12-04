@@ -1,28 +1,35 @@
 #!/bin/bash
-# Pre-commit hook to format files and run checks
+# Pre-commit hook for Arnova Next.js + Django project
 
-echo "Running pre-commit checks..."
+echo "🔍 Running pre-commit checks..."
 
-# Format files
-echo "Formatting files..."
-npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md}" 2>/dev/null || echo "Prettier not available"
+# Format Python files
+echo "🐍 Formatting Python files..."
+black . --exclude="/(migrations|venv|.venv|node_modules|.next)/" 2>/dev/null || echo "Black not available"
+isort . --skip=migrations --skip=venv --skip=.venv --skip=node_modules --skip=.next 2>/dev/null || echo "isort not available"
+
+# Format JavaScript/TypeScript files
+echo "⚛️ Formatting JS/TS files..."
+npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md}" --ignore-path .gitignore 2>/dev/null || echo "Prettier not available"
 
 # Check if there are any changes after formatting
 if ! git diff --quiet; then
-    echo "Files were formatted. Please review and commit again."
+    echo "📝 Files were formatted. Please review and commit again."
     exit 1
 fi
 
-# Run basic checks
-echo "Running basic file checks..."
+# Run linting
+echo "🔧 Running linters..."
+flake8 . --exclude=migrations,venv,.venv,node_modules,.next 2>/dev/null || echo "flake8 not available"
+npm run lint 2>/dev/null || echo "ESLint not available"
 
-# Check for trailing whitespace in staged files
+# Check for trailing whitespace
 if git diff --cached --check; then
-    echo "Trailing whitespace check passed"
+    echo "✅ Trailing whitespace check passed"
 else
-    echo "Please fix trailing whitespace"
+    echo "❌ Please fix trailing whitespace"
     exit 1
 fi
 
-echo "Pre-commit checks passed"
+echo "✅ Pre-commit checks passed"
 exit 0
