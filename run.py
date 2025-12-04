@@ -90,8 +90,7 @@ def main():
                 cwd=base_dir,
             )
         else:
-            subprocess.run("python manage.py runserver",
-                           shell=True, cwd=base_dir)
+            subprocess.run("python manage.py runserver", shell=True, cwd=base_dir)
     except KeyboardInterrupt:
         print("\n👋 Shutting down Arnova...")
 

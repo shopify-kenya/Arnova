@@ -13,8 +13,7 @@ def generate_pwa_icons():
     public_dir = Path("public")
 
     # Check if icons exist
-    required_icons = ["icon-192x192.jpg",
-                      "icon-512x512.jpg", "apple-touch-icon.jpg"]
+    required_icons = ["icon-192x192.jpg", "icon-512x512.jpg", "apple-touch-icon.jpg"]
 
     missing_icons = []
     for icon in required_icons:
@@ -43,14 +42,11 @@ def validate_manifest():
             manifest = json.load(f)
 
         # Check required fields
-        required_fields = ["name", "short_name",
-                           "start_url", "display", "icons"]
-        missing_fields = [
-            field for field in required_fields if field not in manifest]
+        required_fields = ["name", "short_name", "start_url", "display", "icons"]
+        missing_fields = [field for field in required_fields if field not in manifest]
 
         if missing_fields:
-            print(
-                f"Missing required manifest fields: {', '.join(missing_fields)}")
+            print(f"Missing required manifest fields: {', '.join(missing_fields)}")
             return False
 
         # Validate icons

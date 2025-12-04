@@ -54,8 +54,7 @@ def api_register(request):
     if User.objects.filter(username=username).exists():
         return JsonResponse({"error": "Username already exists"}, status=400)
 
-    user = User.objects.create_user(
-        username=username, email=email, password=password)
+    user = User.objects.create_user(username=username, email=email, password=password)
     UserProfile.objects.create(user=user)
     Cart.objects.create(user=user)
 
@@ -190,8 +189,7 @@ def api_product_detail(request, product_id):
 @require_http_methods(["GET"])
 def api_categories(request):
     categories = Category.objects.all()
-    data = [{"id": cat.id, "name": cat.name, "slug": cat.slug}
-            for cat in categories]
+    data = [{"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories]
     return JsonResponse({"categories": data})
 
 
