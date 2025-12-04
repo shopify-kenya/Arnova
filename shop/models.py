@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -70,7 +69,12 @@ class CartItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ["cart", "product", "selected_size", "selected_color"]
+        unique_together = [
+            "cart",
+            "product",
+            "selected_size",
+            "selected_color",
+        ]
 
 
 class SavedItem(models.Model):

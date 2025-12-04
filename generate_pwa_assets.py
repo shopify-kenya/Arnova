@@ -3,8 +3,6 @@
 Generate PWA assets and validate PWA configuration
 """
 import json
-import os
-import shutil
 from pathlib import Path
 
 
@@ -13,7 +11,11 @@ def generate_pwa_icons():
     public_dir = Path("public")
 
     # Check if icons exist
-    required_icons = ["icon-192x192.jpg", "icon-512x512.jpg", "apple-touch-icon.jpg"]
+    required_icons = [
+        "icon-192x192.jpg",
+        "icon-512x512.jpg",
+        "apple-touch-icon.jpg",
+    ]
 
     missing_icons = []
     for icon in required_icons:
@@ -21,8 +23,9 @@ def generate_pwa_icons():
             missing_icons.append(icon)
 
     if missing_icons:
-        print(f"Missing PWA icons: {', '.join(missing_icons)}")
-        print("Please add these icons to the public/ directory for full PWA support")
+        icons_str = ", ".join(missing_icons)
+        print(f"Missing PWA icons: {icons_str}")
+        print("Please add these icons to the public/ directory for " "full PWA support")
         return False
 
     print("All PWA icons found")
@@ -46,7 +49,8 @@ def validate_manifest():
         missing_fields = [field for field in required_fields if field not in manifest]
 
         if missing_fields:
-            print(f"Missing required manifest fields: {', '.join(missing_fields)}")
+            fields_str = ", ".join(missing_fields)
+            print(f"Missing required manifest fields: {fields_str}")
             return False
 
         # Validate icons
@@ -105,7 +109,8 @@ self.addEventListener('fetch', event => {
         }
         return fetch(event.request)
           .catch(() => {
-            // If both cache and network fail, show offline page for navigation requests
+            // If both cache and network fail, show offline page
+            // for navigation requests
             if (event.request.mode === 'navigate') {
               return caches.match('/offline/');
             }

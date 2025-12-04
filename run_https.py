@@ -22,11 +22,12 @@ def run_https_server():
 
     # Install django-extensions if not already installed
     try:
-        import django_extensions
+        import django_extensions  # noqa: F401
     except ImportError:
         print("Installing django-extensions for HTTPS support...")
         subprocess.run(
-            [sys.executable, "-m", "pip", "install", "django-extensions"], check=True
+            [sys.executable, "-m", "pip", "install", "django-extensions"],
+            check=True,
         )
 
     # Update settings to include django-extensions
@@ -53,7 +54,7 @@ def run_https_server():
     ]
 
     print("Starting HTTPS server at https://127.0.0.1:8000")
-    print("Note: You may need to accept the self-signed certificate in your browser")
+    print("Note: You may need to accept the self-signed certificate " "in your browser")
 
     try:
         subprocess.run(cmd)
@@ -61,7 +62,8 @@ def run_https_server():
         print("\nServer stopped")
     except FileNotFoundError:
         print(
-            "Django not found. Make sure you're in the correct directory and Django is installed."
+            "Django not found. Make sure you're in the correct directory and "
+            "Django is installed."
         )
 
 

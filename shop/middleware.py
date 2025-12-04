@@ -1,9 +1,4 @@
-import json
-
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 
 
 class AuthMiddleware:
@@ -31,7 +26,10 @@ class AuthMiddleware:
         # Check if path requires authentication
         if any(request.path.startswith(path) for path in self.PROTECTED_PATHS):
             if not request.user.is_authenticated:
-                return JsonResponse({"error": "Authentication required"}, status=401)
+                return JsonResponse(
+                    {"error": "Authentication required"},
+                    status=401,
+                )
 
         response = self.get_response(request)
         return response

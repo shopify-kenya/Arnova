@@ -5,7 +5,6 @@ Complete workflow runner for Arnova Django + Next.js integration
 import os
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 
@@ -14,8 +13,13 @@ def run_command(cmd, cwd=None, use_venv=False):
     try:
         if use_venv and os.path.exists("venv/bin/activate"):
             cmd = f"source venv/bin/activate && {cmd}"
-        result = subprocess.run(
-            cmd, shell=True, cwd=cwd, check=True, capture_output=True, text=True
+        subprocess.run(
+            cmd,
+            shell=True,
+            cwd=cwd,
+            check=True,
+            capture_output=True,
+            text=True,
         )
         print(f"✅ {cmd}")
         return True
@@ -41,7 +45,8 @@ def main():
 
     # 2. Install Python dependencies
     print("\n📦 Installing Python dependencies...")
-    if not run_command("pip install -r requirements.txt", base_dir, use_venv=True):
+    cmd = "pip install -r requirements.txt"
+    if not run_command(cmd, base_dir, use_venv=True):
         print("⚠️  Skipping Python dependencies (may already be installed)")
 
     # 3. Install Node.js dependencies
@@ -51,7 +56,8 @@ def main():
 
     # 4. Run Django migrations
     print("\n🗄️ Running Django migrations...")
-    if not run_command("python manage.py migrate", base_dir, use_venv=True):
+    cmd = "python manage.py migrate"
+    if not run_command(cmd, base_dir, use_venv=True):
         print("⚠️  Skipping migrations (may already be applied)")
 
     # 5. Clean and build Next.js app

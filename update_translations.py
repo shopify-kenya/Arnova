@@ -2,7 +2,6 @@
 """
 Update all components to use the translation system
 """
-import os
 import re
 from pathlib import Path
 
@@ -136,7 +135,8 @@ def generate_translation_report():
     suggestions = suggest_translation_keys(all_strings)
 
     print(
-        f"Found {len(all_strings)} unique hardcoded strings across {len(hardcoded_strings_by_file)} files:"
+        f"Found {len(all_strings)} unique hardcoded strings across "
+        f"{len(hardcoded_strings_by_file)} files:"
     )
     print()
 

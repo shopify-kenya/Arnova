@@ -2,8 +2,6 @@
 """
 Quick start script for Arnova - skips dependency installation
 """
-import json
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -116,7 +114,12 @@ def main():
 
     print("\nBuilding Next.js frontend...")
     try:
-        result = subprocess.run("npm run build", shell=True, cwd=base_dir, check=True)
+        subprocess.run(
+            "npm run build",
+            shell=True,
+            cwd=base_dir,
+            check=True,
+        )
         print("Frontend built successfully")
     except subprocess.CalledProcessError:
         print("Frontend build failed")
