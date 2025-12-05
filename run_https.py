@@ -54,7 +54,8 @@ def run_https_server():
     ]
 
     print("Starting HTTPS server at https://127.0.0.1:8000")
-    print("Note: You may need to accept the self-signed certificate " "in your browser")
+    msg = "Note: You may need to accept the self-signed certificate " "in your browser"
+    print(msg)
 
     try:
         subprocess.run(cmd)

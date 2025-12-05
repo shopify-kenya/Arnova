@@ -25,7 +25,8 @@ def generate_pwa_icons():
     if missing_icons:
         icons_str = ", ".join(missing_icons)
         print(f"Missing PWA icons: {icons_str}")
-        print("Please add these icons to the public/ directory for " "full PWA support")
+        msg = "Please add these icons to the public/ directory for " "full PWA support"
+        print(msg)
         return False
 
     print("All PWA icons found")
@@ -45,7 +46,13 @@ def validate_manifest():
             manifest = json.load(f)
 
         # Check required fields
-        required_fields = ["name", "short_name", "start_url", "display", "icons"]
+        required_fields = [
+            "name",
+            "short_name",
+            "start_url",
+            "display",
+            "icons",
+        ]
         missing_fields = [field for field in required_fields if field not in manifest]
 
         if missing_fields:

@@ -214,7 +214,6 @@ def api_profile(request):
             },
         }
         return JsonResponse(data)
-
     elif request.method == "PUT":
         data = json.loads(request.body)
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -349,8 +348,10 @@ def api_admin_analytics(request):
         "total_users": total_users,
         "total_products": total_products,
         "recent_orders": Order.objects.count(),
-        "popular_products": Product.objects.annotate(order_count=Count("orderitem"))
-        .order_by("-order_count")[:5]
-        .values("name", "order_count"),
+        "popular_products": (
+            Product.objects.annotate(order_count=Count("orderitem"))
+            .order_by("-order_count")[:5]
+            .values("name", "order_count")
+        ),
     }
     return JsonResponse(data)
