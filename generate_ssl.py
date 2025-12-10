@@ -50,9 +50,11 @@ def generate_ssl_cert():
         print(f"Error generating SSL certificate: {e}")
         sys.exit(1)
     except FileNotFoundError:
-        print(
-            "OpenSSL not found. Please install OpenSSL to generate " "SSL certificates."
+        msg = (
+            "OpenSSL not found. Please install OpenSSL to "
+            "generate SSL certificates."
         )
+        print(msg)
         print("On Ubuntu/Debian: sudo apt-get install openssl")
         print("On macOS: brew install openssl")
         sys.exit(1)

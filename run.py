@@ -47,7 +47,9 @@ def main():
     print("\n📦 Installing Python dependencies...")
     cmd = "pip install -r requirements.txt"
     if not run_command(cmd, base_dir, use_venv=True):
-        print("⚠️  Skipping Python dependencies (may already be installed)")
+        print(
+            "⚠️  Skipping Python dependencies (may already be installed)"
+        )
 
     # 3. Install Node.js dependencies
     print("\n📦 Installing Node.js dependencies...")

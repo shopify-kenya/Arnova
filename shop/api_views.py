@@ -53,7 +53,11 @@ def api_register(request):
     if User.objects.filter(username=username).exists():
         return JsonResponse({"error": "Username already exists"}, status=400)
 
-    user = User.objects.create_user(username=username, email=email, password=password)
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password,
+    )
     UserProfile.objects.create(user=user)
     Cart.objects.create(user=user)
 
@@ -76,7 +80,9 @@ def api_products(request):
             "name": p.name,
             "description": p.description,
             "price": float(p.price),
-            "sale_price": (float(p.sale_price) if p.sale_price else None),
+            "sale_price": (
+                float(p.sale_price) if p.sale_price else None
+            ),
             "category": p.category.name,
             "sizes": p.sizes,
             "colors": p.colors,
@@ -169,7 +175,9 @@ def api_product_detail(request, product_id):
             "name": product.name,
             "description": product.description,
             "price": float(product.price),
-            "sale_price": (float(product.sale_price) if product.sale_price else None),
+            "sale_price": (
+                float(product.sale_price) if product.sale_price else None
+            ),
             "category": product.category.name,
             "sizes": product.sizes,
             "colors": product.colors,
@@ -188,7 +196,10 @@ def api_product_detail(request, product_id):
 @require_http_methods(["GET"])
 def api_categories(request):
     categories = Category.objects.all()
-    data = [{"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories]
+    data = [
+        {"id": cat.id, "name": cat.name, "slug": cat.slug}
+        for cat in categories
+    ]
     return JsonResponse({"categories": data})
 
 

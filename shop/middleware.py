@@ -24,7 +24,8 @@ class AuthMiddleware:
 
     def __call__(self, request):
         # Check if path requires authentication
-        if any(request.path.startswith(path) for path in self.PROTECTED_PATHS):
+        protected = any(request.path.startswith(path) for path in self.PROTECTED_PATHS)
+        if protected:
             if not request.user.is_authenticated:
                 return JsonResponse(
                     {"error": "Authentication required"},
@@ -50,7 +51,8 @@ def admin_required(view_func):
     """Decorator for admin-only views"""
 
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_authenticated or not request.user.is_staff:
+        is_admin = request.user.is_authenticated and request.user.is_staff
+        if not is_admin:
             return JsonResponse({"error": "Admin access required"}, status=403)
         return view_func(request, *args, **kwargs)
 

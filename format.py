@@ -10,7 +10,9 @@ from pathlib import Path
 def format_python_files():
     """Format Python files using autopep8 (built-in alternative)"""
     base_dir = Path(__file__).parent
-    python_files = [f for f in base_dir.rglob("*.py") if not str(f).startswith(".")]
+    python_files = [
+        f for f in base_dir.rglob("*.py") if not str(f).startswith(".")
+    ]
 
     if not python_files:
         print("No Python files found")
