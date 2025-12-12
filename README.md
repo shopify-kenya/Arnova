@@ -25,14 +25,24 @@ cd Arnova
 npm install
 pip install -r requirements.txt
 
-# Start development server
+# Start unified development server
 python quick-start.py
 ```
 
-The application will be available at:
+**Unified Server Architecture:**
 
-- HTTP: http://127.0.0.1:8000
-- HTTPS: https://127.0.0.1:8443 (if SSL enabled)
+- Single server endpoint serves both frontend and backend
+- Django handles API routes (`/api/*`) and admin (`/admin/`)
+- Next.js frontend integrated seamlessly
+- CSRF protection enabled for secure API communication
+
+**Access Points:**
+
+- Main App: <http://127.0.0.1:8000>
+- HTTPS: <https://127.0.0.1:8443> (if SSL enabled)
+- Admin Panel: <http://127.0.0.1:8000/admin/>
+- API Endpoints: <http://127.0.0.1:8000/api/>\*
+- CSRF Demo: <http://127.0.0.1:8000/csrf-example/>
 
 ## Documentation
 

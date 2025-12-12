@@ -166,16 +166,16 @@ if not DEBUG:
         "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
     )
 
-# CSRF Configuration for Frontend-Backend Integration
+# CSRF Configuration for Unified Frontend-Backend
 CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access
 CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
-CSRF_COOKIE_AGE = 31449600  # 1 year
+CSRF_COOKIE_AGE = 86400  # 24 hours
 
-# Trusted origins for CSRF
+# Trusted origins for CSRF (same-origin by default)
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'https://127.0.0.1:8443',
@@ -183,14 +183,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://localhost:8443',
 ]
 
-# CORS Configuration
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:8000',
-    'https://127.0.0.1:8443',
-    'http://localhost:8000',
-    'https://localhost:8443',
-]
+# Allow same-origin requests without CSRF for GET requests
+CSRF_COOKIE_DOMAIN = None  # Use default domain
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
