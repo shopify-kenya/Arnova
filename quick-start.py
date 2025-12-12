@@ -124,6 +124,8 @@ def main():
 
         # Copy Next.js build files to Django-compatible structure
         print("Copying Next.js build files...")
+        build_dir = base_dir / "build"
+        build_dir.mkdir(exist_ok=True)
         subprocess.run(
             "python copy_nextjs_build.py",
             shell=True,
