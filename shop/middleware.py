@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.utils.deprecation import MiddlewareMixin
 
 
 class AuthMiddleware:
@@ -57,3 +58,35 @@ def admin_required(view_func):
         return view_func(request, *args, **kwargs)
 
     return wrapper
+
+
+class CorsMiddleware(MiddlewareMixin):
+    """CORS middleware for frontend-backend integration"""
+
+    def process_response(self, request, response):
+        # Allow credentials for same-origin requests
+        origin = request.META.get('HTTP_ORIGIN')
+        allowed_origins = [
+            'http://127.0.0.1:8000',
+            'https://127.0.0.1:8443',
+            'http://localhost:8000',
+            'https://localhost:8443',
+        ]
+
+        if origin in allowed_origins:
+            response['Access-Control-Allow-Origin'] = origin
+            response['Access-Control-Allow-Credentials'] = 'true'
+
+        response['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response['Access-Control-Allow-Headers'] = (
+            'Accept, Content-Type, Content-Length, Accept-Encoding, '
+            'X-CSRF-Token, X-CSRFToken, Authorization, X-Requested-With'
+        )
+        response['Access-Control-Max-Age'] = '86400'
+
+        return response
+
+    def process_request(self, request):
+        if request.method == 'OPTIONS':
+            response = JsonResponse({})
+            return self.process_response(request, response)

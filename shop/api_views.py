@@ -3,7 +3,8 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from .middleware import admin_required, api_login_required
@@ -18,7 +19,16 @@ from .models import (
 )
 
 
-@csrf_exempt
+@ensure_csrf_cookie
+@require_http_methods(["GET"])
+def api_csrf_token(request):
+    """Get CSRF token for frontend requests"""
+    return JsonResponse({
+        'csrfToken': get_token(request),
+        'success': True
+    })
+
+
 @require_http_methods(["POST"])
 def api_login(request):
     data = json.loads(request.body)
@@ -42,7 +52,6 @@ def api_login(request):
     return JsonResponse({"error": "Invalid credentials"}, status=401)
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_register(request):
     data = json.loads(request.body)
@@ -99,7 +108,6 @@ def api_products(request):
 
 
 @api_login_required
-@csrf_exempt
 def api_cart(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
@@ -141,7 +149,6 @@ def api_cart(request):
 
 
 @api_login_required
-@csrf_exempt
 def api_saved(request):
     if request.method == "GET":
         items = SavedItem.objects.filter(user=request.user)
@@ -204,7 +211,6 @@ def api_categories(request):
 
 
 @api_login_required
-@csrf_exempt
 def api_profile(request):
     if request.method == "GET":
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -289,7 +295,6 @@ def api_admin_orders(request):
 
 
 @admin_required
-@csrf_exempt
 def api_admin_products(request):
     if request.method == "GET":
         products = Product.objects.all()

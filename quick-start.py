@@ -140,7 +140,10 @@ def main():
     print("HTTP URL: http://127.0.0.1:8000")
     if ssl_enabled:
         print("HTTPS URL: https://127.0.0.1:8443")
+    print("Admin: /admin/ (create superuser: python manage.py createsuperuser)")
+    print("CSRF Example: /csrf-example/ (secure API integration demo)")
     print("PWA features enabled")
+    print("CSRF protection enabled")
     print("=" * 30)
 
     try:

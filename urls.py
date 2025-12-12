@@ -10,6 +10,8 @@ from shop import api_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # CSRF Token API
+    path("api/csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
     # Authentication API
     path("api/auth/login/", api_views.api_login, name="api_login"),
     path(
@@ -96,6 +98,14 @@ urlpatterns = [
         {
             "document_root": os.path.join(settings.BASE_DIR, "public"),
             "path": "sitemap.xml",
+        },
+    ),
+    path(
+        "csrf-example/",
+        serve,
+        {
+            "document_root": os.path.join(settings.BASE_DIR, "public"),
+            "path": "csrf-example.html",
         },
     ),
     re_path(
