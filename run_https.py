@@ -43,34 +43,27 @@ def run_https_server():
             f.write(content)
         print("Added django_extensions to INSTALLED_APPS")
 
-    # Run HTTPS server
-    cmd = [
-        sys.executable,
-        "manage.py",
-        "runserver_plus",
-        "--cert-file",
-        cert_file,
-        "--key-file",
-        key_file,
-        "127.0.0.1:8000",
-    ]
-
-    print("Starting HTTPS server at https://127.0.0.1:8000")
-    msg = (
-        "Note: You may need to accept the self-signed certificate "
-        "in your browser"
-    )
-    print(msg)
-
+    # Try HTTPS server with django-extensions, fallback to HTTP
     try:
+        cmd = [
+            sys.executable,
+            "manage.py",
+            "runserver_plus",
+            "--cert-file",
+            cert_file,
+            "--key-file",
+            key_file,
+            "127.0.0.1:8000",
+        ]
+        print("Starting HTTPS server at https://127.0.0.1:8000")
+        print("Note: You may need to accept the self-signed certificate in your browser")
+        subprocess.run(cmd)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("HTTPS server failed, starting HTTP server instead...")
+        cmd = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
         subprocess.run(cmd)
     except KeyboardInterrupt:
         print("\nServer stopped")
-    except FileNotFoundError:
-        print(
-            "Django not found. Make sure you're in the correct directory and "
-            "Django is installed."
-        )
 
 
 if __name__ == "__main__":

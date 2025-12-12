@@ -126,10 +126,9 @@ def main():
         sys.exit(1)
 
     # 5. Check if build files exist
-    build_dir = base_dir / "build"
-    index_file = build_dir / "index.html"
+    next_dir = base_dir / ".next"
 
-    if not index_file.exists():
+    if not next_dir.exists():
         print("Build files not found")
         sys.exit(1)
 
