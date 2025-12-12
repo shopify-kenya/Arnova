@@ -20,13 +20,22 @@ def run_https_server():
         print("SSL certificates not found!")
         sys.exit(1)
 
-    # Install django-extensions if not already installed
+    # Install required packages if not already installed
     try:
         import django_extensions  # noqa: F401
     except ImportError:
         print("Installing django-extensions for HTTPS support...")
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "django-extensions"],
+            check=True,
+        )
+
+    try:
+        import werkzeug  # noqa: F401
+    except ImportError:
+        print("Installing Werkzeug for HTTPS support...")
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "Werkzeug"],
             check=True,
         )
 
