@@ -121,6 +121,15 @@ def main():
             check=True,
         )
         print("Frontend built successfully")
+
+        # Copy Next.js build files to Django-compatible structure
+        print("Copying Next.js build files...")
+        subprocess.run(
+            "python copy_nextjs_build.py",
+            shell=True,
+            cwd=base_dir,
+            check=True,
+        )
     except subprocess.CalledProcessError:
         print("Frontend build failed")
         sys.exit(1)
