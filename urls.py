@@ -6,7 +6,7 @@ from django.urls import path, re_path
 from django.views.static import serve
 
 import views
-from shop import api_views
+from shop import api_views, payment_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -55,6 +55,17 @@ urlpatterns = [
         "api/admin/analytics/",
         api_views.api_admin_analytics,
         name="api_admin_analytics",
+    ),
+    # Payment API
+    path(
+        "api/payment/process/",
+        payment_views.process_payment,
+        name="api_process_payment",
+    ),
+    path(
+        "api/payment/validate-card/",
+        payment_views.validate_card,
+        name="api_validate_card",
     ),
     # Serve Next.js static assets
     re_path(

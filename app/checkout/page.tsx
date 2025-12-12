@@ -6,7 +6,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { CreditCard, MapPin, ArrowRight, CheckCircle } from "lucide-react"
+import { MapPin, ArrowRight, CheckCircle } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { GlassCard } from "@/components/glass-card"
@@ -25,6 +25,8 @@ import { useAuth } from "@/components/auth-provider"
 import { useCart } from "@/components/cart-provider"
 import { countries } from "@/lib/countries"
 import { toast } from "sonner"
+import { PaymentMethods } from "@/components/payment-methods"
+import { processPayment } from "@/lib/payment"
 
 function CheckoutPageContent() {
   const router = useRouter()
@@ -34,6 +36,7 @@ function CheckoutPageContent() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
 
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card")
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -44,9 +47,12 @@ function CheckoutPageContent() {
     state: "",
     zipCode: "",
     country: "",
+  })
+  const [cardData, setCardData] = useState({
     cardNumber: "",
     cardExpiry: "",
     cardCvc: "",
+    cardName: "",
   })
 
   useEffect(() => {
@@ -74,13 +80,86 @@ function CheckoutPageContent() {
     e.preventDefault()
     setIsProcessing(true)
 
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    try {
+      // Validate form data
+      const requiredFields = [
+        "firstName",
+        "lastName",
+        "email",
+        "address",
+        "city",
+        "country",
+      ]
+      for (const field of requiredFields) {
+        if (!formData[field as keyof typeof formData]) {
+          toast.error(
+            `Please fill in ${field.replace(/([A-Z])/g, " $1").toLowerCase()}`
+          )
+          setIsProcessing(false)
+          return
+        }
+      }
 
-    setIsProcessing(false)
-    setOrderComplete(true)
-    clearCart()
-    toast.success("Order placed successfully!")
+      if (paymentMethod === "card") {
+        // Validate card data
+        if (
+          !cardData.cardNumber ||
+          !cardData.cardExpiry ||
+          !cardData.cardCvc ||
+          !cardData.cardName
+        ) {
+          toast.error("Please fill in all card details")
+          setIsProcessing(false)
+          return
+        }
+      }
+
+      // Process payment
+      const paymentData = {
+        payment_method: paymentMethod,
+        amount: grandTotal,
+        card_data: paymentMethod === "card" ? cardData : undefined,
+        order_data: {
+          items: cart.map(item => ({
+            product_id: item.product.id,
+            quantity: item.quantity,
+            size: item.selectedSize,
+            color: item.selectedColor,
+            price: item.product.price,
+          })),
+          shipping_address: formData,
+          billing_address: formData,
+        },
+      }
+
+      const result = await processPayment(paymentData)
+
+      if (result.success) {
+        if (result.redirect_url && paymentMethod === "paypal") {
+          toast.info("Redirecting to PayPal...")
+          window.open(result.redirect_url, "_blank")
+          // Simulate successful return from PayPal
+          await new Promise(resolve => setTimeout(resolve, 3000))
+        }
+
+        setIsProcessing(false)
+        setOrderComplete(true)
+        clearCart()
+        toast.success(
+          result.message ||
+            `Payment successful via ${paymentMethod === "paypal" ? "PayPal" : "Credit Card"}!`
+        )
+      } else {
+        throw new Error(result.error || "Payment failed")
+      }
+    } catch (error: unknown) {
+      setIsProcessing(false)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Payment failed. Please try again."
+      toast.error(errorMessage)
+    }
   }
 
   if (!isAuthenticated) return null
@@ -304,68 +383,12 @@ function CheckoutPageContent() {
                 </GlassCard>
 
                 {/* Payment Information */}
-                <GlassCard className="p-6" strong>
-                  <div className="flex items-center gap-2 mb-6">
-                    <CreditCard className="h-6 w-6 text-primary" />
-                    <h2 className="text-2xl font-bold text-foreground">
-                      Payment Information
-                    </h2>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="cardNumber">Card Number</Label>
-                      <Input
-                        id="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        value={formData.cardNumber}
-                        onChange={e =>
-                          setFormData({
-                            ...formData,
-                            cardNumber: e.target.value,
-                          })
-                        }
-                        required
-                        className="glass"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="cardExpiry">Expiry Date</Label>
-                        <Input
-                          id="cardExpiry"
-                          placeholder="MM/YY"
-                          value={formData.cardExpiry}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              cardExpiry: e.target.value,
-                            })
-                          }
-                          required
-                          className="glass"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="cardCvc">CVC</Label>
-                        <Input
-                          id="cardCvc"
-                          placeholder="123"
-                          value={formData.cardCvc}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              cardCvc: e.target.value,
-                            })
-                          }
-                          required
-                          className="glass"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </GlassCard>
+                <PaymentMethods
+                  selectedMethod={paymentMethod}
+                  onMethodChange={setPaymentMethod}
+                  cardData={cardData}
+                  onCardDataChange={setCardData}
+                />
               </div>
 
               {/* Order Summary */}
