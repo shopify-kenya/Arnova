@@ -4,8 +4,8 @@ const DYNAMIC_CACHE = "arnova-dynamic-v2"
 const STATIC_ASSETS = [
   "/",
   "/manifest.json",
-  "/icon-192x192.jpg",
-  "/icon-512x512.jpg",
+  "/icon-192x192.png",
+  "/icon-512x512.png",
   "/apple-touch-icon.jpg",
   "/favicon.svg",
   "/offline/",
@@ -46,6 +46,12 @@ self.addEventListener("activate", event => {
 // Fetch event
 self.addEventListener("fetch", event => {
   const { request } = event
+
+  // Skip chrome-extension and other unsupported schemes
+  if (!request.url.startsWith("http")) {
+    return
+  }
+
   const url = new URL(request.url)
 
   // Handle API requests
