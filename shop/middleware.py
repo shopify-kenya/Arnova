@@ -11,7 +11,6 @@ class AuthMiddleware:
         "/api/saved/",
         "/api/profile/",
         "/api/admin/",
-        "/admin/",
     ]
 
     PUBLIC_PATHS = [
