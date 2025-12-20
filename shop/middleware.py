@@ -10,6 +10,7 @@ class AuthMiddleware:
         "/api/orders/",
         "/api/saved/",
         "/api/profile/",
+        "/api/admin/",
         "/admin/",
     ]
 
@@ -52,8 +53,9 @@ def admin_required(view_func):
     """Decorator for admin-only views"""
 
     def wrapper(request, *args, **kwargs):
-        is_admin = request.user.is_authenticated and request.user.is_staff
-        if not is_admin:
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        if not request.user.is_staff:
             return JsonResponse({"error": "Admin access required"}, status=403)
         return view_func(request, *args, **kwargs)
 
