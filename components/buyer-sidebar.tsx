@@ -8,9 +8,7 @@ import {
   User,
   ShoppingBag,
   Heart,
-  MapPin,
-  CreditCard,
-  Settings,
+  Package,
   LogOut,
   Menu,
   X,
@@ -20,6 +18,12 @@ import { GlassCard } from "@/components/glass-card"
 import { useAuth } from "@/components/auth-provider"
 
 const sidebarItems = [
+  {
+    title: "Dashboard",
+    href: "/",
+    icon: User,
+    description: "Overview",
+  },
   {
     title: "Profile",
     href: "/profile",
@@ -39,22 +43,28 @@ const sidebarItems = [
     description: "Your wishlist",
   },
   {
-    title: "Addresses",
-    href: "/profile/addresses",
-    icon: MapPin,
-    description: "Shipping addresses",
+    title: "Cart",
+    href: "/cart",
+    icon: ShoppingBag,
+    description: "Shopping cart",
   },
   {
-    title: "Payment Methods",
-    href: "/profile/payment",
-    icon: CreditCard,
-    description: "Manage payments",
+    title: "New Arrivals",
+    href: "/new-arrivals",
+    icon: Package,
+    description: "Latest products",
   },
   {
-    title: "Settings",
-    href: "/profile/settings",
-    icon: Settings,
-    description: "Account preferences",
+    title: "Categories",
+    href: "/clothing",
+    icon: Package,
+    description: "Browse products",
+  },
+  {
+    title: "Sale",
+    href: "/sale",
+    icon: Package,
+    description: "Special offers",
   },
 ]
 

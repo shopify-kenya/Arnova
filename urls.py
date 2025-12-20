@@ -9,7 +9,7 @@ import views
 from shop import api_views, payment_views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("django-admin/", admin.site.urls),
     # CSRF Token API
     path("api/csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
     # Authentication API
@@ -48,11 +48,26 @@ urlpatterns = [
         api_views.api_admin_products,
         name="api_admin_products",
     ),
+    path(
+        "api/admin/products/<str:product_id>/",
+        api_views.api_admin_product_detail,
+        name="api_admin_product_detail",
+    ),
     path("api/admin/users/", api_views.api_admin_users, name="api_admin_users"),
+    path(
+        "api/admin/users/<int:user_id>/",
+        api_views.api_admin_user_detail,
+        name="api_admin_user_detail",
+    ),
     path(
         "api/admin/analytics/",
         api_views.api_admin_analytics,
         name="api_admin_analytics",
+    ),
+    path(
+        "api/admin/settings/",
+        api_views.api_admin_settings,
+        name="api_admin_settings",
     ),
     # Payment API
     path(

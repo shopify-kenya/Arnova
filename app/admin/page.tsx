@@ -9,6 +9,7 @@ import {
   Users,
   TrendingUp,
   DollarSign,
+  Settings,
 } from "lucide-react"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { GlassCard } from "@/components/glass-card"
@@ -85,6 +86,12 @@ export default function AdminDashboardPage() {
       href: "/admin/analytics",
       icon: TrendingUp,
     },
+    {
+      title: "Settings",
+      description: "Configure platform settings",
+      href: "/admin/settings",
+      icon: Settings,
+    },
   ]
 
   return (
@@ -140,7 +147,7 @@ export default function AdminDashboardPage() {
                 <h2 className="font-serif text-3xl font-bold text-foreground mb-6">
                   Quick Actions
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                   {quickActions.map((action, index) => (
                     <motion.div
                       key={action.title}
