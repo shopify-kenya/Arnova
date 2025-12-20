@@ -150,7 +150,9 @@ def main():
     print("HTTP URL: http://127.0.0.1:8000")
     if ssl_enabled:
         print("HTTPS URL: https://127.0.0.1:8443")
-    print("Admin: /admin/ (create superuser: python manage.py createsuperuser)")
+    print(
+        "Admin: /admin/ (create superuser: python manage.py createsuperuser)"
+    )
     print("CSRF Example: /csrf-example/ (secure API integration demo)")
     print("PWA features enabled")
     print("CSRF protection enabled")
@@ -160,7 +162,9 @@ def main():
         if ssl_enabled:
             subprocess.run("python run_https.py", shell=True, cwd=base_dir)
         else:
-            subprocess.run("python manage.py runserver", shell=True, cwd=base_dir)
+            subprocess.run(
+                "python manage.py runserver", shell=True, cwd=base_dir
+            )
     except KeyboardInterrupt:
         print("\nShutting down Arnova...")
 

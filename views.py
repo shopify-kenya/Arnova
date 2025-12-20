@@ -30,8 +30,10 @@ def index(request):
     <div style="text-align:center; padding:50px; font-family:Arial;">
         <h1>🛍️ Arnova Shop</h1>
         <p>Django backend is running!</p>
-        <p>Run <code>npm run build</code> to generate the frontend.</p>
-        <p><a href="/admin/">Django Admin</a> | <a href="/api/products/">API</a></p>
+        <p>Run <code>npm run build</code> to generate the "
+        "frontend.</p>
+        <p><a href="/admin/">Django Admin</a> | "
+        "<a href="/api/products/">API</a></p>
     </div>
 </body>
 </html>

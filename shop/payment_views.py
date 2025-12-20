@@ -21,7 +21,8 @@ def process_payment(request):
             return process_paypal_payment(data, amount)
         else:
             return JsonResponse(
-                {"success": False, "error": "Invalid payment method"}, status=400
+                {"success": False, "error": "Invalid payment method"},
+                status=400,
             )
 
     except Exception as e:
