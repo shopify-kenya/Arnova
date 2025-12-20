@@ -1,11 +1,31 @@
-name: Proof HTML
+name: Build Validation
 on:
   push:
+    branches: [ main, develop ]
   workflow_dispatch:
 jobs:
-  build:
+  validate-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: anishathalye/proof-html@v2.2.2
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          directory: ./
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js application
+        run: npm run build
+
+      - name: Validate build output
+        run: |
+          if [ -d ".next" ]; then
+            echo "Next.js build successful"
+          else
+            echo "Next.js build failed"
+            exit 1
+          fi
