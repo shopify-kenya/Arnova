@@ -69,12 +69,12 @@ urlpatterns = [
     re_path(
         r"^_next/static/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, ".next", "static")},
+        {"document_root": os.path.join(settings.BASE_DIR, "out", "_next", "static")},
     ),
     re_path(
         r"^_next/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, ".next")},
+        {"document_root": os.path.join(settings.BASE_DIR, "out", "_next")},
     ),
     # Serve public assets
     path(
@@ -124,37 +124,6 @@ urlpatterns = [
     ),
     # Specific Next.js routes for better handling
     path("", views.index, name="home"),
-    path("login/", views.index, name="login"),
-    path("register/", views.index, name="register"),
-    path("profile/", views.index, name="profile"),
-    path("cart/", views.index, name="cart"),
-    path("checkout/", views.index, name="checkout"),
-    path("saved/", views.index, name="saved"),
-    path("about/", views.index, name="about"),
-    path("contact/", views.index, name="contact"),
-    path("faq/", views.index, name="faq"),
-    path("careers/", views.index, name="careers"),
-    path("shipping/", views.index, name="shipping"),
-    path("returns/", views.index, name="returns"),
-    path("privacy/", views.index, name="privacy"),
-    path("terms/", views.index, name="terms"),
-    path("size-guide/", views.index, name="size_guide"),
-    path("offline/", views.index, name="offline"),
-    # Category routes
-    path("new-arrivals/", views.index, name="new_arrivals"),
-    path("clothing/", views.index, name="clothing"),
-    path("shoes/", views.index, name="shoes"),
-    path("bags/", views.index, name="bags"),
-    path("accessories/", views.index, name="accessories"),
-    path("sale/", views.index, name="sale"),
-    # Product routes
-    path("product/<str:product_id>/", views.index, name="product_detail"),
-    # Admin routes
-    path("admin-panel/", views.index, name="admin_panel"),
-    path("admin-panel/products/", views.index, name="admin_products"),
-    path("admin-panel/orders/", views.index, name="admin_orders"),
-    path("admin-panel/users/", views.index, name="admin_users"),
-    path("admin-panel/analytics/", views.index, name="admin_analytics"),
     # Catch-all for any remaining routes (MUST BE LAST)
     re_path(r"^.*$", views.index, name="catch_all"),
 ]

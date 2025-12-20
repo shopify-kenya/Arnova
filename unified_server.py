@@ -35,7 +35,9 @@ def run_unified_server():
     # Copy Next.js build files
     print("📁 Copying build files...")
     try:
-        subprocess.run([sys.executable, "copy_nextjs_build.py"], check=True, cwd=base_dir)
+        subprocess.run(
+            [sys.executable, "copy_nextjs_build.py"], check=True, cwd=base_dir
+        )
         print("✅ Build files copied")
     except subprocess.CalledProcessError:
         print("❌ Failed to copy build files")
@@ -44,7 +46,9 @@ def run_unified_server():
     # Run Django migrations
     print("🗄️  Running database migrations...")
     try:
-        subprocess.run([sys.executable, "manage.py", "migrate"], check=True, cwd=base_dir)
+        subprocess.run(
+            [sys.executable, "manage.py", "migrate"], check=True, cwd=base_dir
+        )
         print("✅ Migrations completed")
     except subprocess.CalledProcessError:
         print("⚠️  Migrations failed, continuing...")
@@ -72,12 +76,19 @@ def run_unified_server():
                 )
 
             # Start HTTPS server
-            subprocess.run([
-                sys.executable, "manage.py", "runserver_plus",
-                "--cert-file", "ssl/cert.pem",
-                "--key-file", "ssl/key.pem",
-                "127.0.0.1:8443"
-            ], cwd=base_dir)
+            subprocess.run(
+                [
+                    sys.executable,
+                    "manage.py",
+                    "runserver_plus",
+                    "--cert-file",
+                    "ssl/cert.pem",
+                    "--key-file",
+                    "ssl/key.pem",
+                    "127.0.0.1:8443",
+                ],
+                cwd=base_dir,
+            )
         except (subprocess.CalledProcessError, FileNotFoundError):
             print("⚠️  HTTPS server failed, falling back to HTTP...")
             start_http_server(base_dir)
@@ -96,7 +107,9 @@ def start_http_server(base_dir):
     print("\n🔧 Press Ctrl+C to stop the server")
 
     try:
-        subprocess.run([sys.executable, "manage.py", "runserver", "127.0.0.1:8000"], cwd=base_dir)
+        subprocess.run(
+            [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"], cwd=base_dir
+        )
     except KeyboardInterrupt:
         print("\n🛑 Server stopped")
 

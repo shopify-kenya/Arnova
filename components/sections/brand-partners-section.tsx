@@ -47,23 +47,23 @@ export function BrandPartnersSection() {
             <motion.div
               className="flex items-center space-x-16"
               animate={{
-                x: ["-100%", "0%"],
+                x: ["-50%", "-100%"],
               }}
               transition={{
                 x: {
                   repeat: Infinity,
                   repeatType: "loop",
-                  duration: 20,
+                  duration: 15,
                   ease: "linear",
                 },
               }}
             >
-              {[...brands, ...brands].map((brand, index) => (
+              {[...brands, ...brands, ...brands].map((brand, index) => (
                 <div key={`${brand.name}-${index}`} className="flex-shrink-0">
                   <img
                     src={brand.logo}
                     alt={brand.name}
-                    className="h-12 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0"
+                    className="h-12 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0 brightness-0 dark:invert dark:brightness-100"
                   />
                 </div>
               ))}
