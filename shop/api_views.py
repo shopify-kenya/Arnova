@@ -1,4 +1,6 @@
 import json
+import requests
+from decimal import Decimal
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -79,14 +81,29 @@ def api_logout(request):
 
 @require_http_methods(["GET"])
 def api_products(request):
+    target_currency = request.GET.get('currency', 'USD')
     products = Product.objects.all()
-    data = [
-        {
+    data = []
+
+    for p in products:
+        # Convert price if different currency requested
+        price = float(p.price)
+        sale_price = float(p.sale_price) if p.sale_price else None
+
+        if target_currency != p.currency:
+            rate = get_exchange_rate(p.currency, target_currency)
+            if rate:
+                price = price * rate
+                if sale_price:
+                    sale_price = sale_price * rate
+        data.append({
             "id": p.id,
             "name": p.name,
             "description": p.description,
-            "price": float(p.price),
-            "sale_price": (float(p.sale_price) if p.sale_price else None),
+            "price": round(price, 2),
+            "sale_price": round(sale_price, 2) if sale_price else None,
+            "currency": target_currency,
+            "base_currency": p.currency,
             "category": p.category.name,
             "sizes": p.sizes,
             "colors": p.colors,
@@ -96,9 +113,7 @@ def api_products(request):
             "on_sale": p.on_sale,
             "rating": float(p.rating),
             "reviews": p.reviews,
-        }
-        for p in products
-    ]
+        })
     return JsonResponse({"products": data})
 
 
@@ -309,6 +324,7 @@ def api_admin_products(request):
             name=data["name"],
             description=data["description"],
             price=data["price"],
+            currency=data.get("currency", "USD"),
             category=category,
             sizes=data.get("sizes", []),
             colors=data.get("colors", []),
@@ -361,3 +377,52 @@ def api_admin_analytics(request):
         ),
     }
     return JsonResponse(data)
+
+
+def get_exchange_rate(from_currency, to_currency):
+    """Get exchange rate from free API"""
+    if from_currency == to_currency:
+        return 1.0
+
+    try:
+        # Using exchangerate-api.com free tier
+        url = f"https://api.exchangerate-api.com/v4/latest/{from_currency}"
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            return data['rates'].get(to_currency, 1.0)
+    except:
+        pass
+
+    # Fallback rates if API fails
+    fallback_rates = {
+        ('USD', 'KES'): 150.0,
+        ('KES', 'USD'): 0.0067,
+        ('USD', 'EUR'): 0.85,
+        ('EUR', 'USD'): 1.18,
+    }
+    return fallback_rates.get((from_currency, to_currency), 1.0)
+
+
+@require_http_methods(["GET"])
+def api_exchange_rates(request):
+    """Get current exchange rates"""
+    base_currency = request.GET.get('base', 'USD')
+    try:
+        url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            return JsonResponse(response.json())
+    except:
+        pass
+
+    # Fallback rates
+    fallback_data = {
+        'base': base_currency,
+        'rates': {
+            'USD': 1.0 if base_currency == 'USD' else 0.0067,
+            'KES': 150.0 if base_currency == 'USD' else 1.0,
+            'EUR': 0.85 if base_currency == 'USD' else 0.0057,
+        }
+    }
+    return JsonResponse(fallback_data)

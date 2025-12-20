@@ -65,6 +65,12 @@ urlpatterns = [
         payment_views.validate_card,
         name="api_validate_card",
     ),
+    # Currency API
+    path(
+        "api/exchange-rates/",
+        api_views.api_exchange_rates,
+        name="api_exchange_rates",
+    ),
     # Serve Next.js static assets
     re_path(
         r"^_next/static/(?P<path>.*)$",
