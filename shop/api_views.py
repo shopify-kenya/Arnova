@@ -1,6 +1,5 @@
 import json
 import requests
-from decimal import Decimal
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -391,7 +390,7 @@ def get_exchange_rate(from_currency, to_currency):
         if response.status_code == 200:
             data = response.json()
             return data['rates'].get(to_currency, 1.0)
-    except:
+    except Exception:
         pass
 
     # Fallback rates if API fails
@@ -413,7 +412,7 @@ def api_exchange_rates(request):
         response = requests.get(url, timeout=5)
         if response.status_code == 200:
             return JsonResponse(response.json())
-    except:
+    except Exception:
         pass
 
     # Fallback rates
