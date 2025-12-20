@@ -16,7 +16,9 @@ export function PWAInstaller() {
 
   useEffect(() => {
     const handler = (e: Event) => {
+      // Prevent the default browser install prompt
       e.preventDefault()
+      // Store the event for later use
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       setShowInstallPrompt(true)
     }
@@ -29,18 +31,27 @@ export function PWAInstaller() {
   const handleInstall = async () => {
     if (!deferredPrompt) return
 
-    deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
+    try {
+      // Show the install prompt
+      await deferredPrompt.prompt()
+      const { outcome } = await deferredPrompt.userChoice
 
-    if (outcome === "accepted") {
-      console.log("PWA installed")
+      if (outcome === "accepted") {
+        console.log("PWA installation accepted")
+      } else {
+        console.log("PWA installation dismissed")
+      }
+    } catch (error) {
+      console.log("PWA installation error:", error)
     }
 
+    // Clean up
     setDeferredPrompt(null)
     setShowInstallPrompt(false)
   }
 
-  if (!showInstallPrompt) return null
+  // Only show the install button when we have a deferred prompt
+  if (!showInstallPrompt || !deferredPrompt) return null
 
   return (
     <Button
