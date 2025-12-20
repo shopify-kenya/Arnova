@@ -1,4 +1,4 @@
-import { apiClient } from "./api-client"
+import { api } from "./api-client"
 
 export interface CardData {
   cardNumber: string
@@ -50,8 +50,8 @@ export const processPayment = async (
   paymentData: PaymentData
 ): Promise<PaymentResult> => {
   try {
-    const response = await apiClient.post("/api/payment/process/", paymentData)
-    return response.data
+    const response = await api.processPayment(paymentData)
+    return response.data || { success: false, error: "No response data" }
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Payment processing failed"
@@ -70,10 +70,14 @@ export const validateCard = async (
   error?: string
 }> => {
   try {
-    const response = await apiClient.post("/api/payment/validate-card/", {
-      card_number: cardNumber,
-    })
-    return response.data
+    const response = await api.validateCard(cardNumber)
+    return (
+      response.data || {
+        valid: false,
+        card_type: "unknown",
+        error: "No response data",
+      }
+    )
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Card validation failed"

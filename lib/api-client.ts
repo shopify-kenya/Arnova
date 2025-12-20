@@ -136,6 +136,57 @@ export interface UserProfile {
   avatar_url?: string
 }
 
+// Payment types
+export interface PaymentData {
+  payment_method: "card" | "paypal"
+  amount: number
+  card_data?: {
+    cardNumber: string
+    cardExpiry: string
+    cardCvc: string
+    cardName: string
+  }
+  order_data: {
+    items: Array<{
+      product_id: string
+      quantity: number
+      size: string
+      color: string
+      price: number
+    }>
+    shipping_address: {
+      firstName: string
+      lastName: string
+      email: string
+      phone: string
+      address: string
+      city: string
+      state: string
+      zipCode: string
+      country: string
+    }
+    billing_address?: {
+      firstName: string
+      lastName: string
+      email: string
+      phone: string
+      address: string
+      city: string
+      state: string
+      zipCode: string
+      country: string
+    }
+  }
+}
+
+export interface PaymentResult {
+  success: boolean
+  transaction_id?: string
+  message?: string
+  error?: string
+  redirect_url?: string
+}
+
 // ============================================================================
 // API Client Class
 // ============================================================================
@@ -486,6 +537,28 @@ class ApiClient {
     }>
   > {
     return this.request(`/orders/${id}/track/`)
+  }
+
+  // ============================================================================
+  // Payment
+  // ============================================================================
+
+  async processPayment(data: PaymentData): Promise<ApiResponse<PaymentResult>> {
+    return this.request("/payment/process/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+  }
+
+  async validateCard(
+    cardNumber: string
+  ): Promise<
+    ApiResponse<{ valid: boolean; card_type: string; error?: string }>
+  > {
+    return this.request("/payment/validate-card/", {
+      method: "POST",
+      body: JSON.stringify({ card_number: cardNumber }),
+    })
   }
 }
 
