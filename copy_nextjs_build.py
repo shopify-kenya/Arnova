@@ -14,7 +14,8 @@ def copy_nextjs_build():
 
     if not out_dir.exists():
         print(
-            "❌ Next.js 'out' directory not found. Make sure 'npm run build' completed successfully."
+            "❌ Next.js 'out' directory not found. "
+            "Make sure 'npm run build' completed successfully."
         )
         return
 

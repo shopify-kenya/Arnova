@@ -63,7 +63,7 @@ export function BrandPartnersSection() {
                   <img
                     src={brand.logo}
                     alt={brand.name}
-                    className="h-12 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0 brightness-0 dark:invert dark:brightness-100"
+                    className="h-12 w-auto object-contain opacity-60 hover:opacity-100 transition-opacity duration-300 filter grayscale hover:grayscale-0 invert dark:invert-0"
                   />
                 </div>
               ))}

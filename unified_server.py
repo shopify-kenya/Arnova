@@ -4,7 +4,6 @@ Unified Server for Arnova E-commerce
 Builds Next.js frontend and serves both frontend and backend from Django
 Supports both HTTP and HTTPS with SSL certificates
 """
-import os
 import subprocess
 import sys
 from pathlib import Path
