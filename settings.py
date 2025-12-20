@@ -99,19 +99,13 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation.MinimumLengthValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation.MinimumLengthValidator"),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation.CommonPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation.CommonPasswordValidator"),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation.NumericPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator"),
     },
 ]
 
@@ -169,20 +163,20 @@ if not DEBUG:
     )
 
 # CSRF Configuration for Unified Frontend-Backend
-CSRF_COOKIE_NAME = 'csrftoken'
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access
 CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_AGE = 86400  # 24 hours
 
 # Trusted origins for CSRF (same-origin by default)
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:8000',
-    'https://127.0.0.1:8443',
-    'http://localhost:8000',
-    'https://localhost:8443',
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:8443",
+    "http://localhost:8000",
+    "https://localhost:8443",
 ]
 
 # Allow same-origin requests without CSRF for GET requests

@@ -45,9 +45,7 @@ def run_https_server():
         content = f.read()
 
     if "'django_extensions'," not in content:
-        content = content.replace(
-            "'shop',", "'shop',\n    'django_extensions',"
-        )
+        content = content.replace("'shop',", "'shop',\n    'django_extensions',")
         with open(settings_file, "w") as f:
             f.write(content)
         print("Added django_extensions to INSTALLED_APPS")
@@ -65,7 +63,9 @@ def run_https_server():
             "127.0.0.1:8000",
         ]
         print("Starting HTTPS server at https://127.0.0.1:8000")
-        print("Note: You may need to accept the self-signed certificate in your browser")
+        print(
+            "Note: You may need to accept the self-signed certificate in your browser"
+        )
         subprocess.run(cmd)
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("HTTPS server failed, starting HTTP server instead...")

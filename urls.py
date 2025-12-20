@@ -48,9 +48,7 @@ urlpatterns = [
         api_views.api_admin_products,
         name="api_admin_products",
     ),
-    path(
-        "api/admin/users/", api_views.api_admin_users, name="api_admin_users"
-    ),
+    path("api/admin/users/", api_views.api_admin_users, name="api_admin_users"),
     path(
         "api/admin/analytics/",
         api_views.api_admin_analytics,

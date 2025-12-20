@@ -4,29 +4,18 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from .middleware import admin_required, api_login_required
-from .models import (
-    Cart,
-    CartItem,
-    Category,
-    Order,
-    Product,
-    SavedItem,
-    UserProfile,
-)
+from .models import Cart, CartItem, Category, Order, Product, SavedItem, UserProfile
 
 
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
 def api_csrf_token(request):
     """Get CSRF token for frontend requests"""
-    return JsonResponse({
-        'csrfToken': get_token(request),
-        'success': True
-    })
+    return JsonResponse({"csrfToken": get_token(request), "success": True})
 
 
 @require_http_methods(["POST"])
@@ -89,9 +78,7 @@ def api_products(request):
             "name": p.name,
             "description": p.description,
             "price": float(p.price),
-            "sale_price": (
-                float(p.sale_price) if p.sale_price else None
-            ),
+            "sale_price": (float(p.sale_price) if p.sale_price else None),
             "category": p.category.name,
             "sizes": p.sizes,
             "colors": p.colors,
@@ -182,9 +169,7 @@ def api_product_detail(request, product_id):
             "name": product.name,
             "description": product.description,
             "price": float(product.price),
-            "sale_price": (
-                float(product.sale_price) if product.sale_price else None
-            ),
+            "sale_price": (float(product.sale_price) if product.sale_price else None),
             "category": product.category.name,
             "sizes": product.sizes,
             "colors": product.colors,
@@ -203,10 +188,7 @@ def api_product_detail(request, product_id):
 @require_http_methods(["GET"])
 def api_categories(request):
     categories = Category.objects.all()
-    data = [
-        {"id": cat.id, "name": cat.name, "slug": cat.slug}
-        for cat in categories
-    ]
+    data = [{"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories]
     return JsonResponse({"categories": data})
 
 

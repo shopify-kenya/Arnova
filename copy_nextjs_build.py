@@ -6,6 +6,7 @@ import os
 import shutil
 from pathlib import Path
 
+
 def copy_nextjs_build():
     base_dir = Path(__file__).parent
     next_dir = base_dir / ".next"
@@ -37,6 +38,7 @@ def copy_nextjs_build():
                     break
 
     print("Next.js build files copied to build directory")
+
 
 if __name__ == "__main__":
     copy_nextjs_build()
