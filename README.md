@@ -25,8 +25,8 @@ cd Arnova
 npm install
 pip install -r requirements.txt
 
-# Start unified development server
-python quick-start.py
+# Start unified server (builds frontend + runs backend)
+python unified_server.py
 ```
 
 **Unified Server Architecture:**
