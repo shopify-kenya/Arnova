@@ -42,7 +42,7 @@ jobs:
 
     - name: Lint Django code
       run: |
-        flake8 . --exclude=migrations,venv,.venv,node_modules
+        flake8 . --exclude=migrations,venv,.venv,node_modules --max-line-length=88 --extend-ignore=E203
         black --check . --exclude="/(migrations|venv|.venv|node_modules)/"
         isort --check-only . --skip=migrations --skip=venv --skip=.venv --skip=node_modules
 
