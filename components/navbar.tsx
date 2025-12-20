@@ -14,7 +14,12 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from "@/components/ui/sheet"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -271,16 +276,24 @@ export function Navbar() {
                     side="right"
                     className="backdrop-blur-xl bg-background/80 dark:bg-background/80 border border-border/20 w-[300px]"
                   >
-                    <div className="flex flex-col space-y-4 mt-8">
-                      {navLinks.map(link => (
-                        <Link
+                    <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                    <div className="flex flex-col space-y-6 mt-8">
+                      {navLinks.map((link, index) => (
+                        <motion.div
                           key={link.href}
-                          href={link.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-lg font-medium text-foreground transition-colors hover:text-primary"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
                         >
-                          {link.label}
-                        </Link>
+                          <Link
+                            href={link.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="group flex items-center space-x-3 p-3 rounded-lg text-lg font-medium text-foreground transition-all duration-200 hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20"
+                          >
+                            <div className="w-2 h-2 rounded-full bg-primary/60 group-hover:bg-primary transition-colors" />
+                            <span>{link.label}</span>
+                          </Link>
+                        </motion.div>
                       ))}
                     </div>
                   </SheetContent>

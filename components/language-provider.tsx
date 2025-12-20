@@ -37,6 +37,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.returns": "Returns",
     "nav.privacy": "Privacy",
     "nav.terms": "Terms",
+    "nav.cookies": "Cookies",
     "nav.sizeGuide": "Size Guide",
 
     // Authentication
@@ -180,6 +181,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.returns": "Returns",
     "nav.privacy": "Privacy",
     "nav.terms": "Terms",
+    "nav.cookies": "Cookies",
     "nav.sizeGuide": "Size Guide",
 
     // Authentication
@@ -323,6 +325,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.returns": "Kurejesha",
     "nav.privacy": "Faragha",
     "nav.terms": "Masharti",
+    "nav.cookies": "Vidakuzi",
     "nav.sizeGuide": "Mwongozo wa Ukubwa",
 
     // Authentication

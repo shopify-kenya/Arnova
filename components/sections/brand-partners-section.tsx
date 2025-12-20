@@ -13,11 +13,11 @@ const brands = [
   },
   {
     name: "ZARA",
-    logo: "https://logos-world.net/wp-content/uploads/2020/09/Zara-Logo.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Zara_Logo.svg",
   },
   {
     name: "H&M",
-    logo: "https://logos-world.net/wp-content/uploads/2020/12/HM-Logo.png",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/5/53/H%26M-Logo.svg",
   },
   {
     name: "Puma",

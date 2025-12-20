@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useState, useEffect } from "react"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },
@@ -18,6 +19,50 @@ const staggerContainer = {
       staggerChildren: 0.1,
     },
   },
+}
+
+function TypewriterText({
+  texts,
+  delay = 0,
+}: {
+  texts: string[]
+  delay?: number
+}) {
+  const [currentTextIndex, setCurrentTextIndex] = useState(0)
+  const [displayText, setDisplayText] = useState("")
+  const [currentCharIndex, setCurrentCharIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const currentText = texts[currentTextIndex]
+
+    if (!isDeleting && currentCharIndex < currentText.length) {
+      const timer = setTimeout(() => {
+        setDisplayText(currentText.slice(0, currentCharIndex + 1))
+        setCurrentCharIndex(currentCharIndex + 1)
+      }, 50)
+      return () => clearTimeout(timer)
+    } else if (!isDeleting && currentCharIndex === currentText.length) {
+      const timer = setTimeout(() => setIsDeleting(true), 1500)
+      return () => clearTimeout(timer)
+    } else if (isDeleting && currentCharIndex > 0) {
+      const timer = setTimeout(() => {
+        setDisplayText(currentText.slice(0, currentCharIndex - 1))
+        setCurrentCharIndex(currentCharIndex - 1)
+      }, 30)
+      return () => clearTimeout(timer)
+    } else if (isDeleting && currentCharIndex === 0) {
+      setIsDeleting(false)
+      setCurrentTextIndex((currentTextIndex + 1) % texts.length)
+    }
+  }, [currentCharIndex, currentTextIndex, texts, isDeleting])
+
+  return (
+    <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+      {displayText}
+      <span className="animate-pulse">|</span>
+    </span>
+  )
 }
 
 export function HeroSection() {
@@ -44,10 +89,17 @@ export function HeroSection() {
             className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 leading-tight"
             variants={fadeInUp}
           >
-            <span className="block">Contemporary</span>
-            <span className="block bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-              and urban energy
-            </span>
+            <TypewriterText
+              texts={[
+                "Street Vibes",
+                "Urban Edge",
+                "Fresh Drops",
+                "Style Goals",
+                "Next Level",
+                "Pure Fire",
+              ]}
+              delay={500}
+            />
           </motion.h1>
 
           <motion.p

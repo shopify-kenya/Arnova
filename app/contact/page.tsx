@@ -52,7 +52,7 @@ export default function ContactPage() {
                   <Phone className="w-6 h-6 text-primary" />
                   <div>
                     <h3 className="font-semibold">Phone</h3>
-                    <p className="text-muted-foreground">+1 (555) 123-4567</p>
+                    <p className="text-muted-foreground">+254 710 973221</p>
                   </div>
                 </div>
               </GlassCard>
