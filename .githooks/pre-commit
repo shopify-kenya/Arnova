@@ -20,7 +20,7 @@ fi
 
 # Run linting
 echo "🔧 Running linters..."
-flake8 . --exclude=migrations,venv,.venv,node_modules,.next 2>/dev/null || echo "flake8 not available"
+flake8 . --exclude=migrations,venv,.venv,node_modules,.next --max-line-length=88 --extend-ignore=E203 2>/dev/null || echo "flake8 not available"
 npm run lint 2>/dev/null || echo "ESLint not available"
 
 # Check for trailing whitespace
