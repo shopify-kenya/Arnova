@@ -21,7 +21,7 @@ export default function HomePage() {
       {!isAuthenticated && <Navbar />}
       <div className="flex">
         {isAuthenticated && <BuyerSidebar />}
-        <main className={`flex-1 ${!isAuthenticated ? "" : "lg:ml-80"}`}>
+        <main className={`flex-1 ${!isAuthenticated ? "" : "ml-80"}`}>
           <HeroSection />
           <FeaturedProductsSection />
           <CategoriesSection />
