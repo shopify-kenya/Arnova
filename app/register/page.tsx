@@ -207,7 +207,7 @@ export default function RegisterPage() {
       })
       setUser(user)
       toast.success("Account created successfully!")
-      router.push("/")
+      router.push("/store")
     } catch {
       setErrors({ ...errors, general: "An error occurred. Please try again." })
     } finally {

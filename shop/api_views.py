@@ -1,5 +1,6 @@
 import json
 import requests
+from django.http import HttpResponse
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -239,6 +240,7 @@ def api_profile(request):
                 "last_name": request.user.last_name,
             },
             "profile": {
+                "avatar": profile.avatar,
                 "phone": profile.phone,
                 "address": profile.address,
                 "city": profile.city,
@@ -256,10 +258,12 @@ def api_profile(request):
             request.user.first_name = data["first_name"]
         if "last_name" in data:
             request.user.last_name = data["last_name"]
+        if "email" in data:
+            request.user.email = data["email"]
         request.user.save()
 
         # Update profile fields
-        for field in ["phone", "address", "city", "country", "postal_code"]:
+        for field in ["avatar", "phone", "address", "city", "country", "postal_code"]:
             if field in data:
                 setattr(profile, field, data[field])
         profile.save()
@@ -320,9 +324,15 @@ def api_admin_products(request):
                 "name": p.name,
                 "description": p.description,
                 "price": float(p.price),
+                "sale_price": float(p.sale_price) if p.sale_price else None,
+                "currency": p.currency,
                 "category": p.category.name,
                 "category_id": p.category.id,
                 "in_stock": p.in_stock,
+                "is_new": p.is_new,
+                "on_sale": p.on_sale,
+                "rating": float(p.rating),
+                "reviews": p.reviews,
                 "sizes": p.sizes,
                 "colors": p.colors,
                 "images": p.images,
@@ -340,12 +350,17 @@ def api_admin_products(request):
             name=data["name"],
             description=data["description"],
             price=data["price"],
-            currency=data.get("currency", "USD"),
+            sale_price=data.get("sale_price"),
+            currency=data.get("currency", "KES"),
             category=category,
             sizes=data.get("sizes", []),
             colors=data.get("colors", []),
             images=data.get("images", []),
             in_stock=data.get("in_stock", True),
+            is_new=data.get("is_new", False),
+            on_sale=data.get("on_sale", False),
+            rating=data.get("rating", 0.0),
+            reviews=data.get("reviews", 0),
         )
         return JsonResponse({"success": True, "product_id": product.id})
 
@@ -361,8 +376,14 @@ def api_admin_product_detail(request, product_id):
                 "name": product.name,
                 "description": product.description,
                 "price": float(product.price),
+                "sale_price": float(product.sale_price) if product.sale_price else None,
+                "currency": product.currency,
                 "category_id": product.category.id,
                 "in_stock": product.in_stock,
+                "is_new": product.is_new,
+                "on_sale": product.on_sale,
+                "rating": float(product.rating),
+                "reviews": product.reviews,
                 "sizes": product.sizes,
                 "colors": product.colors,
                 "images": product.images,
@@ -374,7 +395,13 @@ def api_admin_product_detail(request, product_id):
             product.name = data.get("name", product.name)
             product.description = data.get("description", product.description)
             product.price = data.get("price", product.price)
+            product.sale_price = data.get("sale_price", product.sale_price)
+            product.currency = data.get("currency", product.currency)
             product.in_stock = data.get("in_stock", product.in_stock)
+            product.is_new = data.get("is_new", product.is_new)
+            product.on_sale = data.get("on_sale", product.on_sale)
+            product.rating = data.get("rating", product.rating)
+            product.reviews = data.get("reviews", product.reviews)
             product.sizes = data.get("sizes", product.sizes)
             product.colors = data.get("colors", product.colors)
             product.images = data.get("images", product.images)
@@ -410,6 +437,7 @@ def api_admin_users(request):
                 "is_active": user.is_active,
                 "date_joined": user.date_joined.isoformat(),
                 "profile": {
+                    "avatar": profile.avatar,
                     "phone": profile.phone,
                     "address": profile.address,
                     "city": profile.city,
@@ -431,6 +459,7 @@ def api_admin_users(request):
         )
         profile = UserProfile.objects.create(
             user=user,
+            avatar=data.get("avatar", ""),
             phone=data.get("phone", ""),
             address=data.get("address", ""),
             city=data.get("city", ""),
@@ -457,6 +486,7 @@ def api_admin_user_detail(request, user_id):
                 "is_staff": user.is_staff,
                 "is_active": user.is_active,
                 "profile": {
+                    "avatar": profile.avatar,
                     "phone": profile.phone,
                     "address": profile.address,
                     "city": profile.city,
@@ -476,6 +506,7 @@ def api_admin_user_detail(request, user_id):
             user.is_active = data.get("is_active", user.is_active)
             user.save()
             
+            profile.avatar = data.get("avatar", profile.avatar)
             profile.phone = data.get("phone", profile.phone)
             profile.address = data.get("address", profile.address)
             profile.city = data.get("city", profile.city)
@@ -687,3 +718,38 @@ def api_admin_settings(request):
 
 
     return JsonResponse(fallback_data)
+
+
+def api_placeholder_image(request, width, height):
+    """Generate placeholder image"""
+    try:
+        from PIL import Image, ImageDraw
+        import io
+        
+        # Create a simple placeholder image
+        img = Image.new('RGB', (width, height), color='#f0f0f0')
+        draw = ImageDraw.Draw(img)
+        
+        # Add text
+        text = f"{width}x{height}"
+        try:
+            bbox = draw.textbbox((0, 0), text)
+            text_width = bbox[2] - bbox[0]
+            text_height = bbox[3] - bbox[1]
+        except:
+            # Fallback for older PIL versions
+            text_width, text_height = draw.textsize(text)
+        
+        x = (width - text_width) // 2
+        y = (height - text_height) // 2
+        draw.text((x, y), text, fill='#999999')
+        
+        # Save to bytes
+        img_io = io.BytesIO()
+        img.save(img_io, 'PNG')
+        img_io.seek(0)
+        
+        return HttpResponse(img_io.getvalue(), content_type='image/png')
+    except ImportError:
+        # Fallback if PIL is not available
+        return HttpResponse(b'', content_type='image/png', status=404)

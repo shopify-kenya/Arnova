@@ -14,24 +14,21 @@ import { FinalCTASection } from "@/components/sections/final-cta-section"
 import { useAuth } from "@/components/auth-provider"
 
 export default function HomePage() {
-  const { isAuthenticated } = useAuth()
+  const { user } = useAuth()
 
   return (
     <div className="min-h-screen">
-      {!isAuthenticated && <Navbar />}
-      <div className="flex">
-        {isAuthenticated && <BuyerSidebar />}
-        <main className={`flex-1 ${!isAuthenticated ? "" : "ml-80"}`}>
-          <HeroSection />
-          <FeaturedProductsSection />
-          <CategoriesSection />
-          <BrandPartnersSection />
-          <CurrencySection />
-          <FeaturesSection />
-          <NewsletterSection />
-          <FinalCTASection />
-        </main>
-      </div>
+      <Navbar />
+      <main className="flex-1">
+        <HeroSection />
+        <FeaturedProductsSection />
+        <CategoriesSection />
+        <BrandPartnersSection />
+        <CurrencySection />
+        <FeaturesSection />
+        <NewsletterSection />
+        <FinalCTASection />
+      </main>
       <Footer />
     </div>
   )

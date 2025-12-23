@@ -28,9 +28,10 @@ export interface Address {
 }
 
 export interface PaymentData {
-  payment_method: "card" | "paypal"
+  payment_method: "card" | "paypal" | "mpesa"
   amount: number
   card_data?: CardData
+  phone_number?: string
   order_data: {
     items: OrderItem[]
     shipping_address: Address
@@ -44,14 +45,25 @@ export interface PaymentResult {
   message?: string
   error?: string
   redirect_url?: string
+  checkout_request_id?: string
+  merchant_request_id?: string
 }
 
 export const processPayment = async (
   paymentData: PaymentData
 ): Promise<PaymentResult> => {
   try {
-    const response = await api.processPayment(paymentData)
-    return response.data || { success: false, error: "No response data" }
+    if (paymentData.payment_method === "mpesa") {
+      const response = await api.processMpesaPayment({
+        phone_number: paymentData.phone_number!,
+        amount: paymentData.amount,
+        order_data: paymentData.order_data,
+      })
+      return response.data || { success: false, error: "No response data" }
+    } else {
+      const response = await api.processPayment(paymentData)
+      return response.data || { success: false, error: "No response data" }
+    }
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Payment processing failed"
@@ -144,4 +156,49 @@ export const validateCVC = (cvc: string, cardType: string): boolean => {
     return /^\d{4}$/.test(cvc)
   }
   return /^\d{3}$/.test(cvc)
+}
+export const checkMpesaPaymentStatus = async (
+  checkoutRequestId: string
+): Promise<{
+  status: string
+  result_code: string
+  result_desc: string
+  transaction_id?: string
+}> => {
+  try {
+    const response = await api.checkMpesaStatus(checkoutRequestId)
+    return (
+      response.data || {
+        status: "failed",
+        result_code: "1",
+        result_desc: "No response data",
+      }
+    )
+  } catch (error: unknown) {
+    return {
+      status: "failed",
+      result_code: "1",
+      result_desc:
+        error instanceof Error ? error.message : "Status check failed",
+    }
+  }
+}
+
+export const formatPhoneNumber = (phone: string): string => {
+  // Remove all non-digits
+  let cleaned = phone.replace(/\D/g, "")
+
+  // Handle Kenyan numbers
+  if (cleaned.startsWith("0")) {
+    cleaned = "254" + cleaned.substring(1)
+  } else if (cleaned.startsWith("254")) {
+    // Already in correct format
+  } else if (cleaned.startsWith("+254")) {
+    cleaned = cleaned.substring(1)
+  } else if (cleaned.length === 9) {
+    // Assume it's a Kenyan number without country code
+    cleaned = "254" + cleaned
+  }
+
+  return cleaned
 }

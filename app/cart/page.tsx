@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react"
-import { Navbar } from "@/components/navbar"
+import { BuyerNavbar } from "@/components/buyer-navbar"
+import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
 import { Footer } from "@/components/footer"
 import { ProtectedRoute } from "@/components/protected-route"
 import { GlassCard } from "@/components/glass-card"
@@ -21,6 +22,7 @@ function CartPageContent() {
   const { isAuthenticated } = useAuth()
   const { cart, removeItem, updateQuantity, total, itemCount } = useCart()
   const { formatPrice } = useCurrency()
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated && cart.length > 0) {
@@ -40,8 +42,16 @@ function CartPageContent() {
   if (cart.length === 0) {
     return (
       <div className="min-h-screen">
-        <Navbar />
-        <main className="container mx-auto px-4 py-20">
+        <BuyerNavbar
+          title="Shopping Cart"
+          subtitle="Your cart is empty"
+          onMenuToggle={() => setIsFilterOpen(true)}
+        />
+        <BuyerFilterSidebar
+          isOpen={isFilterOpen}
+          onClose={() => setIsFilterOpen(false)}
+        />
+        <main className="container mx-auto px-4 py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -56,7 +66,7 @@ function CartPageContent() {
               <p className="text-muted-foreground mb-8">
                 Start shopping to add items to your cart
               </p>
-              <Link href="/new-arrivals">
+              <Link href="/store">
                 <Button size="lg">
                   Browse Products
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -72,22 +82,21 @@ function CartPageContent() {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-      <main className="container mx-auto px-4 py-12">
+      <BuyerNavbar
+        title="Shopping Cart"
+        subtitle={`${itemCount} items in your cart`}
+        onMenuToggle={() => setIsFilterOpen(true)}
+      />
+      <BuyerFilterSidebar
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+      />
+      <main className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="mb-8">
-            <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
-              Shopping Cart
-            </h1>
-            <p className="text-muted-foreground">
-              {itemCount} items in your cart
-            </p>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
@@ -212,7 +221,7 @@ function CartPageContent() {
                   Proceed to Checkout
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
-                <Link href="/new-arrivals">
+                <Link href="/store">
                   <Button
                     variant="outline"
                     className="w-full mt-3 bg-transparent"

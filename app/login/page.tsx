@@ -60,7 +60,7 @@ export default function LoginPage() {
         setUser(user)
         toast.success("Welcome back!")
         // Use window.location for immediate redirect
-        window.location.href = user.role === "admin" ? "/admin" : "/"
+        window.location.href = user.role === "admin" ? "/admin" : "/store"
       } else {
         setErrors({ ...errors, general: "Invalid email or password" })
       }

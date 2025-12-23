@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Navbar } from "@/components/navbar"
+import { BuyerNavbar } from "@/components/buyer-navbar"
+import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
 import { Footer } from "@/components/footer"
 import { ProductCard } from "@/components/product-card"
 import { ProductFilters, type FilterState } from "@/components/product-filters"
@@ -18,6 +19,7 @@ import {
 
 export default function AccessoriesPage() {
   const [sortBy, setSortBy] = useState("newest")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 500],
     sizes: [],
@@ -29,10 +31,16 @@ export default function AccessoriesPage() {
 
   let products = getProductsByCategory("accessories")
 
+  // Apply filters
   products = products.filter(product => {
     if (filters.inStock && !product.inStock) return false
     if (filters.onSale && !product.onSale) return false
     if (filters.isNew && !product.isNew) return false
+    if (
+      filters.sizes.length > 0 &&
+      !product.sizes.some(s => filters.sizes.includes(s))
+    )
+      return false
     if (
       filters.colors.length > 0 &&
       !product.colors.some(c => filters.colors.includes(c))
@@ -45,6 +53,7 @@ export default function AccessoriesPage() {
     return true
   })
 
+  // Apply sorting
   products = [...products].sort((a, b) => {
     switch (sortBy) {
       case "price-low":
@@ -61,28 +70,30 @@ export default function AccessoriesPage() {
   return (
     <CurrencyProvider>
       <div className="min-h-screen">
-        <Navbar />
+        <BuyerNavbar
+          title="Accessories"
+          subtitle="Complete your look"
+          onMenuToggle={() => setIsFilterOpen(true)}
+        />
 
-        <main className="container mx-auto px-4 py-12">
+        <BuyerFilterSidebar
+          isOpen={isFilterOpen}
+          onClose={() => setIsFilterOpen(false)}
+        />
+
+        <main className="container mx-auto px-4 py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="mb-8">
-              <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
-                Accessories
-              </h1>
-              <p className="text-muted-foreground">
-                Complete your look with the perfect finishing touches
-              </p>
-            </div>
-
             <div className="flex flex-col lg:flex-row gap-8">
-              <div className="lg:w-64 flex-shrink-0">
+              {/* Filters Sidebar - Desktop */}
+              <div className="lg:w-64 flex-shrink-0 hidden lg:block">
                 <ProductFilters onFilterChange={setFilters} />
               </div>
 
+              {/* Products Grid */}
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-muted-foreground">

@@ -34,9 +34,15 @@ interface Product {
   name: string
   description: string
   price: number
+  sale_price?: number
+  currency: string
   category: string
   category_id: number
   in_stock: boolean
+  is_new: boolean
+  on_sale: boolean
+  rating: number
+  reviews: number
   sizes: string[]
   colors: string[]
   images: string[]
@@ -64,8 +70,14 @@ function AdminProductsContent() {
     name: "",
     description: "",
     price: 0,
+    sale_price: 0,
+    currency: "KES",
     category_id: 0,
     in_stock: true,
+    is_new: false,
+    on_sale: false,
+    rating: 0,
+    reviews: 0,
     sizes: [] as string[],
     colors: [] as string[],
     images: [] as string[],
@@ -117,8 +129,14 @@ function AdminProductsContent() {
       name: "",
       description: "",
       price: 0,
+      sale_price: 0,
+      currency: "KES",
       category_id: categories[0]?.id || 0,
       in_stock: true,
+      is_new: false,
+      on_sale: false,
+      rating: 0,
+      reviews: 0,
       sizes: [],
       colors: [],
       images: [],
@@ -133,8 +151,14 @@ function AdminProductsContent() {
       name: product.name,
       description: product.description,
       price: product.price,
+      sale_price: product.sale_price || 0,
+      currency: product.currency,
       category_id: product.category_id,
       in_stock: product.in_stock,
+      is_new: product.is_new,
+      on_sale: product.on_sale,
+      rating: product.rating,
+      reviews: product.reviews,
       sizes: product.sizes,
       colors: product.colors,
       images: product.images,
@@ -393,7 +417,7 @@ function AdminProductsContent() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="price">Price</Label>
                 <Input
@@ -410,6 +434,42 @@ function AdminProductsContent() {
                   required
                 />
               </div>
+              <div>
+                <Label htmlFor="sale_price">Sale Price</Label>
+                <Input
+                  id="sale_price"
+                  type="number"
+                  step="0.01"
+                  value={formData.sale_price}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      sale_price: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="currency">Currency</Label>
+                <Select
+                  value={formData.currency}
+                  onValueChange={value =>
+                    setFormData({ ...formData, currency: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="KES">KES</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="category">Category</Label>
                 <Select
@@ -432,6 +492,23 @@ function AdminProductsContent() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label htmlFor="rating">Rating</Label>
+                <Input
+                  id="rating"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  value={formData.rating}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      rating: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                />
               </div>
             </div>
 
@@ -490,15 +567,37 @@ function AdminProductsContent() {
               />
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="in_stock"
-                checked={formData.in_stock}
-                onCheckedChange={checked =>
-                  setFormData({ ...formData, in_stock: !!checked })
-                }
-              />
-              <Label htmlFor="in_stock">In Stock</Label>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="in_stock"
+                  checked={formData.in_stock}
+                  onCheckedChange={checked =>
+                    setFormData({ ...formData, in_stock: !!checked })
+                  }
+                />
+                <Label htmlFor="in_stock">In Stock</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="is_new"
+                  checked={formData.is_new}
+                  onCheckedChange={checked =>
+                    setFormData({ ...formData, is_new: !!checked })
+                  }
+                />
+                <Label htmlFor="is_new">New Product</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="on_sale"
+                  checked={formData.on_sale}
+                  onCheckedChange={checked =>
+                    setFormData({ ...formData, on_sale: !!checked })
+                  }
+                />
+                <Label htmlFor="on_sale">On Sale</Label>
+              </div>
             </div>
 
             <div className="flex justify-end space-x-2">

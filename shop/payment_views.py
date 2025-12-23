@@ -9,6 +9,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
+from .models import Payment, MpesaPayment, Order
 
 
 def get_mpesa_access_token():
@@ -128,6 +129,30 @@ def process_mpesa_payment(data, amount):
         result = response.json()
         
         if result.get('ResponseCode') == '0':
+            # Create payment record
+            try:
+                # Create a temporary order for tracking (in production, this should be passed from frontend)
+                order_id = f"ARNOVA{timezone.now().strftime('%Y%m%d%H%M%S')}"
+                
+                # Create payment record
+                payment = Payment.objects.create(
+                    order_id=order_id,  # This should be actual order ID
+                    payment_method='mpesa',
+                    amount=amount,
+                    currency='KES',
+                    status='processing'
+                )
+                
+                # Create M-Pesa payment record
+                MpesaPayment.objects.create(
+                    payment=payment,
+                    phone_number=phone_number,
+                    checkout_request_id=result.get('CheckoutRequestID'),
+                    merchant_request_id=result.get('MerchantRequestID')
+                )
+            except Exception as e:
+                print(f"Error creating payment record: {str(e)}")
+            
             return JsonResponse({
                 "success": True,
                 "checkout_request_id": result.get('CheckoutRequestID'),
@@ -178,22 +203,40 @@ def mpesa_callback(request):
                 elif name == 'PhoneNumber':
                     payment_data['phone_number'] = value
             
-            # TODO: Update order status in database
-            # Order.objects.filter(checkout_request_id=checkout_request_id).update(
-            #     status='paid',
-            #     mpesa_receipt=payment_data.get('receipt_number'),
-            #     paid_at=timezone.now()
-            # )
+            # Update M-Pesa payment record
+            try:
+                mpesa_payment = MpesaPayment.objects.get(checkout_request_id=checkout_request_id)
+                mpesa_payment.mpesa_receipt_number = payment_data.get('receipt_number', '')
+                mpesa_payment.result_code = '0'
+                mpesa_payment.result_desc = result_desc
+                mpesa_payment.transaction_date = timezone.now()
+                mpesa_payment.save()
+                
+                # Update payment status
+                mpesa_payment.payment.status = 'completed'
+                mpesa_payment.payment.transaction_id = payment_data.get('receipt_number', '')
+                mpesa_payment.payment.save()
+                
+            except MpesaPayment.DoesNotExist:
+                print(f"M-Pesa payment record not found for checkout_request_id: {checkout_request_id}")
             
             print(f"M-Pesa payment successful: {payment_data}")
         else:
             # Payment failed
-            print(f"M-Pesa payment failed: {result_desc}")
+            try:
+                mpesa_payment = MpesaPayment.objects.get(checkout_request_id=checkout_request_id)
+                mpesa_payment.result_code = str(result_code)
+                mpesa_payment.result_desc = result_desc
+                mpesa_payment.save()
+                
+                # Update payment status
+                mpesa_payment.payment.status = 'failed'
+                mpesa_payment.payment.save()
+                
+            except MpesaPayment.DoesNotExist:
+                print(f"M-Pesa payment record not found for checkout_request_id: {checkout_request_id}")
             
-            # TODO: Update order status to failed
-            # Order.objects.filter(checkout_request_id=checkout_request_id).update(
-            #     status='failed'
-            # )
+            print(f"M-Pesa payment failed: {result_desc}")
         
         return JsonResponse({"ResultCode": 0, "ResultDesc": "Success"})
         
@@ -245,6 +288,86 @@ def process_paypal_payment(data, amount):
         }
     )
 
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def check_mpesa_status(request, checkout_request_id):
+    """Check M-Pesa payment status"""
+    try:
+        # Get access token
+        access_token = get_mpesa_access_token()
+        
+        # Generate password and timestamp
+        password, timestamp = generate_mpesa_password()
+        
+        # Determine environment URL
+        if settings.MPESA_ENVIRONMENT == 'sandbox':
+            url = 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
+        else:
+            url = 'https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query'
+        
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            "BusinessShortCode": settings.MPESA_SHORTCODE,
+            "Password": password,
+            "Timestamp": timestamp,
+            "CheckoutRequestID": checkout_request_id
+        }
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
+        response.raise_for_status()
+        
+        result = response.json()
+        
+        return JsonResponse({
+            "status": "success" if result.get('ResultCode') == '0' else "pending" if result.get('ResultCode') == '1032' else "failed",
+            "result_code": result.get('ResultCode', '1'),
+            "result_desc": result.get('ResultDesc', 'Unknown status'),
+            "transaction_id": result.get('MpesaReceiptNumber')
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            "status": "failed",
+            "result_code": "1",
+            "result_desc": f"Status check failed: {str(e)}"
+        }, status=500)
+    """Validate credit card details"""
+    try:
+        data = json.loads(request.body)
+        card_number = data.get("card_number", "").replace(" ", "")
+
+        # Basic Luhn algorithm check
+        def luhn_check(card_num):
+            def digits_of(n):
+                return [int(d) for d in str(n)]
+
+            digits = digits_of(card_num)
+            odd_digits = digits[-1::-2]
+            even_digits = digits[-2::-2]
+            checksum = sum(odd_digits)
+            for d in even_digits:
+                checksum += sum(digits_of(d * 2))
+            return checksum % 10 == 0
+
+        is_valid = luhn_check(card_number) if card_number.isdigit() else False
+
+        # Determine card type
+        card_type = "unknown"
+        if card_number.startswith("4"):
+            card_type = "visa"
+        elif card_number.startswith(("5", "2")):
+            card_type = "mastercard"
+        elif card_number.startswith("3"):
+            card_type = "amex"
+
+        return JsonResponse({"valid": is_valid, "card_type": card_type})
+    except Exception as e:
+        return JsonResponse({"valid": False, "error": str(e)}, status=500)
 
 @csrf_exempt
 @require_http_methods(["POST"])

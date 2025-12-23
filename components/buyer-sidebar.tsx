@@ -19,10 +19,10 @@ import { useAuth } from "@/components/auth-provider"
 
 const sidebarItems = [
   {
-    title: "Dashboard",
-    href: "/",
-    icon: User,
-    description: "Overview",
+    title: "Store",
+    href: "/store",
+    icon: Package,
+    description: "Browse all products",
   },
   {
     title: "Profile",
@@ -58,7 +58,7 @@ const sidebarItems = [
     title: "Categories",
     href: "/clothing",
     icon: Package,
-    description: "Browse products",
+    description: "Browse by category",
   },
   {
     title: "Sale",

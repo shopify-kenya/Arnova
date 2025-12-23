@@ -2,7 +2,7 @@
 // Frontend integration for Django REST API
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
 
 // ============================================================================
 // Types
@@ -138,7 +138,7 @@ export interface UserProfile {
 
 // Payment types
 export interface PaymentData {
-  payment_method: "card" | "paypal"
+  payment_method: "card" | "paypal" | "mpesa"
   amount: number
   card_data?: {
     cardNumber: string
@@ -146,6 +146,7 @@ export interface PaymentData {
     cardCvc: string
     cardName: string
   }
+  phone_number?: string
   order_data: {
     items: Array<{
       product_id: string
@@ -185,6 +186,8 @@ export interface PaymentResult {
   message?: string
   error?: string
   redirect_url?: string
+  checkout_request_id?: string
+  merchant_request_id?: string
 }
 
 // ============================================================================
@@ -548,6 +551,28 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify(data),
     })
+  }
+
+  async processMpesaPayment(data: {
+    phone_number: string
+    amount: number
+    order_data: PaymentData["order_data"]
+  }): Promise<ApiResponse<PaymentResult>> {
+    return this.request("/payment/mpesa/stk-push/", {
+      method: "POST",
+      body: JSON.stringify(data),
+    })
+  }
+
+  async checkMpesaStatus(checkoutRequestId: string): Promise<
+    ApiResponse<{
+      status: string
+      result_code: string
+      result_desc: string
+      transaction_id?: string
+    }>
+  > {
+    return this.request(`/payment/mpesa/status/${checkoutRequestId}/`)
   }
 
   async validateCard(
