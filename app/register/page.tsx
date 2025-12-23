@@ -223,8 +223,6 @@ export default function RegisterPage() {
   return (
     <CurrencyProvider>
       <div className="min-h-screen">
-        <Navbar />
-
         <main className="container mx-auto px-4 py-20">
           <div className="max-w-2xl mx-auto">
             <motion.div
