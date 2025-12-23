@@ -80,6 +80,11 @@ urlpatterns = [
         payment_views.validate_card,
         name="api_validate_card",
     ),
+    path(
+        "api/payment/mpesa/callback/",
+        payment_views.mpesa_callback,
+        name="api_mpesa_callback",
+    ),
     # Currency API
     path(
         "api/exchange-rates/",

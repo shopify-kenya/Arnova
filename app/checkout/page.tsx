@@ -36,7 +36,10 @@ function CheckoutPageContent() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
 
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card")
+  const [paymentMethod, setPaymentMethod] = useState<
+    "card" | "paypal" | "mpesa"
+  >("card")
+  const [phoneNumber, setPhoneNumber] = useState("")
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -112,6 +115,13 @@ function CheckoutPageContent() {
           setIsProcessing(false)
           return
         }
+      } else if (paymentMethod === "mpesa") {
+        // Validate phone number
+        if (!phoneNumber) {
+          toast.error("Please enter your M-Pesa phone number")
+          setIsProcessing(false)
+          return
+        }
       }
 
       // Process payment
@@ -119,6 +129,7 @@ function CheckoutPageContent() {
         payment_method: paymentMethod,
         amount: grandTotal,
         card_data: paymentMethod === "card" ? cardData : undefined,
+        phone_number: paymentMethod === "mpesa" ? phoneNumber : undefined,
         order_data: {
           items: cart.map(item => ({
             product_id: item.product.id,
@@ -142,12 +153,20 @@ function CheckoutPageContent() {
           await new Promise(resolve => setTimeout(resolve, 3000))
         }
 
+        if (paymentMethod === "mpesa") {
+          toast.info(
+            "STK Push sent to your phone. Please enter your M-Pesa PIN to complete the payment."
+          )
+          // Wait for callback or timeout
+          await new Promise(resolve => setTimeout(resolve, 5000))
+        }
+
         setIsProcessing(false)
         setOrderComplete(true)
         clearCart()
         toast.success(
           result.message ||
-            `Payment successful via ${paymentMethod === "paypal" ? "PayPal" : "Credit Card"}!`
+            `Payment successful via ${paymentMethod === "paypal" ? "PayPal" : paymentMethod === "mpesa" ? "M-Pesa" : "Credit Card"}!`
         )
       } else {
         throw new Error(result.error || "Payment failed")
@@ -388,6 +407,8 @@ function CheckoutPageContent() {
                   onMethodChange={setPaymentMethod}
                   cardData={cardData}
                   onCardDataChange={setCardData}
+                  phoneNumber={phoneNumber}
+                  onPhoneNumberChange={setPhoneNumber}
                 />
               </div>
 

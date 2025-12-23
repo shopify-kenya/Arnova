@@ -1,7 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { CreditCard, Wallet, CheckCircle, AlertCircle } from "lucide-react"
+import {
+  CreditCard,
+  Wallet,
+  Smartphone,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,10 +21,12 @@ import {
 } from "@/lib/payment"
 
 interface PaymentMethodsProps {
-  selectedMethod: "card" | "paypal"
-  onMethodChange: (method: "card" | "paypal") => void
+  selectedMethod: "card" | "paypal" | "mpesa"
+  onMethodChange: (method: "card" | "paypal" | "mpesa") => void
   cardData: CardData
   onCardDataChange: (data: CardData) => void
+  phoneNumber?: string
+  onPhoneNumberChange?: (phone: string) => void
 }
 
 export function PaymentMethods({
@@ -26,6 +34,8 @@ export function PaymentMethods({
   onMethodChange,
   cardData,
   onCardDataChange,
+  phoneNumber = "",
+  onPhoneNumberChange,
 }: PaymentMethodsProps) {
   const [cardValidation, setCardValidation] = useState<{
     valid: boolean
@@ -46,6 +56,36 @@ export function PaymentMethods({
     return () => clearTimeout(timeoutId)
   }, [cardData.cardNumber])
 
+  const formatPhoneNumber = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, "")
+
+    // Format as +254 XXX XXX XXX
+    if (digits.startsWith("254")) {
+      const formatted = digits.replace(
+        /(\d{3})(\d{3})(\d{3})(\d{3})/,
+        "+$1 $2 $3 $4"
+      )
+      return formatted
+    } else if (digits.startsWith("0")) {
+      // Convert 0XXX to 254XXX
+      const kenyanNumber = "254" + digits.substring(1)
+      return kenyanNumber.replace(
+        /(\d{3})(\d{3})(\d{3})(\d{3})/,
+        "+$1 $2 $3 $4"
+      )
+    } else if (digits.length > 0) {
+      // Assume it's a Kenyan number without country code
+      const kenyanNumber = "254" + digits
+      return kenyanNumber.replace(
+        /(\d{3})(\d{3})(\d{3})(\d{3})/,
+        "+$1 $2 $3 $4"
+      )
+    }
+
+    return value
+  }
+
   return (
     <GlassCard className="p-6" strong>
       <div className="flex items-center gap-2 mb-6">
@@ -54,7 +94,7 @@ export function PaymentMethods({
       </div>
 
       {/* Payment Method Selection */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         <Button
           type="button"
           variant={selectedMethod === "card" ? "default" : "outline"}
@@ -72,6 +112,15 @@ export function PaymentMethods({
         >
           <Wallet className="h-6 w-6" />
           <span>PayPal</span>
+        </Button>
+        <Button
+          type="button"
+          variant={selectedMethod === "mpesa" ? "default" : "outline"}
+          className="h-16 flex flex-col gap-1"
+          onClick={() => onMethodChange("mpesa")}
+        >
+          <Smartphone className="h-6 w-6" />
+          <span>M-Pesa</span>
         </Button>
       </div>
 
@@ -181,6 +230,42 @@ export function PaymentMethods({
           <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
             <p className="text-sm text-blue-800 dark:text-blue-200">
               PayPal provides secure payment processing with buyer protection.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* M-Pesa Payment */}
+      {selectedMethod === "mpesa" && (
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="phoneNumber">M-Pesa Phone Number</Label>
+            <Input
+              id="phoneNumber"
+              placeholder="+254 XXX XXX XXX"
+              value={phoneNumber}
+              onChange={e => {
+                const formatted = formatPhoneNumber(e.target.value)
+                onPhoneNumberChange?.(formatted)
+              }}
+              required
+              className="glass"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Enter your Safaricom number (e.g., 0712345678 or 254712345678)
+            </p>
+          </div>
+
+          <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Smartphone className="h-5 w-5 text-green-600" />
+              <h3 className="font-semibold text-green-800 dark:text-green-200">
+                M-Pesa STK Push
+              </h3>
+            </div>
+            <p className="text-sm text-green-700 dark:text-green-300">
+              You will receive a payment request on your phone. Enter your
+              M-Pesa PIN to complete the transaction.
             </p>
           </div>
         </div>

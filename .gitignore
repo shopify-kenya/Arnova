@@ -50,3 +50,6 @@ static/
 db.sqlite3
 
 *.pem
+
+PR.md
+payment.md
