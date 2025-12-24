@@ -32,7 +32,7 @@ const sidebarItems = [
   },
   {
     title: "Orders",
-    href: "/profile/orders",
+    href: "/orders",
     icon: ShoppingBag,
     description: "View order history",
   },
@@ -68,6 +68,39 @@ const sidebarItems = [
   },
 ]
 
+const adminSidebarItems = [
+  {
+    title: "Admin Dashboard",
+    href: "/admin",
+    icon: User,
+    description: "Admin control panel",
+  },
+  {
+    title: "Store",
+    href: "/store",
+    icon: Package,
+    description: "Browse all products",
+  },
+  {
+    title: "Profile",
+    href: "/profile",
+    icon: User,
+    description: "Manage your account",
+  },
+  {
+    title: "Orders",
+    href: "/orders",
+    icon: ShoppingBag,
+    description: "View order history",
+  },
+  {
+    title: "Cart",
+    href: "/cart",
+    icon: ShoppingBag,
+    description: "Shopping cart",
+  },
+]
+
 export function BuyerSidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
@@ -77,6 +110,10 @@ export function BuyerSidebar() {
   if (!isAuthenticated || !user) {
     return null
   }
+
+  // Choose sidebar items based on user role
+  const currentSidebarItems =
+    user?.role === "admin" ? adminSidebarItems : sidebarItems
 
   const handleLogout = () => {
     logout()
@@ -136,7 +173,7 @@ export function BuyerSidebar() {
 
             {/* Navigation */}
             <nav className="space-y-2">
-              {sidebarItems.map(item => {
+              {currentSidebarItems.map(item => {
                 const isActive = pathname === item.href
                 return (
                   <Link
