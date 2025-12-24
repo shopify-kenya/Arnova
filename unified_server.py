@@ -35,7 +35,9 @@ def run_unified_server():
     print("📁 Copying build files...")
     try:
         subprocess.run(
-            [sys.executable, "copy_nextjs_build.py"], check=True, cwd=base_dir
+            [sys.executable, "copy_nextjs_build.py"],
+            check=True,
+            cwd=base_dir
         )
         print("✅ Build files copied")
     except subprocess.CalledProcessError:

@@ -141,7 +141,8 @@ urlpatterns = [
         },
     ),
     re_path(
-        r"^(?P<path>.*\.(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|eot|css|js|json))$",  # noqa: E501
+        r"^(?P<path>.*\.(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|"
+        r"eot|css|js|json))$",
         serve,
         {"document_root": os.path.join(settings.BASE_DIR, "public")},
     ),
