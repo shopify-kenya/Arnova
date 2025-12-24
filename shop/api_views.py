@@ -781,6 +781,22 @@ def api_exchange_rates(request):
     return JsonResponse(fallback_data)
 
 
+@admin_required
+@require_http_methods(["GET"])
+def api_admin_settings(request):
+    """Get admin settings"""
+    settings_data = {
+        "site_name": "Arnova",
+        "site_description": "Premium Fashion E-commerce",
+        "contact_email": "admin@arnova.com",
+        "default_currency": "USD",
+        "supported_languages": ["en", "sw"],
+        "timezone": "UTC",
+        "session_timeout": 2592000,  # 30 days
+    }
+    return JsonResponse(settings_data)
+
+
 def api_placeholder_image(request, width, height):
     """Generate placeholder image"""
     from django.http import HttpResponse

@@ -397,6 +397,11 @@ def check_mpesa_status(request, checkout_request_id):
             },
             status=500,
         )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def validate_card(request):
     """Validate credit card details"""
     try:
         data = json.loads(request.body)
