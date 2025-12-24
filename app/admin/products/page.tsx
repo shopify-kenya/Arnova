@@ -25,9 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
-import { useAuth } from "@/components/auth-provider"
 import { toast } from "sonner"
+import { apiClient } from "@/lib/api-client"
+import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
 
 interface Product {
   id: string
@@ -83,45 +83,18 @@ function AdminProductsContent() {
     images: [] as string[],
   })
 
-  const [csrfToken, setCsrfToken] = useState<string>("")
-
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       router.push("/")
       return
     }
-    fetchCsrfToken()
+    fetchProducts()
     fetchCategories()
   }, [isAuthenticated, isAdmin, router])
 
-  useEffect(() => {
-    if (csrfToken) {
-      fetchProducts()
-    }
-  }, [csrfToken])
-
-  const fetchCsrfToken = async () => {
-    try {
-      const response = await fetch("/api/csrf-token/", {
-        credentials: "include",
-      })
-      if (response.ok) {
-        const data = await response.json()
-        setCsrfToken(data.csrfToken)
-      }
-    } catch (error) {
-      console.error("Failed to fetch CSRF token")
-    }
-  }
-
   const fetchProducts = async () => {
     try {
-      const response = await fetch("/api/admin/products/", {
-        credentials: "include",
-        headers: {
-          "X-CSRFToken": csrfToken,
-        },
-      })
+      const response = await apiClient.get("/api/admin/products/")
       if (response.ok) {
         const data = await response.json()
         setProducts(data.products || [])
@@ -140,7 +113,7 @@ function AdminProductsContent() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("/api/categories/")
+      const response = await apiClient.get("/api/categories/")
       if (response.ok) {
         const data = await response.json()
         setCategories(data.categories || [])
@@ -200,17 +173,9 @@ function AdminProductsContent() {
       const url = editingProduct
         ? `/api/admin/products/${editingProduct.id}/`
         : "/api/admin/products/"
-      const method = editingProduct ? "PUT" : "POST"
+      const method = editingProduct ? "put" : "post"
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": csrfToken,
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      })
+      const response = await apiClient[method](url, formData)
 
       if (response.ok) {
         toast.success(
@@ -234,13 +199,9 @@ function AdminProductsContent() {
   const handleDelete = async (product: Product) => {
     if (confirm(`Are you sure you want to delete product ${product.name}?`)) {
       try {
-        const response = await fetch(`/api/admin/products/${product.id}/`, {
-          method: "DELETE",
-          headers: {
-            "X-CSRFToken": csrfToken,
-          },
-          credentials: "include",
-        })
+        const response = await apiClient.delete(
+          `/api/admin/products/${product.id}/`
+        )
 
         if (response.ok) {
           toast.success("Product deleted successfully")
