@@ -1,7 +1,3 @@
-import json
-import requests
-from django.http import HttpResponse
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -31,6 +27,8 @@ def api_csrf_token(request):
 
 @require_http_methods(["POST"])
 def api_login(request):
+    import json
+
     data = json.loads(request.body)
     username = data.get("username") or data.get("email")
     password = data.get("password")
@@ -40,9 +38,7 @@ def api_login(request):
     if "@" in username:
         try:
             user_obj = User.objects.get(email=username)
-            user = authenticate(
-                request, username=user_obj.username, password=password
-            )
+            user = authenticate(request, username=user_obj.username, password=password)
         except User.DoesNotExist:
             pass
     else:
@@ -67,6 +63,8 @@ def api_login(request):
 
 @require_http_methods(["POST"])
 def api_register(request):
+    import json
+
     data = json.loads(request.body)
     username = data.get("username")
     email = data.get("email")
@@ -208,9 +206,7 @@ def api_product_detail(request, product_id):
             "name": product.name,
             "description": product.description,
             "price": float(product.price),
-            "sale_price": (
-                float(product.sale_price) if product.sale_price else None
-            ),
+            "sale_price": (float(product.sale_price) if product.sale_price else None),
             "category": product.category.name,
             "sizes": product.sizes,
             "colors": product.colors,
@@ -229,9 +225,7 @@ def api_product_detail(request, product_id):
 @require_http_methods(["GET"])
 def api_categories(request):
     categories = Category.objects.all()
-    data = [
-        {"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories
-    ]
+    data = [{"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories]
     return JsonResponse({"categories": data})
 
 
@@ -692,12 +686,16 @@ def get_mock_coordinates(city, country):
 
 def get_coordinates(city, country):
     """Get real coordinates using geocoding API"""
+    import requests
+
     try:
         # Use OpenStreetMap Nominatim API (free)
         import urllib.parse
 
         query = urllib.parse.quote(f"{city}, {country}")
-        url = f"https://nominatim.openstreetmap.org/search?q={query}&format=json&limit=1"
+        url = (
+            f"https://nominatim.openstreetmap.org/search?q={query}&format=json&limit=1"
+        )
 
         response = requests.get(
             url, timeout=5, headers={"User-Agent": "Arnova-App/1.0"}
@@ -715,6 +713,8 @@ def get_coordinates(city, country):
 
 def get_exchange_rate(from_currency, to_currency):
     """Get exchange rate from free API"""
+    import requests
+
     if from_currency == to_currency:
         return 1.0
 
@@ -729,18 +729,20 @@ def get_exchange_rate(from_currency, to_currency):
         pass
 
     # Fallback rates if API fails
-    fallback_rates = {
+    rates = {
         ("USD", "KES"): 150.0,
         ("KES", "USD"): 0.0067,
         ("USD", "EUR"): 0.85,
         ("EUR", "USD"): 1.18,
     }
-    return fallback_rates.get((from_currency, to_currency), 1.0)
+    return rates.get((from_currency, to_currency), 1.0)
 
 
 @require_http_methods(["GET"])
 def api_exchange_rates(request):
     """Get current exchange rates"""
+    import requests
+
     base_currency = request.GET.get("base", "USD")
     try:
         url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
@@ -759,28 +761,13 @@ def api_exchange_rates(request):
             "EUR": 0.85 if base_currency == "USD" else 0.0057,
         },
     }
-
-
-@admin_required
-@require_http_methods(["GET"])
-def api_admin_settings(request):
-    """Get admin settings"""
-    settings_data = {
-        "site_name": "Arnova",
-        "site_description": "Premium Fashion E-commerce",
-        "contact_email": "admin@arnova.com",
-        "default_currency": "USD",
-        "supported_languages": ["en", "sw"],
-        "timezone": "UTC",
-        "session_timeout": 2592000,  # 30 days
-    }
-    return JsonResponse(settings_data)
-
     return JsonResponse(fallback_data)
 
 
 def api_placeholder_image(request, width, height):
     """Generate placeholder image"""
+    from django.http import HttpResponse
+
     try:
         from PIL import Image, ImageDraw
         import io
@@ -795,7 +782,7 @@ def api_placeholder_image(request, width, height):
             bbox = draw.textbbox((0, 0), text)
             text_width = bbox[2] - bbox[0]
             text_height = bbox[3] - bbox[1]
-        except:
+        except Exception:
             # Fallback for older PIL versions
             text_width, text_height = draw.textsize(text)
 
