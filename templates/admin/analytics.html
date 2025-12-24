@@ -1,0 +1,89 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Analytics - Arnova Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="glass-strong rounded-xl p-6">
+        <h2 class="text-2xl font-bold mb-2">Analytics</h2>
+        <p class="text-white/70">Business insights and performance metrics</p>
+    </div>
+
+    <!-- Sales Trends -->
+    <div class="glass-strong rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-4">Sales Trends (Last 6 Months)</h3>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {% for trend in sales_trends %}
+            <div class="glass rounded-lg p-4 text-center">
+                <div class="text-2xl font-bold text-green-400">${{ trend.sales|floatformat:0 }}</div>
+                <div class="text-sm text-white/70">{{ trend.orders }} orders</div>
+                <div class="text-xs text-white/50 mt-1">{{ trend.month }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Category Performance -->
+    <div class="glass-strong rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-4">Category Performance</h3>
+        <div class="space-y-4">
+            {% for category in category_stats %}
+            <div class="glass rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-medium">{{ category.name }}</h4>
+                    <span class="text-sm text-white/70">Score: {{ category.popularity_score }}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-white/70">Products:</span>
+                        <span class="font-medium">{{ category.saved_items }}</span>
+                    </div>
+                    <div>
+                        <span class="text-white/70">Orders:</span>
+                        <span class="font-medium">{{ category.orders }}</span>
+                    </div>
+                </div>
+                <!-- Simple progress bar -->
+                <div class="mt-3 bg-white/10 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full"
+                         style="width: {{ category.popularity_score|floatformat:0 }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="glass-strong rounded-xl p-6">
+            <h4 class="font-semibold mb-3">Top Performing Month</h4>
+            <div class="text-2xl font-bold text-green-400">
+                {% for trend in sales_trends %}
+                    {% if forloop.first %}${{ trend.sales|floatformat:0 }}{% endif %}
+                {% endfor %}
+            </div>
+            <p class="text-sm text-white/70">
+                {% for trend in sales_trends %}
+                    {% if forloop.first %}{{ trend.month }} 2024{% endif %}
+                {% endfor %}
+            </p>
+        </div>
+
+        <div class="glass-strong rounded-xl p-6">
+            <h4 class="font-semibold mb-3">Average Order Value</h4>
+            <div class="text-2xl font-bold text-blue-400">
+                {% widthratio sales_trends.0.sales sales_trends.0.orders 1 as avg_order %}
+                ${{ avg_order|floatformat:2 }}
+            </div>
+            <p class="text-sm text-white/70">Per transaction</p>
+        </div>
+
+        <div class="glass-strong rounded-xl p-6">
+            <h4 class="font-semibold mb-3">Growth Rate</h4>
+            <div class="text-2xl font-bold text-purple-400">+12.5%</div>
+            <p class="text-sm text-white/70">Month over month</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

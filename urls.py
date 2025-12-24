@@ -6,13 +6,34 @@ from django.urls import path, re_path
 from django.views.static import serve
 
 import views
-from shop import api_views, payment_views
+from shop import admin_views, api_views, payment_views
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 
 urlpatterns = [
     # Django admin - MUST come first
     path("admin/", admin.site.urls),
     path("django-admin/", admin.site.urls),
+    # Custom Django Template Admin
+    path("dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
+    path("dashboard/products/", admin_views.admin_products, name="admin_products"),
+    path(
+        "dashboard/products/create/",
+        admin_views.admin_product_create,
+        name="admin_product_create",
+    ),
+    path(
+        "dashboard/products/<str:product_id>/edit/",
+        admin_views.admin_product_edit,
+        name="admin_product_edit",
+    ),
+    path(
+        "dashboard/products/<str:product_id>/delete/",
+        admin_views.admin_product_delete,
+        name="admin_product_delete",
+    ),
+    path("dashboard/orders/", admin_views.admin_orders, name="admin_orders"),
+    path("dashboard/users/", admin_views.admin_users, name="admin_users"),
+    path("dashboard/analytics/", admin_views.admin_analytics, name="admin_analytics"),
     # API routes
     path("api/health/", api_views.api_health_check, name="api_health_check"),
     path("api/auth/status/", api_views.api_auth_status, name="api_auth_status"),
