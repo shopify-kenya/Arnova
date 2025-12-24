@@ -83,23 +83,51 @@ function AdminProductsContent() {
     images: [] as string[],
   })
 
+  const [csrfToken, setCsrfToken] = useState<string>("")
+
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       router.push("/")
       return
     }
-    fetchProducts()
+    fetchCsrfToken()
     fetchCategories()
   }, [isAuthenticated, isAdmin, router])
+
+  useEffect(() => {
+    if (csrfToken) {
+      fetchProducts()
+    }
+  }, [csrfToken])
+
+  const fetchCsrfToken = async () => {
+    try {
+      const response = await fetch("/api/csrf-token/", {
+        credentials: "include",
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setCsrfToken(data.csrfToken)
+      }
+    } catch (error) {
+      console.error("Failed to fetch CSRF token")
+    }
+  }
 
   const fetchProducts = async () => {
     try {
       const response = await fetch("/api/admin/products/", {
         credentials: "include",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
       })
       if (response.ok) {
         const data = await response.json()
         setProducts(data.products || [])
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
       } else {
         toast.error("Failed to fetch products")
       }
@@ -176,7 +204,10 @@ function AdminProductsContent() {
 
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
         credentials: "include",
         body: JSON.stringify(formData),
       })
@@ -189,6 +220,9 @@ function AdminProductsContent() {
         )
         setShowModal(false)
         fetchProducts()
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
       } else {
         toast.error("Failed to save product")
       }
@@ -202,12 +236,18 @@ function AdminProductsContent() {
       try {
         const response = await fetch(`/api/admin/products/${product.id}/`, {
           method: "DELETE",
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
           credentials: "include",
         })
 
         if (response.ok) {
           toast.success("Product deleted successfully")
           fetchProducts()
+        } else if (response.status === 401) {
+          toast.error("Authentication required. Please log in as admin.")
+          router.push("/auth/login")
         } else {
           toast.error("Failed to delete product")
         }
