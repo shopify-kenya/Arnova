@@ -10,7 +10,10 @@ from shop import api_views, payment_views
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 
 urlpatterns = [
-    # API routes MUST come first to avoid catch-all interference
+    # Django admin - MUST come first
+    path("admin/", admin.site.urls),
+    path("django-admin/", admin.site.urls),
+    # API routes
     path("api/health/", api_views.api_health_check, name="api_health_check"),
     path("api/auth/status/", api_views.api_auth_status, name="api_auth_status"),
     path("api/csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
@@ -93,8 +96,6 @@ urlpatterns = [
         api_views.api_exchange_rates,
         name="api_exchange_rates",
     ),
-    # Django admin
-    path("django-admin/", admin.site.urls),
     # Serve Next.js static assets
     re_path(
         r"^_next/static/(?P<path>.*)$",

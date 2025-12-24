@@ -13,12 +13,12 @@ def index(request):
     path = request.path.strip("/")
 
     # Base directory for Next.js output
-    out_dir = os.path.join(settings.BASE_DIR, "out")
+    build_dir = os.path.join(settings.BASE_DIR, "build")
 
     # Try to serve the specific HTML file for this route
     if path:
         # Handle nested routes (e.g., admin/users, product/cl-001)
-        html_file = os.path.join(out_dir, path, "index.html")
+        html_file = os.path.join(build_dir, path, "index.html")
         if os.path.exists(html_file):
             with open(html_file, "r", encoding="utf-8") as f:
                 response = HttpResponse(f.read(), content_type="text/html")
@@ -26,7 +26,7 @@ def index(request):
                 return response
 
     # Fallback to root index.html for unknown routes or root
-    root_html = os.path.join(out_dir, "index.html")
+    root_html = os.path.join(build_dir, "index.html")
     if os.path.exists(root_html):
         with open(root_html, "r", encoding="utf-8") as f:
             response = HttpResponse(f.read(), content_type="text/html")
