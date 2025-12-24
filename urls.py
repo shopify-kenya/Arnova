@@ -10,11 +10,9 @@ from shop import admin_views, api_views, payment_views
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 
 urlpatterns = [
-    # Django admin - MUST come first
+    # Django admin for staff login
     path("admin/", admin.site.urls),
-    path("django-admin/", admin.site.urls),
-    # Custom Django Template Admin
-    path("dashboard/login/", admin_views.admin_login, name="admin_login"),
+    # Custom admin dashboard using Django templates
     path("dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
     path("dashboard/products/", admin_views.admin_products, name="admin_products"),
     path(

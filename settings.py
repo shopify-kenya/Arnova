@@ -219,5 +219,5 @@ REST_FRAMEWORK = {
 }
 
 # Login URLs
-LOGIN_URL = "/dashboard/login/"
+LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
