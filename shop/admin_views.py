@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
@@ -16,8 +17,7 @@ def is_admin(user):
     return user.is_authenticated and user.is_staff
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_dashboard(request):
     """Admin dashboard with analytics"""
     # Get analytics data
@@ -47,8 +47,7 @@ def admin_dashboard(request):
     return render(request, "admin/dashboard.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_products(request):
     """Admin products management"""
     products = Product.objects.select_related("category").order_by("-created_at")
@@ -67,8 +66,7 @@ def admin_products(request):
     return render(request, "admin/products.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 @require_http_methods(["POST"])
 def admin_product_create(request):
     """Create new product"""
@@ -93,8 +91,7 @@ def admin_product_create(request):
         return redirect("admin_products")
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_product_edit(request, product_id):
     """Edit product"""
     product = get_object_or_404(Product, id=product_id)
@@ -126,8 +123,7 @@ def admin_product_edit(request, product_id):
     return render(request, "admin/product_edit.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 @require_http_methods(["POST"])
 def admin_product_delete(request, product_id):
     """Delete product"""
@@ -141,8 +137,7 @@ def admin_product_delete(request, product_id):
     return redirect("admin_products")
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_orders(request):
     """Admin orders management"""
     orders = Order.objects.select_related("user").order_by("-created_at")
@@ -158,8 +153,7 @@ def admin_orders(request):
     return render(request, "admin/orders.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_users(request):
     """Admin users management"""
     users = User.objects.select_related("userprofile").order_by("-date_joined")
@@ -175,8 +169,7 @@ def admin_users(request):
     return render(request, "admin/users.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_analytics(request):
     """Admin analytics page"""
     # Sales trends (last 6 months)
@@ -215,8 +208,7 @@ def admin_analytics(request):
     return render(request, "admin/analytics.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_order_detail(request, order_id):
     """Admin order detail view"""
     order = get_object_or_404(Order, id=order_id)
@@ -226,8 +218,7 @@ def admin_order_detail(request, order_id):
     return render(request, "admin/order_detail.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 @require_http_methods(["POST"])
 def admin_order_update_status(request, order_id):
     """Update order status"""
@@ -247,8 +238,7 @@ def admin_order_update_status(request, order_id):
     return redirect("admin_order_detail", order_id=order_id)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_user_detail(request, user_id):
     """Admin user detail view"""
     user = get_object_or_404(User, id=user_id)
@@ -260,8 +250,7 @@ def admin_user_detail(request, user_id):
     return render(request, "admin/user_detail.html", context)
 
 
-@login_required
-@user_passes_test(is_admin)
+@staff_member_required
 def admin_settings(request):
     """Admin settings page"""
     if request.method == "POST":

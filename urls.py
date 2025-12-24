@@ -7,11 +7,12 @@ from django.views.static import serve
 
 import views
 from shop import admin_views, api_views, payment_views
+from shop.admin import admin_site
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 
 urlpatterns = [
-    # Django admin for staff login
-    path("admin/", admin.site.urls),
+    # Django admin for staff login with custom redirect
+    path("admin/", admin_site.urls),
     # Custom admin dashboard using Django templates
     path("dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
     path("dashboard/products/", admin_views.admin_products, name="admin_products"),

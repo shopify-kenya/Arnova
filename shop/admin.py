@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
+from django.shortcuts import redirect
+from django.urls import reverse
 
 from .models import (
     Cart,
@@ -18,6 +20,12 @@ class ArnovaAdminSite(AdminSite):
     site_title = "Arnova Admin Portal"
     index_title = "Welcome to Arnova Administration"
     site_url = "/"
+
+    def index(self, request, extra_context=None):
+        """Redirect admin index to custom dashboard"""
+        if request.user.is_authenticated and request.user.is_staff:
+            return redirect("admin_dashboard")
+        return super().index(request, extra_context)
 
 
 @admin.register(Category)
@@ -119,3 +127,15 @@ class OrderAdmin(admin.ModelAdmin):
             {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
         ),
     )
+
+
+# Custom admin site instance
+admin_site = ArnovaAdminSite(name="admin")
+
+# Register models with custom admin site
+admin_site.register(Category, CategoryAdmin)
+admin_site.register(Product, ProductAdmin)
+admin_site.register(UserProfile, UserProfileAdmin)
+admin_site.register(Cart, CartAdmin)
+admin_site.register(SavedItem, SavedItemAdmin)
+admin_site.register(Order, OrderAdmin)
