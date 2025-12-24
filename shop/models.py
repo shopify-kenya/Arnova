@@ -19,7 +19,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')  # ISO currency code
+    currency = models.CharField(max_length=3, default="USD")  # ISO currency code
     sale_price = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
@@ -100,7 +100,9 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order_id = models.CharField(max_length=20, unique=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default="pending"
+    )
     shipping_address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -110,7 +112,9 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name="items"
+    )
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -120,24 +124,28 @@ class OrderItem(models.Model):
 
 class Payment(models.Model):
     PAYMENT_METHODS = [
-        ('card', 'Credit Card'),
-        ('paypal', 'PayPal'),
-        ('mpesa', 'M-Pesa'),
-    ]
-    
-    PAYMENT_STATUS = [
-        ('pending', 'Pending'),
-        ('processing', 'Processing'),
-        ('completed', 'Completed'),
-        ('failed', 'Failed'),
-        ('cancelled', 'Cancelled'),
+        ("card", "Credit Card"),
+        ("paypal", "PayPal"),
+        ("mpesa", "M-Pesa"),
     ]
 
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
+    PAYMENT_STATUS = [
+        ("pending", "Pending"),
+        ("processing", "Processing"),
+        ("completed", "Completed"),
+        ("failed", "Failed"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    order = models.OneToOneField(
+        Order, on_delete=models.CASCADE, related_name="payment"
+    )
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHODS)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=3, default='USD')
-    status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='pending')
+    currency = models.CharField(max_length=3, default="USD")
+    status = models.CharField(
+        max_length=20, choices=PAYMENT_STATUS, default="pending"
+    )
     transaction_id = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -147,7 +155,9 @@ class Payment(models.Model):
 
 
 class MpesaPayment(models.Model):
-    payment = models.OneToOneField(Payment, on_delete=models.CASCADE, related_name='mpesa_details')
+    payment = models.OneToOneField(
+        Payment, on_delete=models.CASCADE, related_name="mpesa_details"
+    )
     phone_number = models.CharField(max_length=15)
     checkout_request_id = models.CharField(max_length=100, unique=True)
     merchant_request_id = models.CharField(max_length=100)

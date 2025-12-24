@@ -70,7 +70,13 @@ def run_unified_server():
             except ImportError:
                 print("📦 Installing django-extensions for HTTPS support...")
                 subprocess.run(
-                    [sys.executable, "-m", "pip", "install", "django-extensions"],
+                    [
+                        sys.executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "django-extensions",
+                    ],
                     check=True,
                 )
 
@@ -93,7 +99,9 @@ def run_unified_server():
             start_http_server(base_dir)
     else:
         print("🔓 No SSL certificates found, starting HTTP server...")
-        print("💡 Run 'python generate_ssl.py' to generate SSL certificates for HTTPS")
+        print(
+            "💡 Run 'python generate_ssl.py' to generate SSL certificates for HTTPS"
+        )
         start_http_server(base_dir)
 
 
@@ -107,7 +115,8 @@ def start_http_server(base_dir):
 
     try:
         subprocess.run(
-            [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"], cwd=base_dir
+            [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"],
+            cwd=base_dir,
         )
     except KeyboardInterrupt:
         print("\n🛑 Server stopped")

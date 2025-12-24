@@ -40,7 +40,9 @@ def api_login(request):
     if "@" in username:
         try:
             user_obj = User.objects.get(email=username)
-            user = authenticate(request, username=user_obj.username, password=password)
+            user = authenticate(
+                request, username=user_obj.username, password=password
+            )
         except User.DoesNotExist:
             pass
     else:
@@ -93,7 +95,7 @@ def api_logout(request):
 
 @require_http_methods(["GET"])
 def api_products(request):
-    target_currency = request.GET.get('currency', 'USD')
+    target_currency = request.GET.get("currency", "USD")
     products = Product.objects.all()
     data = []
 
@@ -108,24 +110,26 @@ def api_products(request):
                 price = price * rate
                 if sale_price:
                     sale_price = sale_price * rate
-        data.append({
-            "id": p.id,
-            "name": p.name,
-            "description": p.description,
-            "price": round(price, 2),
-            "sale_price": round(sale_price, 2) if sale_price else None,
-            "currency": target_currency,
-            "base_currency": p.currency,
-            "category": p.category.name,
-            "sizes": p.sizes,
-            "colors": p.colors,
-            "images": p.images,
-            "in_stock": p.in_stock,
-            "is_new": p.is_new,
-            "on_sale": p.on_sale,
-            "rating": float(p.rating),
-            "reviews": p.reviews,
-        })
+        data.append(
+            {
+                "id": p.id,
+                "name": p.name,
+                "description": p.description,
+                "price": round(price, 2),
+                "sale_price": round(sale_price, 2) if sale_price else None,
+                "currency": target_currency,
+                "base_currency": p.currency,
+                "category": p.category.name,
+                "sizes": p.sizes,
+                "colors": p.colors,
+                "images": p.images,
+                "in_stock": p.in_stock,
+                "is_new": p.is_new,
+                "on_sale": p.on_sale,
+                "rating": float(p.rating),
+                "reviews": p.reviews,
+            }
+        )
     return JsonResponse({"products": data})
 
 
@@ -204,7 +208,9 @@ def api_product_detail(request, product_id):
             "name": product.name,
             "description": product.description,
             "price": float(product.price),
-            "sale_price": (float(product.sale_price) if product.sale_price else None),
+            "sale_price": (
+                float(product.sale_price) if product.sale_price else None
+            ),
             "category": product.category.name,
             "sizes": product.sizes,
             "colors": product.colors,
@@ -223,7 +229,9 @@ def api_product_detail(request, product_id):
 @require_http_methods(["GET"])
 def api_categories(request):
     categories = Category.objects.all()
-    data = [{"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories]
+    data = [
+        {"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories
+    ]
     return JsonResponse({"categories": data})
 
 
@@ -263,7 +271,14 @@ def api_profile(request):
         request.user.save()
 
         # Update profile fields
-        for field in ["avatar", "phone", "address", "city", "country", "postal_code"]:
+        for field in [
+            "avatar",
+            "phone",
+            "address",
+            "city",
+            "country",
+            "postal_code",
+        ]:
             if field in data:
                 setattr(profile, field, data[field])
         profile.save()
@@ -369,14 +384,16 @@ def api_admin_products(request):
 def api_admin_product_detail(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
-        
+
         if request.method == "GET":
             data = {
                 "id": product.id,
                 "name": product.name,
                 "description": product.description,
                 "price": float(product.price),
-                "sale_price": float(product.sale_price) if product.sale_price else None,
+                "sale_price": (
+                    float(product.sale_price) if product.sale_price else None
+                ),
                 "currency": product.currency,
                 "category_id": product.category.id,
                 "in_stock": product.in_stock,
@@ -389,7 +406,7 @@ def api_admin_product_detail(request, product_id):
                 "images": product.images,
             }
             return JsonResponse({"product": data})
-            
+
         elif request.method == "PUT":
             data = json.loads(request.body)
             product.name = data.get("name", product.name)
@@ -409,11 +426,11 @@ def api_admin_product_detail(request, product_id):
                 product.category = Category.objects.get(id=data["category_id"])
             product.save()
             return JsonResponse({"success": True})
-            
+
         elif request.method == "DELETE":
             product.delete()
             return JsonResponse({"success": True})
-            
+
     except Product.DoesNotExist:
         return JsonResponse({"error": "Product not found"}, status=404)
 
@@ -427,26 +444,28 @@ def api_admin_users(request):
         data = []
         for user in users:
             profile, _ = UserProfile.objects.get_or_create(user=user)
-            data.append({
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "is_staff": user.is_staff,
-                "is_active": user.is_active,
-                "date_joined": user.date_joined.isoformat(),
-                "profile": {
-                    "avatar": profile.avatar,
-                    "phone": profile.phone,
-                    "address": profile.address,
-                    "city": profile.city,
-                    "country": profile.country,
-                    "postal_code": profile.postal_code,
+            data.append(
+                {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "is_staff": user.is_staff,
+                    "is_active": user.is_active,
+                    "date_joined": user.date_joined.isoformat(),
+                    "profile": {
+                        "avatar": profile.avatar,
+                        "phone": profile.phone,
+                        "address": profile.address,
+                        "city": profile.city,
+                        "country": profile.country,
+                        "postal_code": profile.postal_code,
+                    },
                 }
-            })
+            )
         return JsonResponse({"users": data})
-        
+
     elif request.method == "POST":
         data = json.loads(request.body)
         user = User.objects.create_user(
@@ -455,7 +474,7 @@ def api_admin_users(request):
             password=data["password"],
             first_name=data.get("first_name", ""),
             last_name=data.get("last_name", ""),
-            is_staff=data.get("is_staff", False)
+            is_staff=data.get("is_staff", False),
         )
         profile = UserProfile.objects.create(
             user=user,
@@ -464,7 +483,7 @@ def api_admin_users(request):
             address=data.get("address", ""),
             city=data.get("city", ""),
             country=data.get("country", ""),
-            postal_code=data.get("postal_code", "")
+            postal_code=data.get("postal_code", ""),
         )
         Cart.objects.create(user=user)
         return JsonResponse({"success": True, "user_id": user.id})
@@ -475,7 +494,7 @@ def api_admin_user_detail(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         profile, _ = UserProfile.objects.get_or_create(user=user)
-        
+
         if request.method == "GET":
             data = {
                 "id": user.id,
@@ -492,10 +511,10 @@ def api_admin_user_detail(request, user_id):
                     "city": profile.city,
                     "country": profile.country,
                     "postal_code": profile.postal_code,
-                }
+                },
             }
             return JsonResponse({"user": data})
-            
+
         elif request.method == "PUT":
             data = json.loads(request.body)
             user.username = data.get("username", user.username)
@@ -505,7 +524,7 @@ def api_admin_user_detail(request, user_id):
             user.is_staff = data.get("is_staff", user.is_staff)
             user.is_active = data.get("is_active", user.is_active)
             user.save()
-            
+
             profile.avatar = data.get("avatar", profile.avatar)
             profile.phone = data.get("phone", profile.phone)
             profile.address = data.get("address", profile.address)
@@ -513,13 +532,13 @@ def api_admin_user_detail(request, user_id):
             profile.country = data.get("country", profile.country)
             profile.postal_code = data.get("postal_code", profile.postal_code)
             profile.save()
-            
+
             return JsonResponse({"success": True})
-            
+
         elif request.method == "DELETE":
             user.delete()
             return JsonResponse({"success": True})
-            
+
     except User.DoesNotExist:
         return JsonResponse({"error": "User not found"}, status=404)
 
@@ -542,19 +561,25 @@ def api_admin_analytics(request):
 
     # User location analytics with real geocoding
     user_locations = []
-    profiles = UserProfile.objects.select_related('user').all()
+    profiles = UserProfile.objects.select_related("user").all()
     for profile in profiles:
         if profile.city and profile.country:
             lat, lng = get_coordinates(profile.city, profile.country)
-            user_locations.append({
-                'user': profile.user.username,
-                'city': profile.city,
-                'country': profile.country,
-                'lat': lat,
-                'lng': lng,
-                'orders': Order.objects.filter(user=profile.user).count(),
-                'last_login': profile.user.last_login.isoformat() if profile.user.last_login else None
-            })
+            user_locations.append(
+                {
+                    "user": profile.user.username,
+                    "city": profile.city,
+                    "country": profile.country,
+                    "lat": lat,
+                    "lng": lng,
+                    "orders": Order.objects.filter(user=profile.user).count(),
+                    "last_login": (
+                        profile.user.last_login.isoformat()
+                        if profile.user.last_login
+                        else None
+                    ),
+                }
+            )
 
     # Category preferences analytics
     category_stats = []
@@ -562,34 +587,63 @@ def api_admin_analytics(request):
     for category in categories:
         saved_count = SavedItem.objects.filter(product__category=category).count()
         order_count = OrderItem.objects.filter(product__category=category).count()
-        category_stats.append({
-            'name': category.name,
-            'saved_items': saved_count,
-            'orders': order_count,
-            'popularity_score': saved_count + (order_count * 2)
-        })
+        category_stats.append(
+            {
+                "name": category.name,
+                "saved_items": saved_count,
+                "orders": order_count,
+                "popularity_score": saved_count + (order_count * 2),
+            }
+        )
 
     # Sales trends (mock data for demo)
     sales_trends = [
-        {'month': 'Jan', 'sales': random.randint(15000, 25000), 'orders': random.randint(100, 200)},
-        {'month': 'Feb', 'sales': random.randint(18000, 28000), 'orders': random.randint(120, 220)},
-        {'month': 'Mar', 'sales': random.randint(20000, 30000), 'orders': random.randint(140, 240)},
-        {'month': 'Apr', 'sales': random.randint(22000, 32000), 'orders': random.randint(160, 260)},
-        {'month': 'May', 'sales': random.randint(25000, 35000), 'orders': random.randint(180, 280)},
-        {'month': 'Jun', 'sales': random.randint(28000, 38000), 'orders': random.randint(200, 300)},
+        {
+            "month": "Jan",
+            "sales": random.randint(15000, 25000),
+            "orders": random.randint(100, 200),
+        },
+        {
+            "month": "Feb",
+            "sales": random.randint(18000, 28000),
+            "orders": random.randint(120, 220),
+        },
+        {
+            "month": "Mar",
+            "sales": random.randint(20000, 30000),
+            "orders": random.randint(140, 240),
+        },
+        {
+            "month": "Apr",
+            "sales": random.randint(22000, 32000),
+            "orders": random.randint(160, 260),
+        },
+        {
+            "month": "May",
+            "sales": random.randint(25000, 35000),
+            "orders": random.randint(180, 280),
+        },
+        {
+            "month": "Jun",
+            "sales": random.randint(28000, 38000),
+            "orders": random.randint(200, 300),
+        },
     ]
 
     # Login activity analytics
     login_activity = []
     for i in range(7):  # Last 7 days
         from datetime import datetime, timedelta
+
         date = datetime.now() - timedelta(days=i)
         # Mock login data (in production, track actual login times)
-        login_activity.append({
-            'date': date.strftime('%Y-%m-%d'),
-            'logins': random.randint(20, 100),
-            'unique_users': random.randint(15, 80)
-        })
+        login_activity.append(
+            {
+                "date": date.strftime("%Y-%m-%d"),
+                "logins": random.randint(20, 100),
+                "unique_users": random.randint(15, 80),
+            }
+        )
 
     data = {
         "total_orders": total_orders,
@@ -605,7 +659,7 @@ def api_admin_analytics(request):
         "user_locations": user_locations,
         "category_preferences": category_stats,
         "sales_trends": sales_trends,
-        "login_activity": login_activity
+        "login_activity": login_activity,
     }
     return JsonResponse(data)
 
@@ -614,22 +668,23 @@ def get_mock_coordinates(city, country):
     """Generate mock coordinates for demo purposes"""
     # Mock coordinates for common cities
     coordinates = {
-        ('Nairobi', 'Kenya'): (-1.2921, 36.8219),
-        ('Lagos', 'Nigeria'): (6.5244, 3.3792),
-        ('Cairo', 'Egypt'): (30.0444, 31.2357),
-        ('New York', 'USA'): (40.7128, -74.0060),
-        ('London', 'UK'): (51.5074, -0.1278),
-        ('Paris', 'France'): (48.8566, 2.3522),
-        ('Tokyo', 'Japan'): (35.6762, 139.6503),
-        ('Sydney', 'Australia'): (-33.8688, 151.2093),
+        ("Nairobi", "Kenya"): (-1.2921, 36.8219),
+        ("Lagos", "Nigeria"): (6.5244, 3.3792),
+        ("Cairo", "Egypt"): (30.0444, 31.2357),
+        ("New York", "USA"): (40.7128, -74.0060),
+        ("London", "UK"): (51.5074, -0.1278),
+        ("Paris", "France"): (48.8566, 2.3522),
+        ("Tokyo", "Japan"): (35.6762, 139.6503),
+        ("Sydney", "Australia"): (-33.8688, 151.2093),
     }
-    
+
     key = (city, country)
     if key in coordinates:
         return coordinates[key]
-    
+
     # Generate random coordinates if city not found
     import random
+
     lat = random.uniform(-60, 60)
     lng = random.uniform(-180, 180)
     return (lat, lng)
@@ -640,17 +695,20 @@ def get_coordinates(city, country):
     try:
         # Use OpenStreetMap Nominatim API (free)
         import urllib.parse
+
         query = urllib.parse.quote(f"{city}, {country}")
         url = f"https://nominatim.openstreetmap.org/search?q={query}&format=json&limit=1"
-        
-        response = requests.get(url, timeout=5, headers={'User-Agent': 'Arnova-App/1.0'})
+
+        response = requests.get(
+            url, timeout=5, headers={"User-Agent": "Arnova-App/1.0"}
+        )
         if response.status_code == 200:
             data = response.json()
             if data:
-                return (float(data[0]['lat']), float(data[0]['lon']))
+                return (float(data[0]["lat"]), float(data[0]["lon"]))
     except Exception:
         pass
-    
+
     # Fallback to mock coordinates if API fails
     return get_mock_coordinates(city, country)
 
@@ -666,16 +724,16 @@ def get_exchange_rate(from_currency, to_currency):
         response = requests.get(url, timeout=5)
         if response.status_code == 200:
             data = response.json()
-            return data['rates'].get(to_currency, 1.0)
+            return data["rates"].get(to_currency, 1.0)
     except Exception:
         pass
 
     # Fallback rates if API fails
     fallback_rates = {
-        ('USD', 'KES'): 150.0,
-        ('KES', 'USD'): 0.0067,
-        ('USD', 'EUR'): 0.85,
-        ('EUR', 'USD'): 1.18,
+        ("USD", "KES"): 150.0,
+        ("KES", "USD"): 0.0067,
+        ("USD", "EUR"): 0.85,
+        ("EUR", "USD"): 1.18,
     }
     return fallback_rates.get((from_currency, to_currency), 1.0)
 
@@ -683,7 +741,7 @@ def get_exchange_rate(from_currency, to_currency):
 @require_http_methods(["GET"])
 def api_exchange_rates(request):
     """Get current exchange rates"""
-    base_currency = request.GET.get('base', 'USD')
+    base_currency = request.GET.get("base", "USD")
     try:
         url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
         response = requests.get(url, timeout=5)
@@ -694,13 +752,15 @@ def api_exchange_rates(request):
 
     # Fallback rates
     fallback_data = {
-        'base': base_currency,
-        'rates': {
-            'USD': 1.0 if base_currency == 'USD' else 0.0067,
-            'KES': 150.0 if base_currency == 'USD' else 1.0,
-            'EUR': 0.85 if base_currency == 'USD' else 0.0057,
-        }
+        "base": base_currency,
+        "rates": {
+            "USD": 1.0 if base_currency == "USD" else 0.0067,
+            "KES": 150.0 if base_currency == "USD" else 1.0,
+            "EUR": 0.85 if base_currency == "USD" else 0.0057,
+        },
     }
+
+
 @admin_required
 @require_http_methods(["GET"])
 def api_admin_settings(request):
@@ -716,7 +776,6 @@ def api_admin_settings(request):
     }
     return JsonResponse(settings_data)
 
-
     return JsonResponse(fallback_data)
 
 
@@ -725,11 +784,11 @@ def api_placeholder_image(request, width, height):
     try:
         from PIL import Image, ImageDraw
         import io
-        
+
         # Create a simple placeholder image
-        img = Image.new('RGB', (width, height), color='#f0f0f0')
+        img = Image.new("RGB", (width, height), color="#f0f0f0")
         draw = ImageDraw.Draw(img)
-        
+
         # Add text
         text = f"{width}x{height}"
         try:
@@ -739,17 +798,17 @@ def api_placeholder_image(request, width, height):
         except:
             # Fallback for older PIL versions
             text_width, text_height = draw.textsize(text)
-        
+
         x = (width - text_width) // 2
         y = (height - text_height) // 2
-        draw.text((x, y), text, fill='#999999')
-        
+        draw.text((x, y), text, fill="#999999")
+
         # Save to bytes
         img_io = io.BytesIO()
-        img.save(img_io, 'PNG')
+        img.save(img_io, "PNG")
         img_io.seek(0)
-        
-        return HttpResponse(img_io.getvalue(), content_type='image/png')
+
+        return HttpResponse(img_io.getvalue(), content_type="image/png")
     except ImportError:
         # Fallback if PIL is not available
-        return HttpResponse(b'', content_type='image/png', status=404)
+        return HttpResponse(b"", content_type="image/png", status=404)

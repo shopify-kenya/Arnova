@@ -29,13 +29,8 @@ class CategoryAdmin(admin.ModelAdmin):
     readonly_fields = ["created_at"]
 
     fieldsets = (
-        ("Basic Information", {
-            "fields": ("name", "slug")
-        }),
-        ("Timestamps", {
-            "fields": ("created_at",),
-            "classes": ("collapse",)
-        }),
+        ("Basic Information", {"fields": ("name", "slug")}),
+        ("Timestamps", {"fields": ("created_at",), "classes": ("collapse",)}),
     )
 
 
@@ -49,7 +44,7 @@ class ProductAdmin(admin.ModelAdmin):
         "in_stock",
         "is_new",
         "on_sale",
-        "created_at"
+        "created_at",
     ]
     list_filter = ["category", "in_stock", "is_new", "on_sale", "created_at"]
     search_fields = ["name", "description"]
@@ -57,19 +52,16 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ["created_at", "updated_at"]
 
     fieldsets = (
-        ("Basic Information", {
-            "fields": ("name", "category", "description")
-        }),
-        ("Pricing & Stock", {
-            "fields": ("price", "in_stock", "is_new", "on_sale")
-        }),
-        ("Media", {
-            "fields": ("image",)
-        }),
-        ("Timestamps", {
-            "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",)
-        }),
+        ("Basic Information", {"fields": ("name", "category", "description")}),
+        (
+            "Pricing & Stock",
+            {"fields": ("price", "in_stock", "is_new", "on_sale")},
+        ),
+        ("Media", {"fields": ("image",)}),
+        (
+            "Timestamps",
+            {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
+        ),
     )
 
 
@@ -120,14 +112,10 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
 
     fieldsets = (
-        ("Order Information", {
-            "fields": ("order_id", "user", "status")
-        }),
-        ("Financial", {
-            "fields": ("total_amount",)
-        }),
-        ("Timestamps", {
-            "fields": ("created_at", "updated_at"),
-            "classes": ("collapse",)
-        }),
+        ("Order Information", {"fields": ("order_id", "user", "status")}),
+        ("Financial", {"fields": ("total_amount",)}),
+        (
+            "Timestamps",
+            {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
+        ),
     )
