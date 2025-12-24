@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Arnova</title>
+    {% load static %}
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'admin/css/admin-theme.css' %}">
+    <script src="{% static 'admin/js/admin-utils.js' %}" defer></script>
     <script>
         tailwind.config = {
             theme: {
@@ -45,8 +48,8 @@
         </div>
 
         {% if error %}
-        <div class="bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-6">
-            <p class="text-red-300 text-sm">{{ error }}</p>
+        <div class="alert alert-error mb-6">
+            <p class="text-sm">{{ error }}</p>
         </div>
         {% endif %}
 
@@ -55,13 +58,11 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-2">Username or Email</label>
-                    <input type="text" name="username" required
-                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20">
+                    <input type="text" name="username" required class="form-input w-full px-4 py-3 rounded-lg">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Password</label>
-                    <input type="password" name="password" required
-                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20">
+                    <input type="password" name="password" required class="form-input w-full px-4 py-3 rounded-lg">
                 </div>
                 <div class="flex items-center">
                     <input type="checkbox" name="remember_me" id="remember" class="mr-2">
@@ -69,7 +70,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-purple-500 hover:bg-purple-600 py-3 rounded-lg font-medium mt-6 transition-colors">
+            <button type="submit" class="btn-primary w-full py-3 rounded-lg font-medium mt-6 transition-colors">
                 Sign In
             </button>
         </form>
@@ -101,18 +102,10 @@
                 if (result.success) {
                     window.location.href = '{% url "admin_dashboard" %}';
                 } else {
-                    // Show error
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-6';
-                    errorDiv.innerHTML = `<p class="text-red-300 text-sm">${result.error || 'Invalid credentials'}</p>`;
-
-                    const existingError = document.querySelector('.bg-red-500\\/20');
-                    if (existingError) existingError.remove();
-
-                    this.parentNode.insertBefore(errorDiv, this);
+                    AdminUtils.showAlert(result.error || 'Invalid credentials', 'error');
                 }
             } catch (error) {
-                console.error('Login error:', error);
+                AdminUtils.showAlert('Login failed. Please try again.', 'error');
             }
         });
     </script>

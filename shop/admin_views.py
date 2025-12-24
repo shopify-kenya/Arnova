@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
@@ -126,10 +127,11 @@ def admin_product_create(request):
             is_new=request.POST.get("is_new") == "on",
             on_sale=request.POST.get("on_sale") == "on",
         )
-
+        messages.success(request, f'Product "{product.name}" created successfully.')
         return redirect("admin_products")
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        messages.error(request, f"Error creating product: {str(e)}")
+        return redirect("admin_products")
 
 
 @login_required
@@ -152,10 +154,10 @@ def admin_product_edit(request, product_id):
             product.is_new = request.POST.get("is_new") == "on"
             product.on_sale = request.POST.get("on_sale") == "on"
             product.save()
-
+            messages.success(request, f'Product "{product.name}" updated successfully.')
             return redirect("admin_products")
         except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
+            messages.error(request, f"Error updating product: {str(e)}")
 
     categories = Category.objects.all()
     context = {
@@ -170,8 +172,13 @@ def admin_product_edit(request, product_id):
 @require_http_methods(["POST"])
 def admin_product_delete(request, product_id):
     """Delete product"""
-    product = get_object_or_404(Product, id=product_id)
-    product.delete()
+    try:
+        product = get_object_or_404(Product, id=product_id)
+        product_name = product.name
+        product.delete()
+        messages.success(request, f'Product "{product_name}" deleted successfully.')
+    except Exception as e:
+        messages.error(request, f"Error deleting product: {str(e)}")
     return redirect("admin_products")
 
 
@@ -265,11 +272,19 @@ def admin_order_detail(request, order_id):
 @require_http_methods(["POST"])
 def admin_order_update_status(request, order_id):
     """Update order status"""
-    order = get_object_or_404(Order, id=order_id)
-    new_status = request.POST.get("status")
-    if new_status in ["pending", "processing", "shipped", "delivered", "cancelled"]:
-        order.status = new_status
-        order.save()
+    try:
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get("status")
+        if new_status in ["pending", "processing", "shipped", "delivered", "cancelled"]:
+            order.status = new_status
+            order.save()
+            messages.success(
+                request, f"Order #{order.id} status updated to {new_status}."
+            )
+        else:
+            messages.error(request, "Invalid status provided.")
+    except Exception as e:
+        messages.error(request, f"Error updating order status: {str(e)}")
     return redirect("admin_order_detail", order_id=order_id)
 
 
