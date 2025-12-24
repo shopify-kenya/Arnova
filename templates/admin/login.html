@@ -1,208 +1,120 @@
-{% extends "admin/base.html" %}
-{% load i18n static %}
-
-{% block title %}{{ title }} | Arnova Admin{% endblock %}
-
-{% block extrastyle %}
-{{ block.super }}
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-    body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    #container {
-        background: transparent;
-        width: 100%;
-        max-width: 400px;
-        margin: 0;
-        padding: 0;
-    }
-
-    #header, #content, #footer {
-        display: none;
-    }
-
-    .login-form {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        padding: 3rem;
-        width: 100%;
-    }
-
-    .login-form h1 {
-        color: white;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .form-row {
-        margin-bottom: 1.5rem;
-    }
-
-    .form-row label {
-        color: white;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-
-    .form-row input {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
-        color: white;
-        padding: 1rem;
-        width: 100%;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-    }
-
-    .form-row input:focus {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.4);
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-    }
-
-    .form-row input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-    }
-
-    .submit-row {
-        text-align: center;
-        margin-top: 2rem;
-    }
-
-    .submit-row input {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 12px;
-        color: white;
-        padding: 1rem 2rem;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-
-    .submit-row input:hover {
-        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    }
-
-    .errornote {
-        background: rgba(239, 68, 68, 0.2);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 12px;
-        color: white;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-        text-align: center;
-    }
-
-    .brand-logo {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .brand-logo .logo {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 16px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
-    }
-
-    .brand-logo .logo span {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-
-    .brand-text {
-        color: white;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .brand-subtitle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.9rem;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="login-form">
-    <div class="brand-logo">
-        <div class="logo">
-            <span>A</span>
-        </div>
-        <div class="brand-text">Arnova Admin</div>
-        <div class="brand-subtitle">Premium Fashion Management</div>
-    </div>
-
-    {% if form.errors and not form.non_field_errors %}
-        <div class="errornote">
-            Please correct the errors below.
-        </div>
-    {% endif %}
-
-    {% if form.non_field_errors %}
-        <div class="errornote">
-            {{ form.non_field_errors }}
-        </div>
-    {% endif %}
-
-    <form action="{{ app_path }}" method="post" id="login-form">
-        {% csrf_token %}
-
-        <div class="form-row">
-            {{ form.username.label_tag }}
-            {{ form.username }}
-            {% if form.username.errors %}
-                <div class="errornote">{{ form.username.errors }}</div>
-            {% endif %}
-        </div>
-
-        <div class="form-row">
-            {{ form.password.label_tag }}
-            {{ form.password }}
-            {% if form.password.errors %}
-                <div class="errornote">{{ form.password.errors }}</div>
-            {% endif %}
-        </div>
-
-        {% url 'admin_password_reset' as password_reset_url %}
-        {% if password_reset_url %}
-            <div class="password-reset-link" style="text-align: center; margin: 1rem 0;">
-                <a href="{{ password_reset_url }}" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; font-size: 0.9rem;">
-                    Forgot password?
-                </a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Arnova</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8b5cf6',
+                        secondary: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="text-white flex items-center justify-center min-h-screen p-4">
+    <div class="glass-strong rounded-xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span class="text-white font-bold text-2xl">A</span>
             </div>
+            <h1 class="text-2xl font-bold mb-2">Arnova Admin</h1>
+            <p class="text-white/70">Sign in to access the admin dashboard</p>
+        </div>
+
+        {% if error %}
+        <div class="bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-6">
+            <p class="text-red-300 text-sm">{{ error }}</p>
+        </div>
         {% endif %}
 
-        <div class="submit-row">
-            <input type="submit" value="{% trans 'Log in' %}" />
-            <input type="hidden" name="next" value="{{ next }}" />
+        <form method="post" id="loginForm">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Username or Email</label>
+                    <input type="text" name="username" required
+                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" name="password" required
+                           class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20">
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="remember_me" id="remember" class="mr-2">
+                    <label for="remember" class="text-sm text-white/70">Remember me</label>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-purple-500 hover:bg-purple-600 py-3 rounded-lg font-medium mt-6 transition-colors">
+                Sign In
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="/" class="text-white/70 hover:text-white text-sm">← Back to Store</a>
         </div>
-    </form>
-</div>
-{% endblock %}
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('{% url "admin_login" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = '{% url "admin_dashboard" %}';
+                } else {
+                    // Show error
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-6';
+                    errorDiv.innerHTML = `<p class="text-red-300 text-sm">${result.error || 'Invalid credentials'}</p>`;
+
+                    const existingError = document.querySelector('.bg-red-500\\/20');
+                    if (existingError) existingError.remove();
+
+                    this.parentNode.insertBefore(errorDiv, this);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

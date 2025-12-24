@@ -217,3 +217,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
     ],
 }
+
+# Login URLs
+LOGIN_URL = "/dashboard/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"

@@ -1,9 +1,11 @@
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Count, Sum
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import Category, Order, Product, UserProfile
@@ -14,10 +16,58 @@ def is_admin(user):
     return user.is_authenticated and user.is_staff
 
 
+def admin_login(request):
+    """Admin login view"""
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect("admin_dashboard")
+
+    if request.method == "POST":
+        import json
+
+        try:
+            data = json.loads(request.body)
+            username = data.get("username")
+            password = data.get("password")
+
+            # Try to authenticate by email first, then username
+            user = None
+            if "@" in username:
+                try:
+                    user_obj = User.objects.get(email=username)
+                    user = authenticate(
+                        request, username=user_obj.username, password=password
+                    )
+                except User.DoesNotExist:
+                    pass
+            else:
+                user = authenticate(request, username=username, password=password)
+
+            if user and user.is_staff:
+                login(request, user)
+                return JsonResponse({"success": True})
+            else:
+                return JsonResponse(
+                    {"error": "Invalid credentials or insufficient permissions"},
+                    status=401,
+                )
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return render(request, "admin/login.html")
+
+
 @login_required
 @user_passes_test(is_admin)
 def admin_dashboard(request):
     """Admin dashboard with analytics"""
+    # Redirect to login if not authenticated or not admin
+    if not request.user.is_authenticated or not request.user.is_staff:
+        return redirect("admin_login")
+    """Admin dashboard with analytics"""
+    # Redirect to login if not authenticated or not admin
+    if not request.user.is_authenticated or not request.user.is_staff:
+        return redirect("admin_login")
+
     # Get analytics data
     total_orders = Order.objects.count()
     total_revenue = (

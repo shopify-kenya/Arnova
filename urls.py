@@ -14,6 +14,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("django-admin/", admin.site.urls),
     # Custom Django Template Admin
+    path("dashboard/login/", admin_views.admin_login, name="admin_login"),
     path("dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
     path("dashboard/products/", admin_views.admin_products, name="admin_products"),
     path(

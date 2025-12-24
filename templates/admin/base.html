@@ -56,7 +56,10 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <span class="text-sm">{{ user.username }}</span>
-                    <a href="{% url 'api_logout' %}" class="bg-red-500/20 hover:bg-red-500/30 px-3 py-1 rounded-lg text-sm">Logout</a>
+                    <form method="post" action="{% url 'api_logout' %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="bg-red-500/20 hover:bg-red-500/30 px-3 py-1 rounded-lg text-sm">Logout</button>
+                    </form>
                 </div>
             </div>
         </div>
