@@ -25,8 +25,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
 import { apiClient } from "@/lib/api-client"
+import { toast } from "sonner"
+import { useAuth } from "@/components/auth-provider"
 import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
 
 interface Product {

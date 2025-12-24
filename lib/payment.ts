@@ -1,4 +1,4 @@
-import { api } from "./api-client"
+import { apiClient } from "./api-client"
 
 export interface CardData {
   cardNumber: string
@@ -54,15 +54,20 @@ export const processPayment = async (
 ): Promise<PaymentResult> => {
   try {
     if (paymentData.payment_method === "mpesa") {
-      const response = await api.processMpesaPayment({
+      const response = await apiClient.post("/api/payment/mpesa/", {
         phone_number: paymentData.phone_number!,
         amount: paymentData.amount,
         order_data: paymentData.order_data,
       })
-      return response.data || { success: false, error: "No response data" }
+      const data = await response.json()
+      return data || { success: false, error: "No response data" }
     } else {
-      const response = await api.processPayment(paymentData)
-      return response.data || { success: false, error: "No response data" }
+      const response = await apiClient.post(
+        "/api/payment/process/",
+        paymentData
+      )
+      const data = await response.json()
+      return data || { success: false, error: "No response data" }
     }
   } catch (error: unknown) {
     const errorMessage =
@@ -82,9 +87,12 @@ export const validateCard = async (
   error?: string
 }> => {
   try {
-    const response = await api.validateCard(cardNumber)
+    const response = await apiClient.post("/api/payment/validate-card/", {
+      card_number: cardNumber,
+    })
+    const data = await response.json()
     return (
-      response.data || {
+      data || {
         valid: false,
         card_type: "unknown",
         error: "No response data",
@@ -166,9 +174,12 @@ export const checkMpesaPaymentStatus = async (
   transaction_id?: string
 }> => {
   try {
-    const response = await api.checkMpesaStatus(checkoutRequestId)
+    const response = await apiClient.get(
+      `/api/payment/mpesa/status/${checkoutRequestId}/`
+    )
+    const data = await response.json()
     return (
-      response.data || {
+      data || {
         status: "failed",
         result_code: "1",
         result_desc: "No response data",
