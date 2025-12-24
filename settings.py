@@ -181,13 +181,19 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_AGE = 86400  # 24 hours
 
-# Trusted origins for CSRF (same-origin by default)
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "https://127.0.0.1:8443",
-    "http://localhost:8000",
-    "https://localhost:8443",
-]
+# Production CSRF settings from environment
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'true').lower() == 'true'
+    CSRF_FAILURE_VIEW = os.getenv('CSRF_FAILURE_VIEW', 'django.views.csrf.csrf_failure')
+else:
+    # Development CSRF settings
+    CSRF_TRUSTED_ORIGINS = [
+        "http://127.0.0.1:8000",
+        "https://127.0.0.1:8443",
+        "http://localhost:8000",
+        "https://localhost:8443",
+    ]
 
 # Allow same-origin requests without CSRF for GET requests
 CSRF_COOKIE_DOMAIN = None  # Use default domain

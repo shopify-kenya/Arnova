@@ -1,10 +1,10 @@
 from .utils import safe_json_response, serialize_queryset
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods
+from django.utils import timezone
 
 from .middleware import admin_required, api_login_required
 from .models import (
@@ -17,6 +17,18 @@ from .models import (
     SavedItem,
     UserProfile,
 )
+
+
+@require_http_methods(["GET"])
+def api_health_check(request):
+    """Health check endpoint with CSRF token validation"""
+    csrf_token = get_token(request)
+    return JsonResponse({
+        "status": "healthy",
+        "csrf_token": csrf_token,
+        "authenticated": request.user.is_authenticated,
+        "timestamp": timezone.now().isoformat(),
+    })
 
 
 @ensure_csrf_cookie
