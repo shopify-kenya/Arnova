@@ -1,11 +1,12 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
-from .middleware import admin_required, api_login_required
 from .models import (
     Cart,
     CartItem,
@@ -120,7 +121,7 @@ def api_register(request):
     return JsonResponse({"success": True, "message": "User created successfully"})
 
 
-@api_login_required
+@login_required
 @require_http_methods(["POST"])
 def api_logout(request):
     logout(request)
@@ -167,7 +168,7 @@ def api_products(request):
     return JsonResponse({"products": data})
 
 
-@api_login_required
+@login_required
 def api_cart(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
@@ -210,7 +211,7 @@ def api_cart(request):
         return JsonResponse({"success": True})
 
 
-@api_login_required
+@login_required
 def api_saved(request):
     if request.method == "GET":
         items = SavedItem.objects.filter(user=request.user)
@@ -269,7 +270,7 @@ def api_categories(request):
     return JsonResponse({"categories": data})
 
 
-@api_login_required
+@login_required
 def api_profile(request):
     if request.method == "GET":
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
@@ -322,7 +323,7 @@ def api_profile(request):
         return JsonResponse({"success": True})
 
 
-@api_login_required
+@login_required
 @require_http_methods(["GET"])
 def api_orders(request):
     orders = Order.objects.filter(user=request.user).order_by("-created_at")
@@ -347,7 +348,7 @@ def api_orders(request):
     return JsonResponse({"orders": data})
 
 
-@admin_required
+@staff_member_required
 @require_http_methods(["GET"])
 def api_admin_orders(request):
     orders = Order.objects.all().order_by("-created_at")
@@ -365,7 +366,7 @@ def api_admin_orders(request):
     return JsonResponse({"orders": data})
 
 
-@admin_required
+@staff_member_required
 def api_admin_products(request):
     if request.method == "GET":
         products = Product.objects.all()
@@ -418,7 +419,7 @@ def api_admin_products(request):
         return JsonResponse({"success": True, "product_id": product.id})
 
 
-@admin_required
+@staff_member_required
 def api_admin_product_detail(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
@@ -475,7 +476,7 @@ def api_admin_product_detail(request, product_id):
         return JsonResponse({"error": "Product not found"}, status=404)
 
 
-@admin_required
+@staff_member_required
 def api_admin_users(request):
     from django.contrib.auth.models import User
 
@@ -531,7 +532,7 @@ def api_admin_users(request):
         return JsonResponse({"success": True, "user_id": user.id})
 
 
-@admin_required
+@staff_member_required
 def api_admin_user_detail(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -587,7 +588,7 @@ def api_admin_user_detail(request, user_id):
         return JsonResponse({"error": "User not found"}, status=404)
 
 
-@admin_required
+@staff_member_required
 @require_http_methods(["GET"])
 def api_admin_analytics(request):
     import random
@@ -815,7 +816,7 @@ def api_exchange_rates(request):
     return JsonResponse(fallback_data)
 
 
-@admin_required
+@staff_member_required
 @require_http_methods(["GET"])
 def api_admin_settings(request):
     """Get admin settings"""
