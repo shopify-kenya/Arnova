@@ -71,12 +71,28 @@ export default function AdminAnalyticsPage() {
 
   const fetchAnalytics = async () => {
     try {
+      // Get CSRF token first
+      const csrfResponse = await fetch("/api/csrf-token/", {
+        credentials: "include",
+      })
+      const csrfData = await csrfResponse.json()
+
       const response = await fetch("/api/admin/analytics/", {
         credentials: "include",
+        headers: {
+          "X-CSRFToken": csrfData.csrfToken,
+          "Content-Type": "application/json",
+        },
       })
       if (response.ok) {
         const data = await response.json()
         setAnalytics(data)
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
+      } else if (response.status === 403) {
+        toast.error("Admin access required")
+        router.push("/")
       }
     } catch (error) {
       toast.error("Failed to fetch analytics")
