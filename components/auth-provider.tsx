@@ -25,8 +25,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true)
+    // First check localStorage
     const currentUser = getCurrentUser()
-    setUserState(currentUser)
+    if (currentUser) {
+      setUserState(currentUser)
+    } else {
+      // If no local user, check Django session
+      import("@/lib/auth").then(({ checkAuthStatus }) => {
+        checkAuthStatus().then(sessionUser => {
+          if (sessionUser) {
+            setUserState(sessionUser)
+          }
+        })
+      })
+    }
   }, [])
 
   const setUser = (user: User | null) => {

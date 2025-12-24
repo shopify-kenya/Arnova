@@ -10,7 +10,12 @@ class AuthMiddleware:
         "/api/orders/",
         "/api/saved/",
         "/api/profile/",
-        "/api/admin/",
+    ]
+
+    DRF_ADMIN_PATHS = [
+        "/api/admin/products/",
+        "/api/admin/orders/",
+        "/api/admin/users/",
     ]
 
     PUBLIC_PATHS = [
@@ -24,10 +29,15 @@ class AuthMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Check if path requires authentication
-        protected = any(
-            request.path.startswith(path) for path in self.PROTECTED_PATHS
+        # Skip DRF admin paths - they handle their own authentication
+        is_drf_admin = any(
+            request.path.startswith(path) for path in self.DRF_ADMIN_PATHS
         )
+        if is_drf_admin:
+            response = self.get_response(request)
+            return response
+        # Check if path requires authentication
+        protected = any(request.path.startswith(path) for path in self.PROTECTED_PATHS)
         if protected:
             if not request.user.is_authenticated:
                 return JsonResponse(
@@ -96,12 +106,9 @@ class CorsMiddleware(MiddlewareMixin):
                 response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Credentials"] = "true"
 
-        response["Access-Control-Allow-Methods"] = (
-            "GET, POST, PUT, DELETE, OPTIONS"
-        )
+        response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response["Access-Control-Allow-Headers"] = (
-            "Accept, Content-Type, X-CSRFToken, Authorization, "
-            "X-Requested-With"
+            "Accept, Content-Type, X-CSRFToken, Authorization, " "X-Requested-With"
         )
         response["Access-Control-Max-Age"] = "3600"
 

@@ -7,9 +7,12 @@ from django.views.static import serve
 
 import views
 from shop import api_views, payment_views
+from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 
 urlpatterns = [
     # API routes MUST come first to avoid catch-all interference
+    path("api/health/", api_views.api_health_check, name="api_health_check"),
+    path("api/auth/status/", api_views.api_auth_status, name="api_auth_status"),
     path("api/csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
     path("api/auth/login/", api_views.api_login, name="api_login"),
     path("api/auth/register/", api_views.api_register, name="api_register"),
@@ -27,20 +30,24 @@ urlpatterns = [
     path("api/orders/", api_views.api_orders, name="api_orders"),
     path(
         "api/admin/orders/",
-        api_views.api_admin_orders,
-        name="api_admin_orders",
+        AdminOrdersView.as_view(),
+        name="api_admin_orders_drf",
     ),
     path(
         "api/admin/products/",
-        api_views.api_admin_products,
-        name="api_admin_products",
+        AdminProductsView.as_view(),
+        name="api_admin_products_drf",
+    ),
+    path(
+        "api/admin/users/",
+        AdminUsersView.as_view(),
+        name="api_admin_users_drf",
     ),
     path(
         "api/admin/products/<str:product_id>/",
         api_views.api_admin_product_detail,
         name="api_admin_product_detail",
     ),
-    path("api/admin/users/", api_views.api_admin_users, name="api_admin_users"),
     path(
         "api/admin/users/<int:user_id>/",
         api_views.api_admin_user_detail,
@@ -92,11 +99,7 @@ urlpatterns = [
     re_path(
         r"^_next/static/(?P<path>.*)$",
         serve,
-        {
-            "document_root": os.path.join(
-                settings.BASE_DIR, "out", "_next", "static"
-            )
-        },
+        {"document_root": os.path.join(settings.BASE_DIR, "out", "_next", "static")},
     ),
     re_path(
         r"^_next/(?P<path>.*)$",

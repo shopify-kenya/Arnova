@@ -1,15 +1,16 @@
-import json
 import base64
-import requests
+import json
 from datetime import datetime
 from decimal import Decimal
 
+import requests
 from django.conf import settings
 from django.http import JsonResponse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.utils import timezone
-from .models import Payment, MpesaPayment
+
+from .models import MpesaPayment, Payment
 
 
 def get_mpesa_access_token():
@@ -107,15 +108,9 @@ def process_mpesa_payment(data, amount):
 
         # Determine environment URL
         if settings.MPESA_ENVIRONMENT == "sandbox":
-            url = (
-                "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/"
-                "processrequest"
-            )
+            url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/" "processrequest"
         else:
-            url = (
-                "https://api.safaricom.co.ke/mpesa/stkpush/v1/"
-                "processrequest"
-            )
+            url = "https://api.safaricom.co.ke/mpesa/stkpush/v1/" "processrequest"
 
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -132,9 +127,7 @@ def process_mpesa_payment(data, amount):
             "PartyB": settings.MPESA_SHORTCODE,
             "PhoneNumber": phone_number,
             "CallBackURL": settings.MPESA_CALLBACK_URL,
-            "AccountReference": (
-                f"ARNOVA{timezone.now().strftime('%Y%m%d%H%M%S')}"
-            ),
+            "AccountReference": (f"ARNOVA{timezone.now().strftime('%Y%m%d%H%M%S')}"),
             "TransactionDesc": "Arnova Purchase",
         }
 
@@ -147,9 +140,7 @@ def process_mpesa_payment(data, amount):
             # Create payment record
             try:
                 # Create a temporary order for tracking
-                order_id = (
-                    f"ARNOVA{timezone.now().strftime('%Y%m%d%H%M%S')}"
-                )
+                order_id = f"ARNOVA{timezone.now().strftime('%Y%m%d%H%M%S')}"
 
                 # Create payment record
                 payment = Payment.objects.create(
@@ -175,18 +166,14 @@ def process_mpesa_payment(data, amount):
                     "success": True,
                     "checkout_request_id": result.get("CheckoutRequestID"),
                     "merchant_request_id": result.get("MerchantRequestID"),
-                    "message": (
-                        "STK Push sent successfully. Please check your phone."
-                    ),
+                    "message": ("STK Push sent successfully. Please check your phone."),
                 }
             )
         else:
             return JsonResponse(
                 {
                     "success": False,
-                    "error": result.get(
-                        "errorMessage", "M-Pesa payment failed"
-                    ),
+                    "error": result.get("errorMessage", "M-Pesa payment failed"),
                 },
                 status=400,
             )
@@ -213,9 +200,7 @@ def mpesa_callback(request):
 
         if result_code == 0:
             # Payment successful
-            callback_metadata = stk_callback.get(
-                "CallbackMetadata", {}
-            ).get("Item", [])
+            callback_metadata = stk_callback.get("CallbackMetadata", {}).get("Item", [])
 
             # Extract payment details
             payment_data = {}
@@ -344,15 +329,9 @@ def check_mpesa_status(request, checkout_request_id):
 
         # Determine environment URL
         if settings.MPESA_ENVIRONMENT == "sandbox":
-            url = (
-                "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/"
-                "query"
-            )
+            url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/" "query"
         else:
-            url = (
-                "https://api.safaricom.co.ke/mpesa/stkpushquery/v1/"
-                "query"
-            )
+            url = "https://api.safaricom.co.ke/mpesa/stkpushquery/v1/" "query"
 
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -376,11 +355,7 @@ def check_mpesa_status(request, checkout_request_id):
                 "status": (
                     "success"
                     if result.get("ResultCode") == "0"
-                    else (
-                        "pending"
-                        if result.get("ResultCode") == "1032"
-                        else "failed"
-                    )
+                    else ("pending" if result.get("ResultCode") == "1032" else "failed")
                 ),
                 "result_code": result.get("ResultCode", "1"),
                 "result_desc": result.get("ResultDesc", "Unknown status"),

@@ -28,7 +28,6 @@ class ApiClient {
         const token = await csrfManager.getToken()
         headers.set("X-CSRFToken", token)
       } catch (error) {
-        console.error("Failed to get CSRF token:", error)
         throw new Error("Authentication setup failed")
       }
     }
@@ -42,7 +41,6 @@ class ApiClient {
 
     // Handle CSRF token expiry
     if (response.status === 403 && retries > 0) {
-      console.log("CSRF token expired, refreshing...")
       await csrfManager.refreshToken()
       return this.request(url, { ...options, retries: retries - 1 })
     }

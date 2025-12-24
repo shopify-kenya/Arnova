@@ -1,7 +1,6 @@
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import JsonResponse
-import json
 
 
 class SafeJSONEncoder(DjangoJSONEncoder):

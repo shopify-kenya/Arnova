@@ -11,7 +11,6 @@ import {
   Mail,
   Phone,
   MapPin,
-  Calendar,
   Shield,
   LogOut,
   Camera,

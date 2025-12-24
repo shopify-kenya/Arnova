@@ -55,6 +55,33 @@ export function getCurrentUser(): User | null {
   return JSON.parse(userStr)
 }
 
+export async function checkAuthStatus(): Promise<User | null> {
+  try {
+    const response = await fetch("/api/auth/status/", {
+      credentials: "include",
+    })
+    const data = await response.json()
+
+    if (data.authenticated && data.user) {
+      const user: User = {
+        id: data.user.id.toString(),
+        email: data.user.email,
+        firstName: data.user.username,
+        lastName: "",
+        country: "US",
+        phone: "",
+        role: data.user.role,
+        createdAt: new Date().toISOString(),
+      }
+      setCurrentUser(user)
+      return user
+    }
+    return null
+  } catch (error) {
+    return null
+  }
+}
+
 export function setCurrentUser(user: User | null) {
   if (typeof window === "undefined") return
   if (user) {
@@ -123,7 +150,7 @@ export function login(
 
 function getCsrfToken(): string {
   const cookies = document.cookie.split(";")
-  for (let cookie of cookies) {
+  for (const cookie of cookies) {
     const [name, value] = cookie.trim().split("=")
     if (name === "csrftoken") {
       return value

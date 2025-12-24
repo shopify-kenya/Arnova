@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from shop.models import Product, Category
+
+from shop.models import Category, Product
 
 
 class Command(BaseCommand):
@@ -307,7 +308,6 @@ class Command(BaseCommand):
         )
         self.stdout.write(
             self.style.WARNING(
-                "Note: Transport cost is set to KES 1.00 in checkout "
-                "for testing"
+                "Note: Transport cost is set to KES 1.00 in checkout " "for testing"
             )
         )

@@ -35,9 +35,7 @@ def run_unified_server():
     print("📁 Copying build files...")
     try:
         subprocess.run(
-            [sys.executable, "copy_nextjs_build.py"],
-            check=True,
-            cwd=base_dir
+            [sys.executable, "copy_nextjs_build.py"], check=True, cwd=base_dir
         )
         print("✅ Build files copied")
     except subprocess.CalledProcessError:
@@ -54,16 +52,23 @@ def run_unified_server():
     except subprocess.CalledProcessError:
         print("⚠️  Migrations failed, continuing...")
 
-    # Check for SSL certificates and start appropriate server
+    # Check for SSL certificates and start both HTTP and HTTPS servers
     has_ssl = check_ssl_certificates()
 
     if has_ssl:
-        print("🔒 SSL certificates found, starting HTTPS server...")
-        print("📍 Server will be available at:")
-        print("   • Main App: https://127.0.0.1:8443")
-        print("   • Admin Panel: https://127.0.0.1:8443/admin/")
-        print("   • API Endpoints: https://127.0.0.1:8443/api/")
-        print("\n🔧 Press Ctrl+C to stop the server")
+        print("🔒 SSL certificates found, starting both HTTP and HTTPS servers...")
+        print("📍 Servers will be available at:")
+        print("   • HTTP - Main App: http://127.0.0.1:8000")
+        print("   • HTTPS - Main App: https://127.0.0.1:8443")
+        print(
+            "   • Admin Panel: http://127.0.0.1:8000/admin/ or "
+            "https://127.0.0.1:8443/admin/"
+        )
+        print(
+            "   • API Endpoints: http://127.0.0.1:8000/api/ or "
+            "https://127.0.0.1:8443/api/"
+        )
+        print("\n🔧 Press Ctrl+C to stop the servers")
 
         try:
             # Install django-extensions if not available
@@ -82,28 +87,15 @@ def run_unified_server():
                     check=True,
                 )
 
-            # Start HTTPS server
-            subprocess.run(
-                [
-                    sys.executable,
-                    "manage.py",
-                    "runserver_plus",
-                    "--cert-file",
-                    "ssl/cert.pem",
-                    "--key-file",
-                    "ssl/key.pem",
-                    "127.0.0.1:8443",
-                ],
-                cwd=base_dir,
-            )
+            # Start both servers concurrently
+            start_dual_servers(base_dir)
         except (subprocess.CalledProcessError, FileNotFoundError):
-            print("⚠️  HTTPS server failed, falling back to HTTP...")
+            print("⚠️  HTTPS server failed, falling back to HTTP only...")
             start_http_server(base_dir)
     else:
-        print("🔓 No SSL certificates found, starting HTTP server...")
+        print("🔓 No SSL certificates found, starting HTTP server only...")
         print(
-            "💡 Run 'python generate_ssl.py' to generate SSL certificates "
-            "for HTTPS"
+            "💡 Run 'python generate_ssl.py' to generate SSL certificates " "for HTTPS"
         )
         start_http_server(base_dir)
 
@@ -123,6 +115,52 @@ def start_http_server(base_dir):
         )
     except KeyboardInterrupt:
         print("\n🛑 Server stopped")
+
+
+def start_dual_servers(base_dir):
+    """Start both HTTP and HTTPS servers concurrently"""
+    import threading
+    import time
+
+    def run_http():
+        try:
+            subprocess.run(
+                [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"],
+                cwd=base_dir,
+            )
+        except KeyboardInterrupt:
+            pass
+
+    def run_https():
+        try:
+            subprocess.run(
+                [
+                    sys.executable,
+                    "manage.py",
+                    "runserver_plus",
+                    "--cert-file",
+                    "ssl/cert.pem",
+                    "--key-file",
+                    "ssl/key.pem",
+                    "127.0.0.1:8443",
+                ],
+                cwd=base_dir,
+            )
+        except KeyboardInterrupt:
+            pass
+
+    # Start HTTP server in a separate thread
+    http_thread = threading.Thread(target=run_http, daemon=True)
+    http_thread.start()
+
+    # Give HTTP server time to start
+    time.sleep(2)
+
+    # Start HTTPS server in main thread
+    try:
+        run_https()
+    except KeyboardInterrupt:
+        print("\n🛑 Servers stopped")
 
 
 if __name__ == "__main__":

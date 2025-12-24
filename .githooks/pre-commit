@@ -25,7 +25,7 @@ fi
 # Run linting on staged files only
 if [ -n "$STAGED_PY_FILES" ]; then
     echo "🔧 Running Python linter..."
-    echo "$STAGED_PY_FILES" | xargs flake8 --max-line-length=83 --extend-ignore=E203 2>/dev/null || echo "flake8 not available"
+    echo "$STAGED_PY_FILES" | xargs flake8 --max-line-length=88 --extend-ignore=E203 2>/dev/null || echo "flake8 not available"
 fi
 
 # Check for trailing whitespace in staged files

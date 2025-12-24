@@ -59,8 +59,8 @@ export function MpesaAuthModal({
           )
         }
         // If result_code is "1032", payment is still pending, continue polling
-      } catch (error) {
-        console.error("Error checking payment status:", error)
+      } catch {
+        // Error checking payment status
       }
     }
 

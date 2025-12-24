@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "django_extensions",
     "shop",
 ]
@@ -100,22 +101,13 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "MinimumLengthValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "MinimumLengthValidator"),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "CommonPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "CommonPasswordValidator"),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "NumericPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "NumericPasswordValidator"),
     },
 ]
 
@@ -169,7 +161,7 @@ if not DEBUG:
 # Cache settings for static files
 if not DEBUG:
     STATICFILES_STORAGE = (
-        "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        "django.contrib.staticfiles.storage." "ManifestStaticFilesStorage"
     )
 
 # CSRF Configuration for Unified Frontend-Backend
@@ -183,11 +175,13 @@ CSRF_COOKIE_AGE = 86400  # 24 hours
 
 # Production CSRF settings from environment
 if not DEBUG:
-    csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+    csrf_origins = os.getenv("CSRF_TRUSTED_ORIGINS", "")
     if csrf_origins:
-        CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins.split(',') if origin.strip()]
-    CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'true').lower() == 'true'
-    CSRF_FAILURE_VIEW = os.getenv('CSRF_FAILURE_VIEW', 'django.views.csrf.csrf_failure')
+        CSRF_TRUSTED_ORIGINS = [
+            origin.strip() for origin in csrf_origins.split(",") if origin.strip()
+        ]
+    CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "true").lower() == "true"
+    CSRF_FAILURE_VIEW = os.getenv("CSRF_FAILURE_VIEW", "django.views.csrf.csrf_failure")
 else:
     # Development CSRF settings
     CSRF_TRUSTED_ORIGINS = [
@@ -212,3 +206,14 @@ MPESA_ENVIRONMENT = os.getenv("MPESA_ENVIRONMENT", "sandbox")
 MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE", "174379")
 MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
 MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL")
+
+# Django REST Framework Configuration
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+}
