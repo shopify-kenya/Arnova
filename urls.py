@@ -99,12 +99,12 @@ urlpatterns = [
     re_path(
         r"^_next/static/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, "out", "_next", "static")},
+        {"document_root": os.path.join(settings.BASE_DIR, "build", "_next", "static")},
     ),
     re_path(
         r"^_next/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, "out", "_next")},
+        {"document_root": os.path.join(settings.BASE_DIR, "build", "_next")},
     ),
     # Serve public assets
     path(

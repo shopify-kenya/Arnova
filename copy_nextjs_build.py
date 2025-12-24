@@ -10,6 +10,7 @@ def copy_nextjs_build():
     base_dir = Path(__file__).parent
     out_dir = base_dir / "out"  # Next.js export creates 'out' directory
     build_dir = base_dir / "build"
+    next_static = base_dir / ".next" / "static"
 
     if not out_dir.exists():
         print(
@@ -22,6 +23,13 @@ def copy_nextjs_build():
     if build_dir.exists():
         shutil.rmtree(build_dir)
     shutil.copytree(out_dir, build_dir)
+
+    # Also copy .next/static if it exists for better compatibility
+    if next_static.exists():
+        next_build_static = build_dir / "_next" / "static"
+        if next_build_static.exists():
+            shutil.rmtree(next_build_static)
+        shutil.copytree(next_static, next_build_static)
 
     print("✅ Next.js build files copied to build directory")
 
