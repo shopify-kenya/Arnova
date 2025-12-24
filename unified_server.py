@@ -4,9 +4,13 @@ Unified Server for Arnova E-commerce
 Builds Next.js frontend and serves both frontend and backend from Django
 Supports both HTTP and HTTPS with SSL certificates
 """
+import os
 import subprocess
 import sys
 from pathlib import Path
+
+# Set Django settings module
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
 
 def check_ssl_certificates():
@@ -109,9 +113,12 @@ def start_http_server(base_dir):
     print("\n🔧 Press Ctrl+C to stop the server")
 
     try:
+        env = os.environ.copy()
+        env["DJANGO_SETTINGS_MODULE"] = "settings"
         subprocess.run(
             [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"],
             cwd=base_dir,
+            env=env,
         )
     except KeyboardInterrupt:
         print("\n🛑 Server stopped")
@@ -124,15 +131,20 @@ def start_dual_servers(base_dir):
 
     def run_http():
         try:
+            env = os.environ.copy()
+            env["DJANGO_SETTINGS_MODULE"] = "settings"
             subprocess.run(
                 [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"],
                 cwd=base_dir,
+                env=env,
             )
         except KeyboardInterrupt:
             pass
 
     def run_https():
         try:
+            env = os.environ.copy()
+            env["DJANGO_SETTINGS_MODULE"] = "settings"
             subprocess.run(
                 [
                     sys.executable,
@@ -145,6 +157,7 @@ def start_dual_servers(base_dir):
                     "127.0.0.1:8443",
                 ],
                 cwd=base_dir,
+                env=env,
             )
         except KeyboardInterrupt:
             pass
