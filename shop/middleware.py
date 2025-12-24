@@ -25,7 +25,9 @@ class AuthMiddleware:
 
     def __call__(self, request):
         # Check if path requires authentication
-        protected = any(request.path.startswith(path) for path in self.PROTECTED_PATHS)
+        protected = any(
+            request.path.startswith(path) for path in self.PROTECTED_PATHS
+        )
         if protected:
             if not request.user.is_authenticated:
                 return JsonResponse(
@@ -94,9 +96,12 @@ class CorsMiddleware(MiddlewareMixin):
                 response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Credentials"] = "true"
 
-        response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response["Access-Control-Allow-Methods"] = (
+            "GET, POST, PUT, DELETE, OPTIONS"
+        )
         response["Access-Control-Allow-Headers"] = (
-            "Accept, Content-Type, X-CSRFToken, Authorization, " "X-Requested-With"
+            "Accept, Content-Type, X-CSRFToken, Authorization, "
+            "X-Requested-With"
         )
         response["Access-Control-Max-Age"] = "3600"
 

@@ -101,7 +101,10 @@ def run_unified_server():
             start_http_server(base_dir)
     else:
         print("🔓 No SSL certificates found, starting HTTP server...")
-        print("💡 Run 'python generate_ssl.py' to generate SSL certificates for HTTPS")
+        print(
+            "💡 Run 'python generate_ssl.py' to generate SSL certificates "
+            "for HTTPS"
+        )
         start_http_server(base_dir)
 
 
