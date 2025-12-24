@@ -661,11 +661,17 @@ def api_admin_analytics(request):
         "total_users": total_users,
         "total_products": total_products,
         "recent_orders": Order.objects.count(),
-        "popular_products": (
-            Product.objects.annotate(order_count=Count("orderitem"))
-            .order_by("-order_count")[:5]
-            .values("name", "order_count")
-        ),
+        "popular_products": [
+            {
+                "name": product["name"],
+                "order_count": product["order_count"]
+            }
+            for product in (
+                Product.objects.annotate(order_count=Count("orderitem"))
+                .order_by("-order_count")[:5]
+                .values("name", "order_count")
+            )
+        ],
         "user_locations": user_locations,
         "category_preferences": category_stats,
         "sales_trends": sales_trends,
