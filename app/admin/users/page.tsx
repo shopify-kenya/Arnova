@@ -62,22 +62,52 @@ export default function AdminUsersPage() {
     postal_code: "",
   })
 
+  const [csrfToken, setCsrfToken] = useState<string>("")
+
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       router.push("/")
       return
     }
-    fetchUsers()
+    fetchCsrfToken()
   }, [isAuthenticated, isAdmin, router])
+
+  useEffect(() => {
+    if (csrfToken) {
+      fetchUsers()
+    }
+  }, [csrfToken])
+
+  const fetchCsrfToken = async () => {
+    try {
+      const response = await fetch("/api/csrf-token/", {
+        credentials: "include",
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setCsrfToken(data.csrfToken)
+      }
+    } catch (error) {
+      console.error("Failed to fetch CSRF token")
+    }
+  }
 
   const fetchUsers = async () => {
     try {
       const response = await fetch("/api/admin/users/", {
         credentials: "include",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
       })
       if (response.ok) {
         const data = await response.json()
         setUsers(data.users)
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
+      } else {
+        toast.error("Failed to fetch users")
       }
     } catch (error) {
       toast.error("Failed to fetch users")
@@ -134,7 +164,10 @@ export default function AdminUsersPage() {
 
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
         credentials: "include",
         body: JSON.stringify(formData),
       })
@@ -147,6 +180,9 @@ export default function AdminUsersPage() {
         )
         setShowModal(false)
         fetchUsers()
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
       } else {
         toast.error("Failed to save user")
       }
@@ -160,12 +196,18 @@ export default function AdminUsersPage() {
       try {
         const response = await fetch(`/api/admin/users/${user.id}/`, {
           method: "DELETE",
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
           credentials: "include",
         })
 
         if (response.ok) {
           toast.success("User deleted successfully")
           fetchUsers()
+        } else if (response.status === 401) {
+          toast.error("Authentication required. Please log in as admin.")
+          router.push("/auth/login")
         } else {
           toast.error("Failed to delete user")
         }

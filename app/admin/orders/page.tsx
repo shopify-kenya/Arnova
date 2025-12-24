@@ -29,20 +29,52 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
+  const [csrfToken, setCsrfToken] = useState<string>("")
+
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       router.push("/")
       return
     }
-    fetchOrders()
+    fetchCsrfToken()
   }, [isAuthenticated, isAdmin, router])
+
+  useEffect(() => {
+    if (csrfToken) {
+      fetchOrders()
+    }
+  }, [csrfToken])
+
+  const fetchCsrfToken = async () => {
+    try {
+      const response = await fetch("/api/csrf-token/", {
+        credentials: "include",
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setCsrfToken(data.csrfToken)
+      }
+    } catch (error) {
+      console.error("Failed to fetch CSRF token")
+    }
+  }
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("/api/admin/orders/")
+      const response = await fetch("/api/admin/orders/", {
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+      })
       if (response.ok) {
         const data = await response.json()
         setOrders(data.orders)
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
+      } else {
+        toast.error("Failed to fetch orders")
       }
     } catch (error) {
       toast.error("Failed to fetch orders")
