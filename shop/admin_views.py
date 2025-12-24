@@ -60,14 +60,6 @@ def admin_login(request):
 @user_passes_test(is_admin)
 def admin_dashboard(request):
     """Admin dashboard with analytics"""
-    # Redirect to login if not authenticated or not admin
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect("admin_login")
-    """Admin dashboard with analytics"""
-    # Redirect to login if not authenticated or not admin
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect("admin_login")
-
     # Get analytics data
     total_orders = Order.objects.count()
     total_revenue = (
@@ -255,3 +247,57 @@ def admin_analytics(request):
         "category_stats": category_stats,
     }
     return render(request, "admin/analytics.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_order_detail(request, order_id):
+    """Admin order detail view"""
+    order = get_object_or_404(Order, id=order_id)
+    context = {
+        "order": order,
+    }
+    return render(request, "admin/order_detail.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+@require_http_methods(["POST"])
+def admin_order_update_status(request, order_id):
+    """Update order status"""
+    order = get_object_or_404(Order, id=order_id)
+    new_status = request.POST.get("status")
+    if new_status in ["pending", "processing", "shipped", "delivered", "cancelled"]:
+        order.status = new_status
+        order.save()
+    return redirect("admin_order_detail", order_id=order_id)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_detail(request, user_id):
+    """Admin user detail view"""
+    user = get_object_or_404(User, id=user_id)
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    context = {
+        "user": user,
+        "profile": profile,
+    }
+    return render(request, "admin/user_detail.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_settings(request):
+    """Admin settings page"""
+    if request.method == "POST":
+        # Handle settings update
+        pass
+
+    context = {
+        "site_name": "Arnova",
+        "site_description": "Premium Fashion E-commerce",
+        "contact_email": "admin@arnova.com",
+        "default_currency": "USD",
+    }
+    return render(request, "admin/settings.html", context)

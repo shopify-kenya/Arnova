@@ -32,7 +32,11 @@
                                     <span class="text-sm font-medium">{{ user.username|first|upper }}</span>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium">{{ user.username }}</div>
+                                    <div class="text-sm font-medium">
+                                        <a href="{% url 'admin_user_detail' user.id %}" class="text-blue-400 hover:text-blue-300">
+                                            {{ user.username }}
+                                        </a>
+                                    </div>
                                     <div class="text-sm text-white/70">{{ user.first_name }} {{ user.last_name }}</div>
                                 </div>
                             </div>

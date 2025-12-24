@@ -33,8 +33,24 @@ urlpatterns = [
         name="admin_product_delete",
     ),
     path("dashboard/orders/", admin_views.admin_orders, name="admin_orders"),
+    path(
+        "dashboard/orders/<int:order_id>/",
+        admin_views.admin_order_detail,
+        name="admin_order_detail",
+    ),
+    path(
+        "dashboard/orders/<int:order_id>/update/",
+        admin_views.admin_order_update_status,
+        name="admin_order_update_status",
+    ),
     path("dashboard/users/", admin_views.admin_users, name="admin_users"),
+    path(
+        "dashboard/users/<int:user_id>/",
+        admin_views.admin_user_detail,
+        name="admin_user_detail",
+    ),
     path("dashboard/analytics/", admin_views.admin_analytics, name="admin_analytics"),
+    path("dashboard/settings/", admin_views.admin_settings, name="admin_settings"),
     # API routes
     path("api/health/", api_views.api_health_check, name="api_health_check"),
     path("api/auth/status/", api_views.api_auth_status, name="api_auth_status"),
