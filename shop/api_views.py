@@ -1,3 +1,4 @@
+from .utils import safe_json_response, serialize_queryset
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -661,23 +662,17 @@ def api_admin_analytics(request):
         "total_users": total_users,
         "total_products": total_products,
         "recent_orders": Order.objects.count(),
-        "popular_products": [
-            {
-                "name": product["name"],
-                "order_count": product["order_count"]
-            }
-            for product in (
-                Product.objects.annotate(order_count=Count("orderitem"))
-                .order_by("-order_count")[:5]
-                .values("name", "order_count")
-            )
-        ],
+        "popular_products": serialize_queryset(
+            Product.objects.annotate(order_count=Count("orderitem"))
+            .order_by("-order_count")[:5],
+            ["name", "order_count"]
+        ),
         "user_locations": user_locations,
         "category_preferences": category_stats,
         "sales_trends": sales_trends,
         "login_activity": login_activity,
     }
-    return JsonResponse(data)
+    return safe_json_response(data)
 
 
 def get_mock_coordinates(city, country):
