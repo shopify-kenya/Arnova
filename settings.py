@@ -183,7 +183,9 @@ CSRF_COOKIE_AGE = 86400  # 24 hours
 
 # Production CSRF settings from environment
 if not DEBUG:
-    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+    if csrf_origins:
+        CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins.split(',') if origin.strip()]
     CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'true').lower() == 'true'
     CSRF_FAILURE_VIEW = os.getenv('CSRF_FAILURE_VIEW', 'django.views.csrf.csrf_failure')
 else:
