@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from shop.models import Product, Category
-from django.utils.text import slugify
 
 
 class Command(BaseCommand):
@@ -302,11 +301,13 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Successfully created {created_count} test products for M-Pesa testing"
+                f"Successfully created {created_count} test products "
+                f"for M-Pesa testing"
             )
         )
         self.stdout.write(
             self.style.WARNING(
-                "Note: Transport cost is set to KES 1.00 in checkout for testing"
+                "Note: Transport cost is set to KES 1.00 in checkout "
+                "for testing"
             )
         )

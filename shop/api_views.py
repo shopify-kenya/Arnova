@@ -38,7 +38,9 @@ def api_login(request):
     if "@" in username:
         try:
             user_obj = User.objects.get(email=username)
-            user = authenticate(request, username=user_obj.username, password=password)
+            user = authenticate(
+                request, username=user_obj.username, password=password
+            )
         except User.DoesNotExist:
             pass
     else:
@@ -154,6 +156,7 @@ def api_cart(request):
         return JsonResponse({"items": items})
 
     elif request.method == "POST":
+        import json
         data = json.loads(request.body)
         product = Product.objects.get(id=data["product_id"])
 
@@ -191,6 +194,7 @@ def api_saved(request):
         return JsonResponse({"items": data})
 
     elif request.method == "POST":
+        import json
         data = json.loads(request.body)
         product = Product.objects.get(id=data["product_id"])
         SavedItem.objects.get_or_create(user=request.user, product=product)
@@ -206,7 +210,9 @@ def api_product_detail(request, product_id):
             "name": product.name,
             "description": product.description,
             "price": float(product.price),
-            "sale_price": (float(product.sale_price) if product.sale_price else None),
+            "sale_price": (
+                float(product.sale_price) if product.sale_price else None
+            ),
             "category": product.category.name,
             "sizes": product.sizes,
             "colors": product.colors,
@@ -225,7 +231,10 @@ def api_product_detail(request, product_id):
 @require_http_methods(["GET"])
 def api_categories(request):
     categories = Category.objects.all()
-    data = [{"id": cat.id, "name": cat.name, "slug": cat.slug} for cat in categories]
+    data = [
+        {"id": cat.id, "name": cat.name, "slug": cat.slug}
+        for cat in categories
+    ]
     return JsonResponse({"categories": data})
 
 
@@ -252,6 +261,7 @@ def api_profile(request):
         }
         return JsonResponse(data)
     elif request.method == "PUT":
+        import json
         data = json.loads(request.body)
         profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
@@ -352,6 +362,7 @@ def api_admin_products(request):
         return JsonResponse({"products": data})
 
     elif request.method == "POST":
+        import json
         data = json.loads(request.body)
         category = Category.objects.get(id=data["category_id"])
         product = Product.objects.create(
@@ -402,6 +413,7 @@ def api_admin_product_detail(request, product_id):
             return JsonResponse({"product": data})
 
         elif request.method == "PUT":
+            import json
             data = json.loads(request.body)
             product.name = data.get("name", product.name)
             product.description = data.get("description", product.description)
@@ -461,6 +473,7 @@ def api_admin_users(request):
         return JsonResponse({"users": data})
 
     elif request.method == "POST":
+        import json
         data = json.loads(request.body)
         user = User.objects.create_user(
             username=data["username"],
@@ -510,6 +523,7 @@ def api_admin_user_detail(request, user_id):
             return JsonResponse({"user": data})
 
         elif request.method == "PUT":
+            import json
             data = json.loads(request.body)
             user.username = data.get("username", user.username)
             user.email = data.get("email", user.email)
@@ -542,8 +556,6 @@ def api_admin_user_detail(request, user_id):
 def api_admin_analytics(request):
     from django.db.models import Count, Sum
     from django.contrib.auth.models import User
-    import json
-    from collections import defaultdict
     import random
 
     total_orders = Order.objects.count()
@@ -579,8 +591,12 @@ def api_admin_analytics(request):
     category_stats = []
     categories = Category.objects.all()
     for category in categories:
-        saved_count = SavedItem.objects.filter(product__category=category).count()
-        order_count = OrderItem.objects.filter(product__category=category).count()
+        saved_count = SavedItem.objects.filter(
+            product__category=category
+        ).count()
+        order_count = OrderItem.objects.filter(
+            product__category=category
+        ).count()
         category_stats.append(
             {
                 "name": category.name,
@@ -694,7 +710,8 @@ def get_coordinates(city, country):
 
         query = urllib.parse.quote(f"{city}, {country}")
         url = (
-            f"https://nominatim.openstreetmap.org/search?q={query}&format=json&limit=1"
+            f"https://nominatim.openstreetmap.org/search?"
+            f"q={query}&format=json&limit=1"
         )
 
         response = requests.get(
