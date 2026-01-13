@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: arnova-app
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    region: oregon
+    branch: main
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: settings
+      - key: NODE_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    healthCheckPath: /
