@@ -2,42 +2,36 @@
 """
 Copy Next.js build files to Django static directory
 """
-import os
 import shutil
 from pathlib import Path
 
 
 def copy_nextjs_build():
     base_dir = Path(__file__).parent
-    next_dir = base_dir / ".next"
+    out_dir = base_dir / "out"  # Next.js export creates 'out' directory
     build_dir = base_dir / "build"
+    next_static = base_dir / ".next" / "static"
 
-    # Create build directory
-    build_dir.mkdir(exist_ok=True)
+    if not out_dir.exists():
+        print(
+            "❌ Next.js 'out' directory not found. "
+            "Make sure 'npm run build' completed successfully."
+        )
+        return
 
-    # Copy static files
-    next_static = next_dir / "static"
+    # Create build directory and copy everything
+    if build_dir.exists():
+        shutil.rmtree(build_dir)
+    shutil.copytree(out_dir, build_dir)
+
+    # Also copy .next/static if it exists for better compatibility
     if next_static.exists():
-        build_static = build_dir / "_next" / "static"
-        build_static.parent.mkdir(parents=True, exist_ok=True)
-        if build_static.exists():
-            shutil.rmtree(build_static)
-        shutil.copytree(next_static, build_static)
+        next_build_static = build_dir / "_next" / "static"
+        if next_build_static.exists():
+            shutil.rmtree(next_build_static)
+        shutil.copytree(next_static, next_build_static)
 
-    # Copy server files for SSG pages
-    next_server = next_dir / "server" / "app"
-    if next_server.exists():
-        # Find index.html in the server output
-        for root, dirs, files in os.walk(next_server):
-            for file in files:
-                if file == "index.html":
-                    src = os.path.join(root, file)
-                    dst = build_dir / "index.html"
-                    shutil.copy2(src, dst)
-                    print(f"Copied {src} to {dst}")
-                    break
-
-    print("Next.js build files copied to build directory")
+    print("✅ Next.js build files copied to build directory")
 
 
 if __name__ == "__main__":

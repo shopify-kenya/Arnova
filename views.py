@@ -9,15 +9,31 @@ from django.views.decorators.gzip import gzip_page
 @gzip_page
 @cache_control(max_age=3600, public=True)
 def index(request):
-    # Serve the Next.js exported index.html for all routes
-    nextjs_index = os.path.join(settings.BASE_DIR, "build", "index.html")
-    if os.path.exists(nextjs_index):
-        with open(nextjs_index, "r", encoding="utf-8") as f:
+    # Get the request path and clean it
+    path = request.path.strip("/")
+
+    # Base directory for Next.js output
+    build_dir = os.path.join(settings.BASE_DIR, "build")
+
+    # Try to serve the specific HTML file for this route
+    if path:
+        # Handle nested routes (e.g., admin/users, product/cl-001)
+        html_file = os.path.join(build_dir, path, "index.html")
+        if os.path.exists(html_file):
+            with open(html_file, "r", encoding="utf-8") as f:
+                response = HttpResponse(f.read(), content_type="text/html")
+                response["Cache-Control"] = "public, max-age=3600"
+                return response
+
+    # Fallback to root index.html for unknown routes or root
+    root_html = os.path.join(build_dir, "index.html")
+    if os.path.exists(root_html):
+        with open(root_html, "r", encoding="utf-8") as f:
             response = HttpResponse(f.read(), content_type="text/html")
             response["Cache-Control"] = "public, max-age=3600"
             return response
 
-    # Fallback if no Next.js build exists
+    # Final fallback if no Next.js build exists
     return HttpResponse(
         """
 <!DOCTYPE html>

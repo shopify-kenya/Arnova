@@ -2,79 +2,131 @@ import os
 
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import include, path, re_path
 from django.views.static import serve
 
 import views
-from shop import api_views, payment_views
+from shop import admin_views, api_views, payment_views
+from shop.admin import admin_site
+from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 
-urlpatterns = [
-    path("admin/", admin.site.urls),
-    # CSRF Token API
-    path("api/csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
-    # Authentication API
-    path("api/auth/login/", api_views.api_login, name="api_login"),
+# Admin URLs - separate namespace for security
+admin_patterns = [
+    path("", admin_views.admin_dashboard, name="admin_dashboard"),
+    path("products/", admin_views.admin_products, name="admin_products"),
     path(
-        "api/auth/register/",
-        api_views.api_register,
-        name="api_register",
+        "products/create/",
+        admin_views.admin_product_create,
+        name="admin_product_create",
     ),
     path(
-        "api/auth/logout/",
-        api_views.api_logout,
-        name="api_logout",
+        "products/<str:product_id>/edit/",
+        admin_views.admin_product_edit,
+        name="admin_product_edit",
     ),
-    # Product API
-    path("api/products/", api_views.api_products, name="api_products"),
     path(
-        "api/products/<str:product_id>/",
+        "products/<str:product_id>/delete/",
+        admin_views.admin_product_delete,
+        name="admin_product_delete",
+    ),
+    path("orders/", admin_views.admin_orders, name="admin_orders"),
+    path(
+        "orders/<int:order_id>/",
+        admin_views.admin_order_detail,
+        name="admin_order_detail",
+    ),
+    path(
+        "orders/<int:order_id>/update/",
+        admin_views.admin_order_update_status,
+        name="admin_order_update_status",
+    ),
+    path("users/", admin_views.admin_users, name="admin_users"),
+    path(
+        "users/<int:user_id>/", admin_views.admin_user_detail, name="admin_user_detail"
+    ),
+    path("analytics/", admin_views.admin_analytics, name="admin_analytics"),
+    path("settings/", admin_views.admin_settings, name="admin_settings"),
+]
+
+# API URLs - separate namespace for buyers
+api_patterns = [
+    path("health/", api_views.api_health_check, name="api_health_check"),
+    path("auth/status/", api_views.api_auth_status, name="api_auth_status"),
+    path("csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
+    path("auth/login/", api_views.api_login, name="api_login"),
+    path("auth/register/", api_views.api_register, name="api_register"),
+    path("auth/logout/", api_views.api_logout, name="api_logout"),
+    path("products/", api_views.api_products, name="api_products"),
+    path(
+        "products/<str:product_id>/",
         api_views.api_product_detail,
         name="api_product_detail",
     ),
-    path("api/categories/", api_views.api_categories, name="api_categories"),
-    # User API
-    path("api/cart/", api_views.api_cart, name="api_cart"),
-    path("api/saved/", api_views.api_saved, name="api_saved"),
-    path("api/profile/", api_views.api_profile, name="api_profile"),
-    path("api/orders/", api_views.api_orders, name="api_orders"),
-    # Admin API
+    path("categories/", api_views.api_categories, name="api_categories"),
+    path("cart/", api_views.api_cart, name="api_cart"),
+    path("saved/", api_views.api_saved, name="api_saved"),
+    path("profile/", api_views.api_profile, name="api_profile"),
+    path("orders/", api_views.api_orders, name="api_orders"),
+    path("payment/process/", payment_views.process_payment, name="api_process_payment"),
     path(
-        "api/admin/orders/",
-        api_views.api_admin_orders,
-        name="api_admin_orders",
+        "payment/validate-card/", payment_views.validate_card, name="api_validate_card"
     ),
     path(
-        "api/admin/products/",
-        api_views.api_admin_products,
-        name="api_admin_products",
-    ),
-    path("api/admin/users/", api_views.api_admin_users, name="api_admin_users"),
-    path(
-        "api/admin/analytics/",
-        api_views.api_admin_analytics,
-        name="api_admin_analytics",
-    ),
-    # Payment API
-    path(
-        "api/payment/process/",
-        payment_views.process_payment,
-        name="api_process_payment",
+        "payment/mpesa/callback/",
+        payment_views.mpesa_callback,
+        name="api_mpesa_callback",
     ),
     path(
-        "api/payment/validate-card/",
-        payment_views.validate_card,
-        name="api_validate_card",
+        "payment/mpesa/status/<str:checkout_request_id>/",
+        payment_views.check_mpesa_status,
+        name="api_mpesa_status",
     ),
+    path(
+        "placeholder/<int:width>/<int:height>",
+        api_views.api_placeholder_image,
+        name="api_placeholder_image",
+    ),
+    path("exchange-rates/", api_views.api_exchange_rates, name="api_exchange_rates"),
+]
+
+# Admin API URLs - staff only
+admin_api_patterns = [
+    path("orders/", AdminOrdersView.as_view(), name="api_admin_orders_drf"),
+    path("products/", AdminProductsView.as_view(), name="api_admin_products_drf"),
+    path("users/", AdminUsersView.as_view(), name="api_admin_users_drf"),
+    path(
+        "products/<str:product_id>/",
+        api_views.api_admin_product_detail,
+        name="api_admin_product_detail",
+    ),
+    path(
+        "users/<int:user_id>/",
+        api_views.api_admin_user_detail,
+        name="api_admin_user_detail",
+    ),
+    path("analytics/", api_views.api_admin_analytics, name="api_admin_analytics"),
+    path("settings/", api_views.api_admin_settings, name="api_admin_settings"),
+]
+
+urlpatterns = [
+    # Django admin for staff login with custom redirect
+    path("admin/", admin_site.urls),
+    # Admin dashboard - staff only
+    path("dashboard/", include(admin_patterns)),
+    # Buyer API endpoints
+    path("api/", include(api_patterns)),
+    # Admin API endpoints - staff only
+    path("api/admin/", include(admin_api_patterns)),
     # Serve Next.js static assets
     re_path(
         r"^_next/static/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, ".next", "static")},
+        {"document_root": os.path.join(settings.BASE_DIR, "build", "_next", "static")},
     ),
     re_path(
         r"^_next/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, ".next")},
+        {"document_root": os.path.join(settings.BASE_DIR, "build", "_next")},
     ),
     # Serve public assets
     path(
@@ -118,43 +170,13 @@ urlpatterns = [
         },
     ),
     re_path(
-        r"^(?P<path>.*\.(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|eot|css|js|json))$",  # noqa: E501
+        r"^(?P<path>.*\.(jpg|jpeg|png|gif|svg|webp|ico|woff|woff2|ttf|"
+        r"eot|css|js|json))$",
         serve,
         {"document_root": os.path.join(settings.BASE_DIR, "public")},
     ),
     # Specific Next.js routes for better handling
     path("", views.index, name="home"),
-    path("login/", views.index, name="login"),
-    path("register/", views.index, name="register"),
-    path("profile/", views.index, name="profile"),
-    path("cart/", views.index, name="cart"),
-    path("checkout/", views.index, name="checkout"),
-    path("saved/", views.index, name="saved"),
-    path("about/", views.index, name="about"),
-    path("contact/", views.index, name="contact"),
-    path("faq/", views.index, name="faq"),
-    path("careers/", views.index, name="careers"),
-    path("shipping/", views.index, name="shipping"),
-    path("returns/", views.index, name="returns"),
-    path("privacy/", views.index, name="privacy"),
-    path("terms/", views.index, name="terms"),
-    path("size-guide/", views.index, name="size_guide"),
-    path("offline/", views.index, name="offline"),
-    # Category routes
-    path("new-arrivals/", views.index, name="new_arrivals"),
-    path("clothing/", views.index, name="clothing"),
-    path("shoes/", views.index, name="shoes"),
-    path("bags/", views.index, name="bags"),
-    path("accessories/", views.index, name="accessories"),
-    path("sale/", views.index, name="sale"),
-    # Product routes
-    path("product/<str:product_id>/", views.index, name="product_detail"),
-    # Admin routes
-    path("admin-panel/", views.index, name="admin_panel"),
-    path("admin-panel/products/", views.index, name="admin_products"),
-    path("admin-panel/orders/", views.index, name="admin_orders"),
-    path("admin-panel/users/", views.index, name="admin_users"),
-    path("admin-panel/analytics/", views.index, name="admin_analytics"),
     # Catch-all for any remaining routes (MUST BE LAST)
     re_path(r"^.*$", views.index, name="catch_all"),
 ]

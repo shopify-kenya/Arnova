@@ -1,0 +1,91 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Edit Product - Arnova Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="glass-strong rounded-xl p-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold mb-2">Edit Product</h2>
+            <p class="text-white/70">Update product information</p>
+        </div>
+        <a href="{% url 'admin_products' %}" class="text-white/70 hover:text-white">← Back to Products</a>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="glass-strong rounded-xl p-6">
+        <form method="post" onsubmit="return validateForm(this)">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Name</label>
+                    <input type="text" name="name" value="{{ product.name }}" required
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Category</label>
+                    <select name="category_id" required
+                            class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2">Description</label>
+                    <textarea name="description" rows="4"
+                              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400">{{ product.description }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Price</label>
+                    <input type="number" name="price" value="{{ product.price }}" step="0.01" required
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Sale Price</label>
+                    <input type="number" name="sale_price" value="{{ product.sale_price|default:'' }}" step="0.01"
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Currency</label>
+                    <select name="currency"
+                            class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400">
+                        <option value="USD" {% if product.currency == 'USD' %}selected{% endif %}>USD</option>
+                        <option value="KES" {% if product.currency == 'KES' %}selected{% endif %}>KES</option>
+                        <option value="EUR" {% if product.currency == 'EUR' %}selected{% endif %}>EUR</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col space-y-3">
+                    <label class="block text-sm font-medium">Status</label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="in_stock" {% if product.in_stock %}checked{% endif %} class="mr-2">
+                        <span class="text-sm">In Stock</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_new" {% if product.is_new %}checked{% endif %} class="mr-2">
+                        <span class="text-sm">New Product</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="on_sale" {% if product.on_sale %}checked{% endif %} class="mr-2">
+                        <span class="text-sm">On Sale</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-8">
+                <a href="{% url 'admin_products' %}" class="px-6 py-2 text-white/70 hover:text-white border border-white/20 rounded-lg">Cancel</a>
+                <button type="submit" class="bg-purple-500 hover:bg-purple-600 px-6 py-2 rounded-lg font-medium">Update Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

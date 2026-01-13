@@ -6,6 +6,7 @@ import { CurrencyProvider } from "@/components/currency-provider"
 import { AuthProvider } from "@/components/auth-provider"
 import { CartProvider } from "@/components/cart-provider"
 import { PWAInstaller } from "@/components/pwa-installer"
+import { ClientRouter } from "@/components/client-router"
 import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
@@ -84,6 +85,12 @@ export default function RootLayout({
         />
 
         <link rel="manifest" href="/manifest.json" />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -92,18 +99,11 @@ export default function RootLayout({
                   navigator.serviceWorker.register('/service-worker.js')
                     .then(registration => {
                       console.log('SW registered:', registration);
-                      registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        if (newWorker) {
-                          newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                              console.log('New content available, please refresh.');
-                            }
-                          });
-                        }
-                      });
                     })
-                    .catch(error => console.log('SW registration failed:', error));
+                    .catch(error => {
+                      console.log('SW registration failed:', error);
+                      // Silently fail for HTTPS issues
+                    });
                 });
               }
             `,
@@ -121,6 +121,7 @@ export default function RootLayout({
             <CurrencyProvider>
               <AuthProvider>
                 <CartProvider>
+                  <ClientRouter />
                   {children}
                   <Toaster />
                   <PWAInstaller />

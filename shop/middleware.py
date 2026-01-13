@@ -10,7 +10,12 @@ class AuthMiddleware:
         "/api/orders/",
         "/api/saved/",
         "/api/profile/",
-        "/admin/",
+    ]
+
+    DRF_ADMIN_PATHS = [
+        "/api/admin/products/",
+        "/api/admin/orders/",
+        "/api/admin/users/",
     ]
 
     PUBLIC_PATHS = [
@@ -24,6 +29,13 @@ class AuthMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # Skip DRF admin paths - they handle their own authentication
+        is_drf_admin = any(
+            request.path.startswith(path) for path in self.DRF_ADMIN_PATHS
+        )
+        if is_drf_admin:
+            response = self.get_response(request)
+            return response
         # Check if path requires authentication
         protected = any(request.path.startswith(path) for path in self.PROTECTED_PATHS)
         if protected:
@@ -52,8 +64,9 @@ def admin_required(view_func):
     """Decorator for admin-only views"""
 
     def wrapper(request, *args, **kwargs):
-        is_admin = request.user.is_authenticated and request.user.is_staff
-        if not is_admin:
+        if not request.user.is_authenticated:
+            return JsonResponse({"error": "Authentication required"}, status=401)
+        if not request.user.is_staff:
             return JsonResponse({"error": "Admin access required"}, status=403)
         return view_func(request, *args, **kwargs)
 

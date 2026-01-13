@@ -7,7 +7,8 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { MapPin, ArrowRight, CheckCircle } from "lucide-react"
-import { Navbar } from "@/components/navbar"
+import { BuyerNavbar } from "@/components/buyer-navbar"
+import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
 import { Footer } from "@/components/footer"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
@@ -26,7 +27,8 @@ import { useCart } from "@/components/cart-provider"
 import { countries } from "@/lib/countries"
 import { toast } from "sonner"
 import { PaymentMethods } from "@/components/payment-methods"
-import { processPayment } from "@/lib/payment"
+import { MpesaAuthModal } from "@/components/mpesa-auth-modal"
+import { processPayment, checkMpesaPaymentStatus } from "@/lib/payment"
 
 function CheckoutPageContent() {
   const router = useRouter()
@@ -35,8 +37,14 @@ function CheckoutPageContent() {
   const { formatPrice } = useCurrency()
   const [isProcessing, setIsProcessing] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
+  const [showMpesaModal, setShowMpesaModal] = useState(false)
+  const [mpesaCheckoutId, setMpesaCheckoutId] = useState<string>("")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal">("card")
+  const [paymentMethod, setPaymentMethod] = useState<
+    "card" | "paypal" | "mpesa"
+  >("card")
+  const [phoneNumber, setPhoneNumber] = useState("")
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -76,6 +84,22 @@ function CheckoutPageContent() {
     }
   }, [isAuthenticated, cart.length, user, router, orderComplete])
 
+  const handleMpesaSuccess = () => {
+    setShowMpesaModal(false)
+    setOrderComplete(true)
+    clearCart()
+    toast.success("M-Pesa payment completed successfully!")
+  }
+
+  const handleMpesaError = (error: string) => {
+    setShowMpesaModal(false)
+    toast.error(error)
+  }
+
+  const handleMpesaCancel = () => {
+    setShowMpesaModal(false)
+    toast.info("Payment cancelled")
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsProcessing(true)
@@ -112,6 +136,13 @@ function CheckoutPageContent() {
           setIsProcessing(false)
           return
         }
+      } else if (paymentMethod === "mpesa") {
+        // Validate phone number
+        if (!phoneNumber) {
+          toast.error("Please enter your M-Pesa phone number")
+          setIsProcessing(false)
+          return
+        }
       }
 
       // Process payment
@@ -119,6 +150,7 @@ function CheckoutPageContent() {
         payment_method: paymentMethod,
         amount: grandTotal,
         card_data: paymentMethod === "card" ? cardData : undefined,
+        phone_number: paymentMethod === "mpesa" ? phoneNumber : undefined,
         order_data: {
           items: cart.map(item => ({
             product_id: item.product.id,
@@ -142,12 +174,31 @@ function CheckoutPageContent() {
           await new Promise(resolve => setTimeout(resolve, 3000))
         }
 
+        if (paymentMethod === "mpesa") {
+          if (result.checkout_request_id) {
+            setMpesaCheckoutId(result.checkout_request_id)
+            setShowMpesaModal(true)
+            setIsProcessing(false)
+            return // Don't continue processing here
+          } else {
+            throw new Error("No checkout request ID received")
+          }
+        }
+
+        // For card and paypal payments, complete the order
         setIsProcessing(false)
         setOrderComplete(true)
         clearCart()
+
+        const paymentMethodNames = {
+          card: "Credit Card",
+          paypal: "PayPal",
+          mpesa: "M-Pesa",
+        }
+
         toast.success(
           result.message ||
-            `Payment successful via ${paymentMethod === "paypal" ? "PayPal" : "Credit Card"}!`
+            `Payment successful via ${paymentMethodNames[paymentMethod]}!`
         )
       } else {
         throw new Error(result.error || "Payment failed")
@@ -167,7 +218,15 @@ function CheckoutPageContent() {
   if (orderComplete) {
     return (
       <div className="min-h-screen">
-        <Navbar />
+        <BuyerNavbar
+          title="Order Complete"
+          subtitle="Thank you for your purchase"
+          onMenuToggle={() => setIsFilterOpen(true)}
+        />
+        <BuyerFilterSidebar
+          isOpen={isFilterOpen}
+          onClose={() => setIsFilterOpen(false)}
+        />
         <main className="container mx-auto px-4 py-20">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -204,13 +263,21 @@ function CheckoutPageContent() {
     )
   }
 
-  const shipping = 15
-  const tax = total * 0.1
+  const shipping = 1 // KES 1.00 for testing
+  const tax = 0 // No tax for testing
   const grandTotal = total + shipping + tax
 
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <BuyerNavbar
+        title="Checkout"
+        subtitle="Complete your purchase"
+        onMenuToggle={() => setIsFilterOpen(true)}
+      />
+      <BuyerFilterSidebar
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+      />
       <main className="container mx-auto px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -218,7 +285,7 @@ function CheckoutPageContent() {
           transition={{ duration: 0.6 }}
         >
           <div className="mb-8">
-            <h1 className="font-serif text-5xl font-bold text-foreground mb-2">
+            <h1 className="font-serif text-4xl font-bold text-foreground mb-2">
               Checkout
             </h1>
             <p className="text-muted-foreground">Complete your purchase</p>
@@ -388,6 +455,8 @@ function CheckoutPageContent() {
                   onMethodChange={setPaymentMethod}
                   cardData={cardData}
                   onCardDataChange={setCardData}
+                  phoneNumber={phoneNumber}
+                  onPhoneNumberChange={setPhoneNumber}
                 />
               </div>
 
@@ -460,6 +529,17 @@ function CheckoutPageContent() {
           </form>
         </motion.div>
       </main>
+
+      <MpesaAuthModal
+        isOpen={showMpesaModal}
+        phoneNumber={phoneNumber}
+        amount={grandTotal}
+        onSuccess={handleMpesaSuccess}
+        onError={handleMpesaError}
+        onCancel={handleMpesaCancel}
+        checkoutRequestId={mpesaCheckoutId}
+      />
+
       <Footer />
     </div>
   )

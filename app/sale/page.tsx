@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { Navbar } from "@/components/navbar"
+import { BuyerNavbar } from "@/components/buyer-navbar"
+import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
 import { Footer } from "@/components/footer"
 import { ProductCard } from "@/components/product-card"
 import { ProductFilters, type FilterState } from "@/components/product-filters"
@@ -15,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Tag } from "lucide-react"
 
 export default function SalePage() {
   const [sortBy, setSortBy] = useState("newest")
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 500],
     sizes: [],
@@ -30,8 +31,10 @@ export default function SalePage() {
 
   let products = getSaleProducts()
 
+  // Apply filters
   products = products.filter(product => {
     if (filters.inStock && !product.inStock) return false
+    if (filters.isNew && !product.isNew) return false
     if (
       filters.sizes.length > 0 &&
       !product.sizes.some(s => filters.sizes.includes(s))
@@ -42,26 +45,20 @@ export default function SalePage() {
       !product.colors.some(c => filters.colors.includes(c))
     )
       return false
-    const price = product.salePrice || product.price
+    const price =
+      product.onSale && product.salePrice ? product.salePrice : product.price
     if (price < filters.priceRange[0] || price > filters.priceRange[1])
       return false
     return true
   })
 
+  // Apply sorting
   products = [...products].sort((a, b) => {
     switch (sortBy) {
       case "price-low":
-        return (a.salePrice || a.price) - (b.salePrice || b.price)
+        return a.price - b.price
       case "price-high":
-        return (b.salePrice || b.price) - (a.salePrice || a.price)
-      case "discount":
-        const discountA = a.salePrice
-          ? ((a.price - a.salePrice) / a.price) * 100
-          : 0
-        const discountB = b.salePrice
-          ? ((b.price - b.salePrice) / b.price) * 100
-          : 0
-        return discountB - discountA
+        return b.price - a.price
       case "rating":
         return b.rating - a.rating
       default:
@@ -72,42 +69,41 @@ export default function SalePage() {
   return (
     <CurrencyProvider>
       <div className="min-h-screen">
-        <Navbar />
+        <BuyerNavbar
+          title="Deals"
+          subtitle="Special offers and discounts"
+          onMenuToggle={() => setIsFilterOpen(true)}
+        />
 
-        <main className="container mx-auto px-4 py-12">
+        <BuyerFilterSidebar
+          isOpen={isFilterOpen}
+          onClose={() => setIsFilterOpen(false)}
+        />
+
+        <main className="container mx-auto px-4 py-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                <Tag className="h-10 w-10 text-accent" />
-                <h1 className="font-serif text-5xl font-bold text-foreground">
-                  Sale
-                </h1>
-              </div>
-              <p className="text-muted-foreground">
-                Limited time offers on premium products
-              </p>
-            </div>
-
             <div className="flex flex-col lg:flex-row gap-8">
-              <div className="lg:w-64 flex-shrink-0">
+              {/* Filters Sidebar - Desktop */}
+              <div className="lg:w-64 flex-shrink-0 hidden lg:block">
                 <ProductFilters onFilterChange={setFilters} />
               </div>
 
+              {/* Products Grid */}
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-muted-foreground">
-                    {products.length} products on sale
+                    {products.length} products
                   </p>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-[200px] glass">
+                    <SelectTrigger className="w-[180px] glass">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent className="glass-strong">
-                      <SelectItem value="discount">Biggest Discount</SelectItem>
+                      <SelectItem value="newest">Newest</SelectItem>
                       <SelectItem value="price-low">
                         Price: Low to High
                       </SelectItem>

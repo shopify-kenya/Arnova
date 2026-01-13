@@ -1,0 +1,92 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Order #{{ order.order_id }} - Arnova Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="glass-strong rounded-xl p-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold mb-2">Order #{{ order.order_id }}</h2>
+            <p class="text-white/70">Order details and management</p>
+        </div>
+        <a href="{% url 'admin_orders' %}" class="text-white/70 hover:text-white">← Back to Orders</a>
+    </div>
+
+    <!-- Order Info -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Order Details -->
+        <div class="lg:col-span-2 glass-strong rounded-xl p-6">
+            <h3 class="text-lg font-semibold mb-4">Order Information</h3>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <p class="text-sm text-white/70">Customer</p>
+                    <p class="font-medium">{{ order.user.username }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-white/70">Email</p>
+                    <p class="font-medium">{{ order.user.email }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-white/70">Order Date</p>
+                    <p class="font-medium">{{ order.created_at|date:"M d, Y H:i" }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-white/70">Total Amount</p>
+                    <p class="font-medium text-green-400">${{ order.total_amount|floatformat:2 }}</p>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <h4 class="font-semibold mb-3">Order Items</h4>
+            <div class="space-y-3">
+                {% for item in order.items.all %}
+                <div class="glass rounded-lg p-4 flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ item.product.name }}</p>
+                        <p class="text-sm text-white/70">Quantity: {{ item.quantity }}</p>
+                    </div>
+                    <p class="font-medium">${{ item.price|floatformat:2 }}</p>
+                </div>
+                {% empty %}
+                <p class="text-white/70">No items found</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Status Management -->
+        <div class="glass-strong rounded-xl p-6">
+            <h3 class="text-lg font-semibold mb-4">Status Management</h3>
+            <div class="mb-4">
+                <p class="text-sm text-white/70 mb-2">Current Status</p>
+                {% if order.status == 'completed' %}
+                    <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full">Completed</span>
+                {% elif order.status == 'pending' %}
+                    <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full">Pending</span>
+                {% elif order.status == 'cancelled' %}
+                    <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full">Cancelled</span>
+                {% else %}
+                    <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full">{{ order.status|title }}</span>
+                {% endif %}
+            </div>
+
+            <form method="post" action="{% url 'admin_order_update_status' order.id %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Update Status</label>
+                    <select name="status" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-purple-400">
+                        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                        <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                        <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                        <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-purple-500 hover:bg-purple-600 py-2 rounded-lg font-medium">
+                    Update Status
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

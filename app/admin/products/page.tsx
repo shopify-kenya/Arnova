@@ -2,46 +2,247 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import { motion } from "framer-motion"
-import { Edit, Trash2, Search } from "lucide-react"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
+import { Edit, Trash2, Search, Package, Plus } from "lucide-react"
+import { AdminSidebar } from "@/components/admin-sidebar"
 import { GlassCard } from "@/components/glass-card"
-import { AddProductDialog } from "@/components/add-product-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
-import { useAuth } from "@/components/auth-provider"
-import { mockProducts } from "@/lib/products"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { apiClient } from "@/lib/api-client"
 import { toast } from "sonner"
+import { useAuth } from "@/components/auth-provider"
+import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
+
+interface Product {
+  id: string
+  name: string
+  description: string
+  price: number
+  sale_price?: number
+  currency: string
+  category: string
+  category_id: number
+  in_stock: boolean
+  is_new: boolean
+  on_sale: boolean
+  rating: number
+  reviews: number
+  sizes: string[]
+  colors: string[]
+  images: string[]
+  created_at: string
+}
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+}
 
 function AdminProductsContent() {
   const router = useRouter()
   const { isAdmin, isAuthenticated } = useAuth()
   const { formatPrice } = useCurrency()
   const [searchQuery, setSearchQuery] = useState("")
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [formData, setFormData] = useState({
+    id: "",
+    name: "",
+    description: "",
+    price: 0,
+    sale_price: 0,
+    currency: "KES",
+    category_id: 0,
+    in_stock: true,
+    is_new: false,
+    on_sale: false,
+    rating: 0,
+    reviews: 0,
+    sizes: [] as string[],
+    colors: [] as string[],
+    images: [] as string[],
+  })
 
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
       router.push("/")
+      return
     }
+    fetchProducts()
+    fetchCategories()
   }, [isAuthenticated, isAdmin, router])
+
+  const fetchProducts = async () => {
+    try {
+      const response = await apiClient.get("/api/admin/products/")
+      if (response.ok) {
+        const data = await response.json()
+        setProducts(data.products || [])
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
+      } else {
+        toast.error("Failed to fetch products")
+      }
+    } catch (error) {
+      toast.error("Failed to fetch products")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchCategories = async () => {
+    try {
+      const response = await apiClient.get("/api/categories/")
+      if (response.ok) {
+        const data = await response.json()
+        setCategories(data.categories || [])
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories")
+    }
+  }
+
+  const handleCreate = () => {
+    setEditingProduct(null)
+    setFormData({
+      id: `PROD${Date.now()}`,
+      name: "",
+      description: "",
+      price: 0,
+      sale_price: 0,
+      currency: "KES",
+      category_id: categories[0]?.id || 0,
+      in_stock: true,
+      is_new: false,
+      on_sale: false,
+      rating: 0,
+      reviews: 0,
+      sizes: [],
+      colors: [],
+      images: [],
+    })
+    setShowModal(true)
+  }
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product)
+    setFormData({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      sale_price: product.sale_price || 0,
+      currency: product.currency,
+      category_id: product.category_id,
+      in_stock: product.in_stock,
+      is_new: product.is_new,
+      on_sale: product.on_sale,
+      rating: product.rating,
+      reviews: product.reviews,
+      sizes: product.sizes,
+      colors: product.colors,
+      images: product.images,
+    })
+    setShowModal(true)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const url = editingProduct
+        ? `/api/admin/products/${editingProduct.id}/`
+        : "/api/admin/products/"
+      const method = editingProduct ? "put" : "post"
+
+      const response = await apiClient[method](url, formData)
+
+      if (response.ok) {
+        toast.success(
+          editingProduct
+            ? "Product updated successfully"
+            : "Product created successfully"
+        )
+        setShowModal(false)
+        fetchProducts()
+      } else if (response.status === 401) {
+        toast.error("Authentication required. Please log in as admin.")
+        router.push("/auth/login")
+      } else {
+        toast.error("Failed to save product")
+      }
+    } catch (error) {
+      toast.error("Failed to save product")
+    }
+  }
+
+  const handleDelete = async (product: Product) => {
+    if (confirm(`Are you sure you want to delete product ${product.name}?`)) {
+      try {
+        const response = await apiClient.delete(
+          `/api/admin/products/${product.id}/`
+        )
+
+        if (response.ok) {
+          toast.success("Product deleted successfully")
+          fetchProducts()
+        } else if (response.status === 401) {
+          toast.error("Authentication required. Please log in as admin.")
+          router.push("/auth/login")
+        } else {
+          toast.error("Failed to delete product")
+        }
+      } catch (error) {
+        toast.error("Failed to delete product")
+      }
+    }
+  }
 
   if (!isAdmin) return null
 
-  const filteredProducts = mockProducts.filter(
+  const filteredProducts = products.filter(
     product =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.category.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  return (
-    <div className="min-h-screen">
-      <Navbar />
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Loading products...</p>
+        </div>
+      </div>
+    )
+  }
 
-      <main className="container mx-auto px-4 py-12">
+  return (
+    <div className="min-h-screen flex">
+      <AdminSidebar />
+
+      <main className="flex-1 ml-72 lg:ml-72 md:ml-64 sm:ml-56 p-4 md:p-6 lg:p-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -56,7 +257,10 @@ function AdminProductsContent() {
                 Manage your product catalog
               </p>
             </div>
-            <AddProductDialog />
+            <Button onClick={handleCreate}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Product
+            </Button>
           </div>
 
           <GlassCard className="p-6 mb-6" strong>
@@ -87,10 +291,10 @@ function AdminProductsContent() {
                       Price
                     </th>
                     <th className="text-left p-4 font-semibold text-foreground">
-                      Stock
+                      Status
                     </th>
                     <th className="text-left p-4 font-semibold text-foreground">
-                      Status
+                      Created
                     </th>
                     <th className="text-right p-4 font-semibold text-foreground">
                       Actions
@@ -108,13 +312,9 @@ function AdminProductsContent() {
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <Image
-                            src={product.images[0] || "/placeholder.svg"}
-                            alt={product.name}
-                            width={48}
-                            height={48}
-                            className="w-12 h-12 object-cover rounded"
-                          />
+                          <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
+                            <Package className="h-6 w-6 text-muted-foreground" />
+                          </div>
                           <div>
                             <p className="font-medium text-foreground">
                               {product.name}
@@ -129,42 +329,28 @@ function AdminProductsContent() {
                         <Badge variant="outline">{product.category}</Badge>
                       </td>
                       <td className="p-4">
-                        <div>
-                          <p className="font-medium text-foreground">
-                            {formatPrice(product.price)}
-                          </p>
-                          {product.onSale && product.salePrice && (
-                            <p className="text-sm text-accent">
-                              {formatPrice(product.salePrice)}
-                            </p>
-                          )}
-                        </div>
+                        <p className="font-medium text-foreground">
+                          {formatPrice(product.price)}
+                        </p>
                       </td>
                       <td className="p-4">
                         <Badge
-                          variant={product.inStock ? "default" : "destructive"}
+                          variant={product.in_stock ? "default" : "destructive"}
                         >
-                          {product.inStock ? "In Stock" : "Out of Stock"}
+                          {product.in_stock ? "In Stock" : "Out of Stock"}
                         </Badge>
                       </td>
                       <td className="p-4">
-                        <div className="flex gap-2">
-                          {product.isNew && (
-                            <Badge className="bg-primary">New</Badge>
-                          )}
-                          {product.onSale && (
-                            <Badge className="bg-accent">Sale</Badge>
-                          )}
-                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(product.created_at).toLocaleDateString()}
+                        </p>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center justify-end gap-2">
                           <Button
                             size="icon"
                             variant="ghost"
-                            onClick={() =>
-                              toast.success("Edit functionality coming soon")
-                            }
+                            onClick={() => handleEdit(product)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -172,9 +358,7 @@ function AdminProductsContent() {
                             size="icon"
                             variant="ghost"
                             className="text-destructive"
-                            onClick={() =>
-                              toast.success("Delete functionality coming soon")
-                            }
+                            onClick={() => handleDelete(product)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -189,7 +373,250 @@ function AdminProductsContent() {
         </motion.div>
       </main>
 
-      <Footer />
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingProduct ? "Edit Product" : "Create Product"}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="id">Product ID</Label>
+                <Input
+                  id="id"
+                  value={formData.id}
+                  onChange={e =>
+                    setFormData({ ...formData, id: e.target.value })
+                  }
+                  disabled={!!editingProduct}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={e =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={e =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="price">Price</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      price: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="sale_price">Sale Price</Label>
+                <Input
+                  id="sale_price"
+                  type="number"
+                  step="0.01"
+                  value={formData.sale_price}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      sale_price: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="currency">Currency</Label>
+                <Select
+                  value={formData.currency}
+                  onValueChange={value =>
+                    setFormData({ ...formData, currency: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="KES">KES</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={formData.category_id.toString()}
+                  onValueChange={value =>
+                    setFormData({ ...formData, category_id: parseInt(value) })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="rating">Rating</Label>
+                <Input
+                  id="rating"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  value={formData.rating}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      rating: parseFloat(e.target.value) || 0,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="sizes">Sizes (comma separated)</Label>
+                <Input
+                  id="sizes"
+                  value={formData.sizes.join(", ")}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      sizes: e.target.value
+                        .split(",")
+                        .map(s => s.trim())
+                        .filter(s => s),
+                    })
+                  }
+                  placeholder="S, M, L, XL"
+                />
+              </div>
+              <div>
+                <Label htmlFor="colors">Colors (comma separated)</Label>
+                <Input
+                  id="colors"
+                  value={formData.colors.join(", ")}
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      colors: e.target.value
+                        .split(",")
+                        .map(c => c.trim())
+                        .filter(c => c),
+                    })
+                  }
+                  placeholder="Red, Blue, Green"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="images">Image URLs (comma separated)</Label>
+              <Input
+                id="images"
+                value={formData.images.join(", ")}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    images: e.target.value
+                      .split(",")
+                      .map(i => i.trim())
+                      .filter(i => i),
+                  })
+                }
+                placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+              />
+            </div>
+
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="in_stock"
+                  checked={formData.in_stock}
+                  onCheckedChange={checked =>
+                    setFormData({ ...formData, in_stock: !!checked })
+                  }
+                />
+                <Label htmlFor="in_stock">In Stock</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="is_new"
+                  checked={formData.is_new}
+                  onCheckedChange={checked =>
+                    setFormData({ ...formData, is_new: !!checked })
+                  }
+                />
+                <Label htmlFor="is_new">New Product</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="on_sale"
+                  checked={formData.on_sale}
+                  onCheckedChange={checked =>
+                    setFormData({ ...formData, on_sale: !!checked })
+                  }
+                />
+                <Label htmlFor="on_sale">On Sale</Label>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">
+                {editingProduct ? "Update" : "Create"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

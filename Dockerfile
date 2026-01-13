@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Arnova Shop (Django + Next.js)
 
 # Stage 1: Build Next.js frontend
-FROM node:18-alpine AS frontend-builder
+FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
@@ -53,13 +53,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Copy built frontend from previous stage
-COPY --from=frontend-builder /app/build ./build
+COPY --from=frontend-builder /app/.next/standalone ./
+COPY --from=frontend-builder /app/.next/static ./.next/static
 COPY --from=frontend-builder /app/public ./public
 
 # Create necessary directories
-RUN mkdir -p staticfiles ssl
+RUN mkdir -p staticfiles ssl templates/admin static/admin
 
-# Collect static files
+# Run migrations and collect static files
+RUN python manage.py migrate --noinput
 RUN python manage.py collectstatic --noinput
 
 # Create non-root user

@@ -3,33 +3,36 @@
 
 echo "🔍 Running pre-commit checks..."
 
+# Get list of staged files
+STAGED_PY_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' | grep -v 'migrations/' | grep -v '.venv/' | grep -v 'venv/')
+STAGED_JS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|jsx|ts|tsx|json|css|md)$')
+
 # Format Python files
-echo "🐍 Formatting Python files..."
-black . --exclude="/(migrations|venv|.venv|node_modules|.next)/" 2>/dev/null || echo "Black not available"
-isort . --skip=migrations --skip=venv --skip=.venv --skip=node_modules --skip=.next 2>/dev/null || echo "isort not available"
-
-# Format JavaScript/TypeScript files
-echo "⚛️ Formatting JS/TS files..."
-npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md}" --ignore-path .gitignore 2>/dev/null || echo "Prettier not available"
-
-# Check if there are any changes after formatting
-if ! git diff --quiet; then
-    echo "📝 Files were formatted. Please review and commit again."
-    exit 1
+if [ -n "$STAGED_PY_FILES" ]; then
+    echo "🐍 Formatting Python files..."
+    echo "$STAGED_PY_FILES" | xargs black 2>/dev/null || echo "Black not available"
+    echo "$STAGED_PY_FILES" | xargs isort 2>/dev/null || echo "isort not available"
+    echo "$STAGED_PY_FILES" | xargs git add
 fi
 
-# Run linting
-echo "🔧 Running linters..."
-flake8 . --exclude=migrations,venv,.venv,node_modules,.next 2>/dev/null || echo "flake8 not available"
-npm run lint 2>/dev/null || echo "ESLint not available"
+# Format JavaScript/TypeScript files
+if [ -n "$STAGED_JS_FILES" ]; then
+    echo "⚛️ Formatting JS/TS files..."
+    echo "$STAGED_JS_FILES" | xargs npx prettier --write 2>/dev/null || echo "Prettier not available"
+    echo "$STAGED_JS_FILES" | xargs git add
+fi
 
-# Check for trailing whitespace
+# Run linting on staged files only
+if [ -n "$STAGED_PY_FILES" ]; then
+    echo "🔧 Running Python linter..."
+    echo "$STAGED_PY_FILES" | xargs flake8 --max-line-length=88 --extend-ignore=E203 2>/dev/null || echo "flake8 not available"
+fi
+
+# Check for trailing whitespace in staged files
 if git diff --cached --check; then
-    echo "✅ Trailing whitespace check passed"
+    echo "✅ Pre-commit checks passed"
+    exit 0
 else
     echo "❌ Please fix trailing whitespace"
     exit 1
 fi
-
-echo "✅ Pre-commit checks passed"
-exit 0

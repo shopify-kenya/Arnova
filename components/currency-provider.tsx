@@ -35,13 +35,17 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(
 )
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<Currency>(currencies[0])
+  const [currency, setCurrencyState] = useState<Currency>(
+    currencies.find(c => c.code === "KES") || currencies[0]
+  )
 
   useEffect(() => {
     const stored = localStorage.getItem("arnova-currency")
     if (stored) {
       const found = currencies.find(c => c.code === stored)
-      if (found) setCurrencyState(found)
+      if (found) {
+        setCurrencyState(found)
+      }
     }
   }, [])
 

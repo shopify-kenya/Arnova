@@ -25,23 +25,22 @@ export function AdminSidebar() {
   const { user, logout } = useAuth()
 
   const getNavigationByRole = (role: string) => {
-    const baseLinks = [{ href: "/admin", label: "Dashboard", icon: BarChart3 }]
-
     if (role === "admin") {
       return [
-        ...baseLinks,
+        { href: "/admin", label: "Dashboard", icon: BarChart3 },
+        { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
         { href: "/admin/products", label: "Products", icon: Package },
         { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
         { href: "/admin/users", label: "Users", icon: Users },
-        { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
         { href: "/admin/settings", label: "Settings", icon: Settings },
       ]
     }
 
+    // Regular user accessing admin area (limited access)
     return [
-      ...baseLinks,
+      { href: "/admin", label: "Dashboard", icon: BarChart3 },
       { href: "/admin/orders", label: "My Orders", icon: ShoppingCart },
-      { href: "/admin/profile", label: "Profile", icon: Users },
+      { href: "/profile", label: "Profile", icon: Users },
     ]
   }
 

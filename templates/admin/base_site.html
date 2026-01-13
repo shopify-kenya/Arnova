@@ -1,0 +1,264 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Arnova Admin{% endblock %}
+
+{% block branding %}
+<div class="flex items-center space-x-3 p-4">
+    <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+        <span class="text-white font-bold text-sm">A</span>
+    </div>
+    <h1 class="text-xl font-bold text-white">Arnova Admin</h1>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* Glass morphism base styles */
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Glass card effect */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header styling */
+    #header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    /* Navigation styling */
+    #nav-sidebar {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #nav-sidebar a {
+        color: rgba(255, 255, 255, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    #nav-sidebar a:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+
+    /* Content area */
+    #content {
+        background: transparent;
+        padding: 2rem;
+    }
+
+    /* Module styling */
+    .module {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .module h2 {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        padding: 1rem 1.5rem;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    /* Table styling */
+    .results {
+        background: transparent;
+    }
+
+    .results table {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .results th {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .results td {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .results tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Form styling */
+    .form-row {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .form-row label {
+        color: white;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    input, textarea, select {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        padding: 0.75rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.4);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
+    input::placeholder, textarea::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Button styling */
+    .default, .button, input[type="submit"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .default:hover, .button:hover, input[type="submit"]:hover {
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .breadcrumbs a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .breadcrumbs a:hover {
+        text-decoration: underline;
+    }
+
+    /* Messages */
+    .messagelist {
+        margin: 0 0 1.5rem 0;
+    }
+
+    .messagelist li {
+        background: rgba(34, 197, 94, 0.2);
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 12px;
+        color: white;
+        padding: 1rem 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .messagelist .error {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .messagelist .warning {
+        background: rgba(245, 158, 11, 0.2);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    /* Dashboard styling */
+    #content-main {
+        background: transparent;
+    }
+
+    .dashboard .module {
+        margin-bottom: 2rem;
+    }
+
+    .dashboard .module table {
+        margin: 0;
+    }
+
+    /* Links */
+    a {
+        color: #93c5fd;
+        transition: color 0.3s ease;
+    }
+
+    a:hover {
+        color: white;
+    }
+
+    /* Pagination */
+    .paginator {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+
+    .paginator a, .paginator .this-page {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        color: white;
+        padding: 0.5rem 1rem;
+        margin: 0 0.25rem;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .paginator a:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .paginator .this-page {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+</style>
+{% endblock %}

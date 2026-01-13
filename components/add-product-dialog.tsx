@@ -4,11 +4,12 @@ import type React from "react"
 
 import { useState } from "react"
 import Image from "next/image"
-import { X, Upload, Plus } from "lucide-react"
+import { X, Upload, Plus, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
   SelectContent,
@@ -31,16 +32,34 @@ interface AddProductDialogProps {
   onProductAdded?: () => void
 }
 
+const AVAILABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL"]
+const AVAILABLE_COLORS = [
+  "Black",
+  "White",
+  "Gray",
+  "Red",
+  "Blue",
+  "Green",
+  "Yellow",
+  "Pink",
+  "Purple",
+  "Orange",
+  "Brown",
+  "Navy",
+]
+
 export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
   const [open, setOpen] = useState(false)
   const [images, setImages] = useState<string[]>([])
+  const [imageUrl, setImageUrl] = useState("")
   const [formData, setFormData] = useState({
+    id: "",
     name: "",
     description: "",
     price: "",
     category: "",
-    sizes: "",
-    colors: "",
+    sizes: [] as string[],
+    colors: [] as string[],
     stock: "",
   })
 
@@ -65,31 +84,102 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
     setImages(images.filter((_, i) => i !== index))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const addImageUrl = () => {
+    if (imageUrl.trim()) {
+      setImages([...images, imageUrl.trim()])
+      setImageUrl("")
+    }
+  }
+
+  const handleSizeChange = (size: string, checked: boolean) => {
+    if (checked) {
+      setFormData({ ...formData, sizes: [...formData.sizes, size] })
+    } else {
+      setFormData({
+        ...formData,
+        sizes: formData.sizes.filter(s => s !== size),
+      })
+    }
+  }
+
+  const handleColorChange = (color: string, checked: boolean) => {
+    if (checked) {
+      setFormData({ ...formData, colors: [...formData.colors, color] })
+    } else {
+      setFormData({
+        ...formData,
+        colors: formData.colors.filter(c => c !== color),
+      })
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validation
-    if (!formData.name || !formData.price || !formData.category) {
-      toast.error("Please fill in all required fields")
+    // Validation - all fields are now mandatory
+    if (
+      !formData.id ||
+      !formData.name ||
+      !formData.description ||
+      !formData.price ||
+      !formData.category ||
+      formData.sizes.length === 0 ||
+      formData.colors.length === 0 ||
+      images.length === 0
+    ) {
+      toast.error(
+        "Please fill in all required fields including sizes, colors, and images"
+      )
       return
     }
 
-    // Here you would typically send the data to your Django backend
-    console.log("[v0] Adding product:", { ...formData, images })
+    try {
+      const response = await fetch("/api/admin/products/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken":
+            document.cookie
+              .split("; ")
+              .find(row => row.startsWith("csrftoken="))
+              ?.split("=")[1] || "",
+        },
+        body: JSON.stringify({
+          id: formData.id,
+          name: formData.name,
+          description: formData.description,
+          price: parseFloat(formData.price),
+          category_id: parseInt(formData.category),
+          sizes: formData.sizes,
+          colors: formData.colors,
+          images: images,
+          in_stock: parseInt(formData.stock) > 0,
+        }),
+      })
 
-    toast.success("Product added successfully!")
-    setOpen(false)
-    setFormData({
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      sizes: "",
-      colors: "",
-      stock: "",
-    })
-    setImages([])
-    onProductAdded?.()
+      if (response.ok) {
+        toast.success("Product added successfully!")
+        setOpen(false)
+        setFormData({
+          id: "",
+          name: "",
+          description: "",
+          price: "",
+          category: "",
+          sizes: [],
+          colors: [],
+          stock: "",
+        })
+        setImages([])
+        setImageUrl("")
+        onProductAdded?.()
+      } else {
+        const error = await response.json()
+        toast.error(error.error || "Failed to add product")
+      }
+    } catch (error) {
+      toast.error("Network error. Please try again.")
+    }
   }
 
   return (
@@ -112,6 +202,20 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
+            <Label htmlFor="id">
+              Product ID <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="id"
+              value={formData.id}
+              onChange={e => setFormData({ ...formData, id: e.target.value })}
+              placeholder="CL-001"
+              className="glass"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="name">
               Product Name <span className="text-destructive">*</span>
             </Label>
@@ -126,7 +230,9 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">
+              Description <span className="text-destructive">*</span>
+            </Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -136,6 +242,7 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               placeholder="Describe your product..."
               className="glass min-h-[100px]"
               rows={4}
+              required
             />
           </div>
 
@@ -181,37 +288,49 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="sizes">Available Sizes</Label>
-              <Input
-                id="sizes"
-                value={formData.sizes}
-                onChange={e =>
-                  setFormData({ ...formData, sizes: e.target.value })
-                }
-                placeholder="XS, S, M, L, XL"
-                className="glass"
-              />
-              <p className="text-xs text-muted-foreground">
-                Comma-separated values
-              </p>
+              <Label>
+                Available Sizes <span className="text-destructive">*</span>
+              </Label>
+              <div className="grid grid-cols-3 gap-2">
+                {AVAILABLE_SIZES.map(size => (
+                  <div key={size} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`size-${size}`}
+                      checked={formData.sizes.includes(size)}
+                      onCheckedChange={checked =>
+                        handleSizeChange(size, checked as boolean)
+                      }
+                    />
+                    <Label htmlFor={`size-${size}`} className="text-sm">
+                      {size}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="colors">Available Colors</Label>
-              <Input
-                id="colors"
-                value={formData.colors}
-                onChange={e =>
-                  setFormData({ ...formData, colors: e.target.value })
-                }
-                placeholder="Black, White, Blue"
-                className="glass"
-              />
-              <p className="text-xs text-muted-foreground">
-                Comma-separated values
-              </p>
+              <Label>
+                Available Colors <span className="text-destructive">*</span>
+              </Label>
+              <div className="grid grid-cols-3 gap-2">
+                {AVAILABLE_COLORS.map(color => (
+                  <div key={color} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`color-${color}`}
+                      checked={formData.colors.includes(color)}
+                      onCheckedChange={checked =>
+                        handleColorChange(color, checked as boolean)
+                      }
+                    />
+                    <Label htmlFor={`color-${color}`} className="text-sm">
+                      {color}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -230,7 +349,25 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>Product Images</Label>
+            <Label>
+              Product Images <span className="text-destructive">*</span>
+            </Label>
+
+            {/* Image URL Input */}
+            <div className="flex gap-2">
+              <Input
+                value={imageUrl}
+                onChange={e => setImageUrl(e.target.value)}
+                placeholder="Enter image URL"
+                className="glass flex-1"
+              />
+              <Button type="button" onClick={addImageUrl} variant="outline">
+                <Link className="h-4 w-4 mr-2" />
+                Add URL
+              </Button>
+            </div>
+
+            {/* File Upload */}
             <div className="border-2 border-dashed border-border rounded-lg p-6 text-center glass">
               <input
                 type="file"
@@ -243,7 +380,7 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               <label htmlFor="images" className="cursor-pointer">
                 <Upload className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground mb-1">
-                  Click to upload product images
+                  Or click to upload product images
                 </p>
                 <p className="text-xs text-muted-foreground">
                   PNG, JPG, WEBP up to 10MB

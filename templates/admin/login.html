@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Arnova</title>
+    {% load static %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'admin/css/admin-theme.css' %}">
+    <script src="{% static 'admin/js/admin-utils.js' %}" defer></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8b5cf6',
+                        secondary: '#ec4899',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="text-white flex items-center justify-center min-h-screen p-4">
+    <div class="glass-strong rounded-xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span class="text-white font-bold text-2xl">A</span>
+            </div>
+            <h1 class="text-2xl font-bold mb-2">Arnova Admin</h1>
+            <p class="text-white/70">Sign in to access the admin dashboard</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error mb-6">
+            <p class="text-sm">{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <form method="post" id="loginForm">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Username or Email</label>
+                    <input type="text" name="username" required class="form-input w-full px-4 py-3 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" name="password" required class="form-input w-full px-4 py-3 rounded-lg">
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="remember_me" id="remember" class="mr-2">
+                    <label for="remember" class="text-sm text-white/70">Remember me</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary w-full py-3 rounded-lg font-medium mt-6 transition-colors">
+                Sign In
+            </button>
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="/" class="text-white/70 hover:text-white text-sm">← Back to Store</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('{% url "admin_login" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = '{% url "admin_dashboard" %}';
+                } else {
+                    AdminUtils.showAlert(result.error || 'Invalid credentials', 'error');
+                }
+            } catch (error) {
+                AdminUtils.showAlert('Login failed. Please try again.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

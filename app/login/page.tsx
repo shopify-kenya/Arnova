@@ -11,6 +11,7 @@ import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import InputError from "@/components/ui/input-error"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
@@ -23,6 +24,7 @@ export default function LoginPage() {
   const { setUser } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState({ email: "", password: "", general: "" })
@@ -53,11 +55,12 @@ export default function LoginPage() {
     setErrors({ email: "", password: "", general: "" })
 
     try {
-      const user = login(email, password)
+      const user = login(email, password, rememberMe)
       if (user) {
         setUser(user)
         toast.success("Welcome back!")
-        router.push(user.role === "admin" ? "/admin" : "/")
+        // Use window.location for immediate redirect
+        window.location.href = user.role === "admin" ? "/admin" : "/store"
       } else {
         setErrors({ ...errors, general: "Invalid email or password" })
       }
@@ -166,6 +169,21 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="remember"
+                      checked={rememberMe}
+                      onCheckedChange={checked =>
+                        setRememberMe(checked as boolean)
+                      }
+                    />
+                    <Label
+                      htmlFor="remember"
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      Remember me
+                    </Label>
+                  </div>
                   <Link
                     href="/forgot-password"
                     className="text-primary hover:underline"
@@ -203,18 +221,6 @@ export default function LoginPage() {
                   >
                     Sign up
                   </Link>
-                </p>
-              </div>
-
-              <div className="mt-8 p-4 glass rounded-lg">
-                <p className="text-xs text-muted-foreground mb-2 font-semibold">
-                  Demo Accounts:
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Admin: admin@arnova.com / password123
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Buyer: buyer@example.com / password123
                 </p>
               </div>
             </GlassCard>

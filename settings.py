@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "django_extensions",
     "shop",
 ]
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "shop.middleware.admin_security.AdminSecurityMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "shop.middleware.AuthMiddleware",
@@ -66,6 +68,7 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
+                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -99,13 +102,13 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.MinimumLengthValidator"),
+        "NAME": ("django.contrib.auth.password_validation." "MinimumLengthValidator"),
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.CommonPasswordValidator"),
+        "NAME": ("django.contrib.auth.password_validation." "CommonPasswordValidator"),
     },
     {
-        "NAME": ("django.contrib.auth.password_validation.NumericPasswordValidator"),
+        "NAME": ("django.contrib.auth.password_validation." "NumericPasswordValidator"),
     },
 ]
 
@@ -141,8 +144,8 @@ USE_GZIP = True
 SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Allow persistent sessions
+SESSION_COOKIE_AGE = 2592000  # 30 days for remember me
 SESSION_SAVE_EVERY_REQUEST = True
 
 # HTTPS Security Headers
@@ -159,7 +162,7 @@ if not DEBUG:
 # Cache settings for static files
 if not DEBUG:
     STATICFILES_STORAGE = (
-        "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        "django.contrib.staticfiles.storage." "ManifestStaticFilesStorage"
     )
 
 # CSRF Configuration for Unified Frontend-Backend
@@ -171,13 +174,23 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_AGE = 86400  # 24 hours
 
-# Trusted origins for CSRF (same-origin by default)
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "https://127.0.0.1:8443",
-    "http://localhost:8000",
-    "https://localhost:8443",
-]
+# Production CSRF settings from environment
+if not DEBUG:
+    csrf_origins = os.getenv("CSRF_TRUSTED_ORIGINS", "")
+    if csrf_origins:
+        CSRF_TRUSTED_ORIGINS = [
+            origin.strip() for origin in csrf_origins.split(",") if origin.strip()
+        ]
+    CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "true").lower() == "true"
+    CSRF_FAILURE_VIEW = os.getenv("CSRF_FAILURE_VIEW", "django.views.csrf.csrf_failure")
+else:
+    # Development CSRF settings
+    CSRF_TRUSTED_ORIGINS = [
+        "http://127.0.0.1:8000",
+        "https://127.0.0.1:8443",
+        "http://localhost:8000",
+        "https://localhost:8443",
+    ]
 
 # Allow same-origin requests without CSRF for GET requests
 CSRF_COOKIE_DOMAIN = None  # Use default domain
@@ -186,3 +199,26 @@ CSRF_COOKIE_DOMAIN = None  # Use default domain
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# M-Pesa Daraja API Configuration
+MPESA_CONSUMER_KEY = os.getenv("MPESA_CONSUMER_KEY")
+MPESA_CONSUMER_SECRET = os.getenv("MPESA_CONSUMER_SECRET")
+MPESA_ENVIRONMENT = os.getenv("MPESA_ENVIRONMENT", "sandbox")
+MPESA_SHORTCODE = os.getenv("MPESA_SHORTCODE", "174379")
+MPESA_PASSKEY = os.getenv("MPESA_PASSKEY")
+MPESA_CALLBACK_URL = os.getenv("MPESA_CALLBACK_URL")
+
+# Django REST Framework Configuration
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+}
+
+# Login URLs
+LOGIN_URL = "/admin/login/"
+LOGIN_REDIRECT_URL = "/dashboard/"

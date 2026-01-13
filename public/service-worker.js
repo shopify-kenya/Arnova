@@ -54,8 +54,13 @@ self.addEventListener("fetch", event => {
 
   const url = new URL(request.url)
 
-  // Handle API requests
-  if (url.pathname.startsWith("/api/")) {
+  // Skip API requests to let them go through normally
+  if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/")) {
+    return
+  }
+
+  // Handle navigation requests - serve from cache or network
+  if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then(response => {
@@ -67,22 +72,6 @@ self.addEventListener("fetch", event => {
           }
           return response
         })
-        .catch(() => caches.match(request))
-    )
-    return
-  }
-
-  // Handle navigation requests
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          const responseClone = response.clone()
-          caches
-            .open(DYNAMIC_CACHE)
-            .then(cache => cache.put(request, responseClone))
-          return response
-        })
         .catch(() => {
           return caches.match(request).then(cachedResponse => {
             return cachedResponse || caches.match("/offline/")
@@ -92,7 +81,7 @@ self.addEventListener("fetch", event => {
     return
   }
 
-  // Handle other requests
+  // Handle static assets
   event.respondWith(
     caches.match(request).then(cachedResponse => {
       if (cachedResponse) {

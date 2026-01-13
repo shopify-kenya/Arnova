@@ -10,21 +10,39 @@ import { Footer } from "@/components/footer"
 export default function CareersPage() {
   const jobs = [
     {
-      title: "Senior Frontend Developer",
-      department: "Engineering",
+      title: "Digital Marketing Manager",
+      department: "Marketing",
       location: "Remote",
       type: "Full-time",
     },
     {
-      title: "Fashion Designer",
-      department: "Design",
+      title: "Social Media Specialist",
+      department: "Marketing",
+      location: "Los Angeles, CA",
+      type: "Full-time",
+    },
+    {
+      title: "Content Marketing Strategist",
+      department: "Marketing",
       location: "New York, NY",
       type: "Full-time",
     },
     {
-      title: "Marketing Manager",
+      title: "Paid Advertising Specialist",
+      department: "Advertising",
+      location: "Remote",
+      type: "Full-time",
+    },
+    {
+      title: "Brand Marketing Manager",
       department: "Marketing",
-      location: "Los Angeles, CA",
+      location: "San Francisco, CA",
+      type: "Full-time",
+    },
+    {
+      title: "Email Marketing Coordinator",
+      department: "Marketing",
+      location: "Remote",
       type: "Full-time",
     },
   ]
@@ -32,7 +50,7 @@ export default function CareersPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
