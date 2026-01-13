@@ -2,7 +2,7 @@ services:
   - type: web
     name: arnova-app
     env: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./docker/Dockerfile
     plan: starter
     region: oregon
     branch: main
