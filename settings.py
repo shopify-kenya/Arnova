@@ -53,14 +53,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "shop.middleware.CorsMiddleware",
+    "shop.middleware.cors.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "shop.middleware.admin_security.AdminSecurityMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "shop.middleware.AuthMiddleware",
+    "shop.middleware.auth.AuthMiddleware",
 ]
 
 ROOT_URLCONF = "urls"
