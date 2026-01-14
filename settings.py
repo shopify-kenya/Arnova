@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
-from django.core.exceptions import ImproperlyConfigured
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
@@ -24,21 +24,16 @@ BASE_DIR = Path(__file__).resolve().parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise ImproperlyConfigured("SECRET_KEY must be set in environment variables")
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-if not DEBUG:
-    allowed_hosts_env = os.getenv("DJANGO_ALLOWED_HOSTS")
-    if allowed_hosts_env:
-        ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(",")]
-    else:
-        raise ImproperlyConfigured("DJANGO_ALLOWED_HOSTS must be set in production.")
-else:
-    ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = config(
+    "DJANGO_ALLOWED_HOSTS",
+    default="127.0.0.1,localhost",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
 
 
 # Application definition
@@ -92,8 +87,13 @@ WSGI_APPLICATION = "wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_URL = os.getenv("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
-DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
+DATABASES = {
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 
 # Password validation
@@ -174,28 +174,15 @@ if not DEBUG:
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access
-CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=not DEBUG, cast=bool)
 CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_AGE = 86400  # 24 hours
-
-# Production CSRF settings from environment
-if not DEBUG:
-    csrf_origins = os.getenv("CSRF_TRUSTED_ORIGINS", "")
-    if csrf_origins:
-        CSRF_TRUSTED_ORIGINS = [
-            origin.strip() for origin in csrf_origins.split(",") if origin.strip()
-        ]
-    CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "true").lower() == "true"
-    CSRF_FAILURE_VIEW = os.getenv("CSRF_FAILURE_VIEW", "django.views.csrf.csrf_failure")
-else:
-    # Development CSRF settings
-    CSRF_TRUSTED_ORIGINS = [
-        "http://127.0.0.1:8000",
-        "https://127.0.0.1:8443",
-        "http://localhost:8000",
-        "https://localhost:8443",
-    ]
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="http://127.0.0.1:8000,https://127.0.0.1:8443,http://localhost:8000,https://localhost:8443",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
 
 # Allow same-origin requests without CSRF for GET requests
 CSRF_COOKIE_DOMAIN = None  # Use default domain
