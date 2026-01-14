@@ -15,3 +15,4 @@ services:
         value: "1"
     healthCheckPath: /
     startCommand: "gunicorn wsgi:application"
+    preDeployCommand: "python manage.py migrate"
