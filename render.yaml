@@ -14,3 +14,4 @@ services:
       - key: PYTHONUNBUFFERED
         value: "1"
     healthCheckPath: /
+    startCommand: "gunicorn wsgi:application"
