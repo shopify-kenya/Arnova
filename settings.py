@@ -34,7 +34,6 @@ ALLOWED_HOSTS = config(
     default="127.0.0.1,localhost",
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
-print(f"DEBUG: ALLOWED_HOSTS = {ALLOWED_HOSTS}")
 
 
 # Application definition
