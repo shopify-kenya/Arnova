@@ -47,9 +47,25 @@ function OrdersPageContent() {
       return
     }
 
-    // TODO: Replace with actual API call to fetch user orders
-    setOrders([])
-    setIsLoading(false)
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/orders/", {
+          credentials: "include",
+        })
+        if (response.ok) {
+          const data = await response.json()
+          setOrders(data.orders)
+        } else {
+          toast.error("Failed to fetch orders.")
+        }
+      } catch (error) {
+        toast.error("An error occurred while fetching orders.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchOrders()
   }, [isAuthenticated, router])
 
   const getStatusColor = (status: Order["status"]) => {
