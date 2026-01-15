@@ -6,7 +6,9 @@ from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from djangoratelimit.decorators import ratelimit
 
+from .forms import RegistrationForm
 from .models import (
     Cart,
     CartItem,
@@ -62,6 +64,7 @@ def api_csrf_token(request):
     return JsonResponse({"csrfToken": get_token(request), "success": True})
 
 
+@ratelimit(key="ip", rate="10/h", block=True)
 @require_http_methods(["POST"])
 def api_login(request):
     import json
@@ -98,27 +101,32 @@ def api_login(request):
     return JsonResponse({"error": "Invalid credentials"}, status=401)
 
 
+@ratelimit(key="ip", rate="10/h", block=True)
 @require_http_methods(["POST"])
 def api_register(request):
     import json
 
-    data = json.loads(request.body)
-    username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-    if User.objects.filter(username=username).exists():
-        return JsonResponse({"error": "Username already exists"}, status=400)
+    form = RegistrationForm(data)
 
-    user = User.objects.create_user(
-        username=username,
-        email=email,
-        password=password,
-    )
-    UserProfile.objects.create(user=user)
-    Cart.objects.create(user=user)
-
-    return JsonResponse({"success": True, "message": "User created successfully"})
+    if form.is_valid():
+        cleaned_data = form.cleaned_data
+        user = User.objects.create_user(
+            username=cleaned_data["username"],
+            email=cleaned_data["email"],
+            password=cleaned_data["password"],
+        )
+        UserProfile.objects.create(user=user)
+        Cart.objects.create(user=user)
+        return JsonResponse({"success": True, "message": "User created successfully"})
+    else:
+        # The form.errors dictionary contains validation errors.
+        # .as_json() provides a serializable format.
+        return JsonResponse({"errors": json.loads(form.errors.as_json())}, status=400)
 
 
 @login_required
