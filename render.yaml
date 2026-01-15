@@ -13,6 +13,6 @@ services:
         value: production
       - key: PYTHONUNBUFFERED
         value: "1"
-    healthCheckPath: /
+    healthCheckPath: /api/health
     startCommand: "gunicorn wsgi:application"
     preDeployCommand: "python manage.py migrate"
