@@ -57,6 +57,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "shop.middleware.ip_access_control.IPAccessControlMiddleware",
     "shop.middleware.admin_security.AdminSecurityMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -218,6 +219,13 @@ REST_FRAMEWORK = {
 # Login URLs
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/dashboard/"
+
+# Admin IP Whitelist (production only)
+ADMIN_ALLOWED_IPS = config(
+    "ADMIN_ALLOWED_IPS",
+    default="127.0.0.1,::1,localhost",
+    cast=lambda v: [s.strip() for s in v.split(",")],
+)
 
 # Logging Configuration
 LOGGING = {
