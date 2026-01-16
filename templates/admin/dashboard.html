@@ -117,33 +117,8 @@
                 <span class="text-sm text-muted-foreground">{{ order.created_at|timesince }} ago</span>
             </div>
             {% empty %}
-            <div class="flex items-center justify-between py-3 border-b border-border">
-                <div>
-                    <p class="font-medium text-foreground">New order placed</p>
-                    <p class="text-sm text-muted-foreground">Order #1234 - $129.99</p>
-                </div>
-                <span class="text-sm text-muted-foreground">5 minutes ago</span>
-            </div>
-            <div class="flex items-center justify-between py-3 border-b border-border">
-                <div>
-                    <p class="font-medium text-foreground">Product updated</p>
-                    <p class="text-sm text-muted-foreground">Premium Cotton T-Shirt</p>
-                </div>
-                <span class="text-sm text-muted-foreground">1 hour ago</span>
-            </div>
-            <div class="flex items-center justify-between py-3 border-b border-border">
-                <div>
-                    <p class="font-medium text-foreground">New customer registered</p>
-                    <p class="text-sm text-muted-foreground">john.doe@example.com</p>
-                </div>
-                <span class="text-sm text-muted-foreground">2 hours ago</span>
-            </div>
-            <div class="flex items-center justify-between py-3">
-                <div>
-                    <p class="font-medium text-foreground">Order shipped</p>
-                    <p class="text-sm text-muted-foreground">Order #1230 - $89.99</p>
-                </div>
-                <span class="text-sm text-muted-foreground">3 hours ago</span>
+            <div class="text-center py-8 text-muted-foreground">
+                <p>No recent activity</p>
             </div>
             {% endfor %}
         </div>
