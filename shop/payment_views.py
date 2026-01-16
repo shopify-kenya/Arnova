@@ -7,7 +7,6 @@ import requests
 from django.conf import settings
 from django.http import JsonResponse
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import MpesaPayment, Payment
@@ -57,7 +56,6 @@ def generate_mpesa_password():
     return password, timestamp
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def process_payment(request):
     """Process payment for orders"""
@@ -185,7 +183,6 @@ def process_mpesa_payment(data, amount):
         )
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def mpesa_callback(request):
     """Handle M-Pesa payment callback"""
@@ -316,7 +313,6 @@ def process_paypal_payment(data, amount):
     )
 
 
-@csrf_exempt
 @require_http_methods(["GET"])
 def check_mpesa_status(request, checkout_request_id):
     """Check M-Pesa payment status"""
@@ -374,7 +370,6 @@ def check_mpesa_status(request, checkout_request_id):
         )
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def validate_card(request):
     """Validate credit card details"""
