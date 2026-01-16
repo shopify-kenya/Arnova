@@ -507,26 +507,42 @@ def api_admin_products(request):
     elif request.method == "POST":
         import json
 
-        data = json.loads(request.body)
-        category = Category.objects.get(id=data["category_id"])
-        product = Product.objects.create(
-            id=data["id"],
-            name=data["name"],
-            description=data["description"],
-            price=data["price"],
-            sale_price=data.get("sale_price"),
-            currency=data.get("currency", "KES"),
-            category=category,
-            sizes=data.get("sizes", []),
-            colors=data.get("colors", []),
-            images=data.get("images", []),
-            in_stock=data.get("in_stock", True),
-            is_new=data.get("is_new", False),
-            on_sale=data.get("on_sale", False),
-            rating=data.get("rating", 0.0),
-            reviews=data.get("reviews", 0),
-        )
-        return JsonResponse({"success": True, "product_id": product.id})
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        try:
+            with transaction.atomic():
+                category = Category.objects.get(id=data["category_id"])
+                product = Product.objects.create(
+                    id=data["id"],
+                    name=data["name"],
+                    description=data["description"],
+                    price=data["price"],
+                    sale_price=data.get("sale_price"),
+                    currency=data.get("currency", "KES"),
+                    category=category,
+                    sizes=data.get("sizes", []),
+                    colors=data.get("colors", []),
+                    images=data.get("images", []),
+                    in_stock=data.get("in_stock", True),
+                    is_new=data.get("is_new", False),
+                    on_sale=data.get("on_sale", False),
+                    rating=data.get("rating", 0.0),
+                    reviews=data.get("reviews", 0),
+                )
+            return JsonResponse({"success": True, "product_id": product.id})
+        except Category.DoesNotExist:
+            return JsonResponse({"error": "Category not found"}, status=404)
+        except KeyError as e:
+            return JsonResponse(
+                {"error": f"Missing required field: {str(e)}"}, status=400
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"Failed to create product: {str(e)}"}, status=500
+            )
 
 
 @staff_member_required
@@ -559,24 +575,35 @@ def api_admin_product_detail(request, product_id):
         elif request.method == "PUT":
             import json
 
-            data = json.loads(request.body)
-            product.name = data.get("name", product.name)
-            product.description = data.get("description", product.description)
-            product.price = data.get("price", product.price)
-            product.sale_price = data.get("sale_price", product.sale_price)
-            product.currency = data.get("currency", product.currency)
-            product.in_stock = data.get("in_stock", product.in_stock)
-            product.is_new = data.get("is_new", product.is_new)
-            product.on_sale = data.get("on_sale", product.on_sale)
-            product.rating = data.get("rating", product.rating)
-            product.reviews = data.get("reviews", product.reviews)
-            product.sizes = data.get("sizes", product.sizes)
-            product.colors = data.get("colors", product.colors)
-            product.images = data.get("images", product.images)
-            if "category_id" in data:
-                product.category = Category.objects.get(id=data["category_id"])
-            product.save()
-            return JsonResponse({"success": True})
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+            try:
+                product.name = data.get("name", product.name)
+                product.description = data.get("description", product.description)
+                product.price = data.get("price", product.price)
+                product.sale_price = data.get("sale_price", product.sale_price)
+                product.currency = data.get("currency", product.currency)
+                product.in_stock = data.get("in_stock", product.in_stock)
+                product.is_new = data.get("is_new", product.is_new)
+                product.on_sale = data.get("on_sale", product.on_sale)
+                product.rating = data.get("rating", product.rating)
+                product.reviews = data.get("reviews", product.reviews)
+                product.sizes = data.get("sizes", product.sizes)
+                product.colors = data.get("colors", product.colors)
+                product.images = data.get("images", product.images)
+                if "category_id" in data:
+                    product.category = Category.objects.get(id=data["category_id"])
+                product.save()
+                return JsonResponse({"success": True})
+            except Category.DoesNotExist:
+                return JsonResponse({"error": "Category not found"}, status=404)
+            except Exception as e:
+                return JsonResponse(
+                    {"error": f"Failed to update product: {str(e)}"}, status=500
+                )
 
         elif request.method == "DELETE":
             product.delete()
