@@ -108,10 +108,20 @@ def api_login(request):
 def api_register(request):
     import json
 
+    from django.contrib.auth.password_validation import validate_password
+    from django.core.exceptions import ValidationError
+
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    # Validate password strength
+    password = data.get("password", "")
+    try:
+        validate_password(password)
+    except ValidationError as e:
+        return JsonResponse({"errors": {"password": list(e.messages)}}, status=400)
 
     form = RegistrationForm(data)
 
