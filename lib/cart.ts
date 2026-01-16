@@ -34,7 +34,7 @@ export async function getCartFromServer(): Promise<CartItem[]> {
  */
 export async function addToCart(item: CartItem): Promise<boolean> {
   try {
-    const response = await apiClient.post("/api/cart/", {
+    const response = await apiClient.post("/api/cart/add/", {
       product_id: item.product.id,
       quantity: item.quantity,
       selected_size: item.selectedSize,

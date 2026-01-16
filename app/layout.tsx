@@ -95,16 +95,10 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              if ('serviceWorker' in navigator) {
+              if ('serviceWorker' in navigator && window.location.protocol === 'http:') {
                 window.addEventListener('load', () => {
                   navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                      console.log('SW registered:', registration);
-                    })
-                    .catch(error => {
-                      console.log('SW registration failed:', error);
-                      // Silently fail for HTTPS issues
-                    });
+                    .catch(() => {});
                 });
               }
             `,
