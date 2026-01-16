@@ -334,3 +334,9 @@ def admin_settings(request):
 def admin_notifications(request):
     """Admin notifications page"""
     return render(request, "admin/notifications.html")
+
+
+@staff_member_required
+def admin_profile(request):
+    """Admin profile page"""
+    return render(request, "admin/profile.html")

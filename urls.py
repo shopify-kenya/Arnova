@@ -20,6 +20,7 @@ from shop.error_handlers import handler400, handler403, handler404, handler500
 # Admin URLs - separate namespace for security
 admin_patterns = [
     path("", admin_views.admin_dashboard, name="admin_dashboard"),
+    path("profile/", admin_views.admin_profile, name="admin_profile"),
     path("products/", admin_views.admin_products, name="admin_products"),
     path(
         "products/create/",

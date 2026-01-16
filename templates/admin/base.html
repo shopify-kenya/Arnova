@@ -145,9 +145,9 @@
             <!-- User Info -->
             <div class="mb-6 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <a href="{% url 'admin_profile' %}" class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/30 transition-colors">
                         <span class="text-sm font-semibold text-primary">{{ user.username|slice:":2"|upper }}</span>
-                    </div>
+                    </a>
                     <div class="flex-1 min-w-0">
                         <p class="font-medium text-sm truncate">{{ user.username }}</p>
                         <p class="text-xs text-muted-foreground truncate">{{ user.email }}</p>
