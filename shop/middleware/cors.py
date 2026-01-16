@@ -13,7 +13,13 @@ class CorsMiddleware(MiddlewareMixin):
         return None
 
     def process_response(self, request, response):
-        return self.add_cors_headers(request, response)
+        response = self.add_cors_headers(request, response)
+        # Ensure CSRF cookie is set for all responses
+        if not request.COOKIES.get(settings.CSRF_COOKIE_NAME):
+            from django.middleware.csrf import get_token
+
+            get_token(request)
+        return response
 
     def add_cors_headers(self, request, response):
         origin = request.META.get("HTTP_ORIGIN")
