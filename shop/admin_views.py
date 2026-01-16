@@ -208,32 +208,41 @@ def admin_users(request):
 @staff_member_required
 def admin_analytics(request):
     """Admin analytics page"""
-    # Sales trends (last 6 months)
-    import random
     from datetime import datetime, timedelta
 
-    sales_trends = []
-    for i in range(6):
-        date = datetime.now() - timedelta(days=30 * i)
-        sales_trends.append(
-            {
-                "month": date.strftime("%b"),
-                "sales": random.randint(15000, 35000),
-                "orders": random.randint(100, 300),
-            }
-        )
+    from django.db.models import Sum
+    from django.db.models.functions import TruncMonth
 
-    # Category stats
+    # Sales trends (last 6 months) - real data
+    six_months_ago = datetime.now() - timedelta(days=180)
+    sales_by_month = (
+        Order.objects.filter(created_at__gte=six_months_ago)
+        .annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(sales=Sum("total_amount"), orders=Count("id"))
+        .order_by("-month")
+    )
+
+    sales_trends = [
+        {
+            "month": item["month"].strftime("%b"),
+            "sales": float(item["sales"] or 0),
+            "orders": item["orders"],
+        }
+        for item in sales_by_month
+    ]
+
+    # Category stats - real data
     category_stats = []
     for category in Category.objects.all():
-        saved_count = category.product_set.count()
+        product_count = category.product_set.count()
         order_count = sum(p.orderitem_set.count() for p in category.product_set.all())
         category_stats.append(
             {
                 "name": category.name,
-                "saved_items": saved_count,
+                "saved_items": product_count,
                 "orders": order_count,
-                "popularity_score": saved_count + (order_count * 2),
+                "popularity_score": min(product_count + (order_count * 2), 100),
             }
         )
 

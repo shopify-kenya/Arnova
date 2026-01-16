@@ -5,7 +5,14 @@ from django.urls import include, path, re_path
 from django.views.static import serve
 
 import views
-from shop import admin_auth_views, admin_views, api_views, payment_views, static_views
+from shop import (
+    admin_auth_views,
+    admin_views,
+    api_views,
+    notification_views,
+    payment_views,
+    static_views,
+)
 from shop.admin import admin_site
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 from shop.error_handlers import handler400, handler403, handler404, handler500
@@ -91,6 +98,20 @@ api_patterns = [
         name="api_placeholder_image",
     ),
     path("exchange-rates/", api_views.api_exchange_rates, name="api_exchange_rates"),
+    # Notifications
+    path(
+        "notifications/", notification_views.api_notifications, name="api_notifications"
+    ),
+    path(
+        "notifications/<int:notification_id>/read/",
+        notification_views.api_notification_mark_read,
+        name="api_notification_mark_read",
+    ),
+    path(
+        "notifications/mark-all-read/",
+        notification_views.api_notifications_mark_all_read,
+        name="api_notifications_mark_all_read",
+    ),
 ]
 
 # Admin API URLs - staff only

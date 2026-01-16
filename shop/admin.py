@@ -7,6 +7,7 @@ from .models import (
     Cart,
     CartItem,
     Category,
+    Notification,
     Order,
     OrderItem,
     Product,
@@ -130,6 +131,24 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ["title", "user", "notification_type", "is_read", "created_at"]
+    list_filter = ["notification_type", "is_read", "created_at"]
+    search_fields = ["title", "message", "user__username"]
+    readonly_fields = ["created_at"]
+    list_editable = ["is_read"]
+
+    fieldsets = (
+        (
+            "Notification Details",
+            {"fields": ("user", "title", "message", "notification_type", "link")},
+        ),
+        ("Status", {"fields": ("is_read",)}),
+        ("Timestamps", {"fields": ("created_at",), "classes": ("collapse",)}),
+    )
+
+
 # Custom admin site instance
 admin_site = ArnovaAdminSite(name="admin")
 
@@ -140,3 +159,4 @@ admin_site.register(UserProfile, UserProfileAdmin)
 admin_site.register(Cart, CartAdmin)
 admin_site.register(SavedItem, SavedItemAdmin)
 admin_site.register(Order, OrderAdmin)
+admin_site.register(Notification, NotificationAdmin)
