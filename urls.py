@@ -5,7 +5,7 @@ from django.urls import include, path, re_path
 from django.views.static import serve
 
 import views
-from shop import admin_views, api_views, payment_views, static_views
+from shop import admin_auth_views, admin_views, api_views, payment_views, static_views
 from shop.admin import admin_site
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 from shop.error_handlers import handler400, handler403, handler404, handler500
@@ -113,6 +113,9 @@ admin_api_patterns = [
 ]
 
 urlpatterns = [
+    # Admin login/logout
+    path("admin/login/", admin_auth_views.admin_login, name="admin_login"),
+    path("admin/logout/", admin_auth_views.admin_logout, name="admin_logout"),
     # Admin dashboard - staff only (secured)
     path("admin/", include(admin_patterns)),
     # Django admin site

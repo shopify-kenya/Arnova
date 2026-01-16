@@ -1,4 +1,5 @@
-from django.http import HttpResponseForbidden, JsonResponse
+from django.http import JsonResponse
+from django.shortcuts import redirect
 
 
 class AdminSecurityMiddleware:
@@ -13,33 +14,23 @@ class AdminSecurityMiddleware:
             response = self.get_response(request)
             return response
 
-        # Check if accessing admin endpoints (but allow login attempts)
-        if request.path.startswith("/admin/") or request.path.startswith("/api/admin/"):
-            # Allow POST to login endpoint
-            if request.path == "/api/auth/login/" and request.method == "POST":
-                response = self.get_response(request)
-                return response
+        # Allow access to admin login/logout pages
+        if request.path in ["/admin/login/", "/admin/logout/"]:
+            response = self.get_response(request)
+            return response
 
+        # Check if accessing admin endpoints
+        if request.path.startswith("/admin/") or request.path.startswith("/api/admin/"):
             # Require staff authentication for admin endpoints
             if not (request.user.is_authenticated and request.user.is_staff):
                 # Return JSON for API requests
                 if request.path.startswith("/api/"):
                     return JsonResponse(
-                        {
-                            "error": "Access denied. Staff privileges required.",
-                            "redirect": "/login?redirect=/admin",
-                        },
+                        {"error": "Access denied. Staff privileges required."},
                         status=403,
                     )
-                # For web requests, let Next.js handle the redirect
-                # Return 403 and let frontend redirect to login
-                return JsonResponse(
-                    {
-                        "error": "Authentication required",
-                        "redirect": "/login?redirect=/admin",
-                    },
-                    status=403,
-                )
+                # Redirect to admin login for web requests
+                return redirect(f"/admin/login/?next={request.path}")
 
         response = self.get_response(request)
         return response

@@ -255,7 +255,7 @@ REST_FRAMEWORK = {
 }
 
 # Login URLs
-LOGIN_URL = "/admin/"
+LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/admin/"
 
 # Admin IP Whitelist (production only)
