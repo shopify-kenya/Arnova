@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Generate PWA icons and assets"""
-import os
+"""Generate PWA icons and assets""
 from pathlib import Path
 
 try:
@@ -21,7 +20,7 @@ def create_icon(size, output_path):
         font = ImageFont.truetype(
             "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size
         )
-    except:
+    except OSError:
         font = ImageFont.load_default()
 
     text = "A"

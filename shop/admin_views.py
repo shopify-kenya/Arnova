@@ -304,22 +304,27 @@ def admin_user_detail(request, user_id):
 def admin_settings(request):
     """Admin settings page"""
     if request.method == "POST":
-        # Handle settings update
-        site_name = request.POST.get("site_name", "Arnova")
-        site_description = request.POST.get(
+        request.session["site_name"] = request.POST.get("site_name", "Arnova")
+        request.session["site_description"] = request.POST.get(
             "site_description", "Premium Fashion E-commerce"
         )
-        contact_email = request.POST.get("contact_email", "admin@arnova.com")
-        default_currency = request.POST.get("default_currency", "KES")
+        request.session["contact_email"] = request.POST.get(
+            "contact_email", "admin@arnova.com"
+        )
+        request.session["default_currency"] = request.POST.get(
+            "default_currency", "KES"
+        )
 
         messages.success(request, "Settings updated successfully.")
         return redirect("admin_settings")
 
     context = {
-        "site_name": "Arnova",
-        "site_description": "Premium Fashion E-commerce",
-        "contact_email": "admin@arnova.com",
-        "default_currency": "KES",
+        "site_name": request.session.get("site_name", "Arnova"),
+        "site_description": request.session.get(
+            "site_description", "Premium Fashion E-commerce"
+        ),
+        "contact_email": request.session.get("contact_email", "admin@arnova.com"),
+        "default_currency": request.session.get("default_currency", "KES"),
         "debug": settings.DEBUG,
     }
     return render(request, "admin/settings.html", context)
