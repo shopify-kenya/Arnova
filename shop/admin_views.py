@@ -111,7 +111,6 @@ def admin_product_create(request):
                 images = ["/api/placeholder/300/400"]
 
         product = Product.objects.create(
-            id=data.get("id"),
             name=data.get("name"),
             description=data.get("description"),
             price=data.get("price"),

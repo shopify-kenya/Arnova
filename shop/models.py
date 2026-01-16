@@ -15,7 +15,6 @@ class Category(models.Model):
 
 
 class Product(models.Model):
-    id = models.CharField(max_length=20, primary_key=True)
     name = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)

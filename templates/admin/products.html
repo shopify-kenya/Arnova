@@ -104,15 +104,9 @@
         <form id="addProductForm" method="post" action="{% url 'admin_product_create' %}">
             {% csrf_token %}
             <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Product ID *</label>
-                        <input type="text" name="id" required class="form-input w-full px-3 py-2 rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Name *</label>
-                        <input type="text" name="name" required class="form-input w-full px-3 py-2 rounded-lg">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Name *</label>
+                    <input type="text" name="name" required class="form-input w-full px-3 py-2 rounded-lg">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1">Description *</label>
@@ -215,7 +209,6 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
     const images = imageText ? imageText.split('\n').filter(url => url.trim()) : [];
 
     const data = {
-        id: formData.get('id'),
         name: formData.get('name'),
         description: formData.get('description'),
         price: parseFloat(formData.get('price')),
