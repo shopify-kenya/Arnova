@@ -68,3 +68,5 @@ DEPLOYMENT_FIXES.md
 
 start_server.py
 test_api_endpoints.py
+ADMIN_STYLING_MIGRATION.md
+Documentations.md

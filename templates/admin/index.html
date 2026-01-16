@@ -4,20 +4,20 @@
 {% block title %}Dashboard | Arnova Admin{% endblock %}
 
 {% block content %}
-<div class="dashboard space-y-6">
+<div class="space-y-6">
     <!-- Header -->
-    <div class="glass-card p-6">
-        <h2 class="text-2xl font-bold text-white mb-2">Dashboard</h2>
-        <p class="text-gray-200">Welcome back! Here's what's happening with your store.</p>
+    <div class="glass-strong rounded-xl p-6">
+        <h2 class="text-2xl font-bold mb-2">Dashboard</h2>
+        <p class="text-white/70">Welcome back! Here's what's happening with your store.</p>
     </div>
 
-    <!-- Quick Stats -->
+    <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="glass-card p-6">
+        <div class="glass rounded-xl p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-white/70 text-sm">Total Orders</p>
-                    <p class="text-2xl font-bold text-white">0</p>
+                    <p class="text-2xl font-bold">0</p>
                 </div>
                 <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,11 +27,11 @@
             </div>
         </div>
 
-        <div class="glass-card p-6">
+        <div class="glass rounded-xl p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-white/70 text-sm">Total Revenue</p>
-                    <p class="text-2xl font-bold text-white">$0.00</p>
+                    <p class="text-2xl font-bold">$0.00</p>
                 </div>
                 <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,11 +41,11 @@
             </div>
         </div>
 
-        <div class="glass-card p-6">
+        <div class="glass rounded-xl p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-white/70 text-sm">Total Users</p>
-                    <p class="text-2xl font-bold text-white">0</p>
+                    <p class="text-2xl font-bold">3</p>
                 </div>
                 <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,11 +55,11 @@
             </div>
         </div>
 
-        <div class="glass-card p-6">
+        <div class="glass rounded-xl p-6">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-white/70 text-sm">Total Products</p>
-                    <p class="text-2xl font-bold text-white">0</p>
+                    <p class="text-2xl font-bold">20</p>
                 </div>
                 <div class="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,55 +70,42 @@
         </div>
     </div>
 
-    <!-- Main Content -->
+    <!-- Recent Orders & Popular Products -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- App List -->
-        <div class="glass-card p-6">
-            <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-            {% if app_list %}
-                {% for app in app_list %}
-                    <div class="mb-6">
-                        <h4 class="text-md font-medium text-white mb-3 flex items-center">
-                            <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center mr-2">
-                                <span class="text-white font-bold text-xs">{{ app.name|first|upper }}</span>
-                            </div>
-                            {{ app.name|capfirst|escape }}
-                        </h4>
-                        <div class="space-y-2">
-                            {% for model in app.models %}
-                                <div class="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-all">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <p class="font-medium text-white text-sm">{{ model.name }}</p>
-                                            {% if model.admin_url %}
-                                                <div class="flex space-x-3 mt-1">
-                                                    {% if model.add_url %}
-                                                        <a href="{{ model.add_url }}" class="text-xs text-blue-400 hover:text-blue-300">
-                                                            + Add
-                                                        </a>
-                                                    {% endif %}
-                                                    <a href="{{ model.admin_url }}" class="text-xs text-gray-300 hover:text-white">
-                                                        View all
-                                                    </a>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-gray-300 text-center py-4">{% trans "You don't have permission to view or edit anything." %}</p>
-            {% endif %}
+        <!-- Recent Orders -->
+        <div class="glass-strong rounded-xl p-6">
+            <h3 class="text-lg font-semibold mb-4">Recent Orders</h3>
+            <div class="space-y-3">
+                <p class="text-white/70 text-center py-4">No recent orders</p>
+            </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="glass-card p-6">
-            <h3 class="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+        <!-- Popular Products -->
+        <div class="glass-strong rounded-xl p-6">
+            <h3 class="text-lg font-semibold mb-4">Popular Products</h3>
             <div class="space-y-3">
-                <p class="text-white/70 text-center py-4">No recent activity</p>
+                {% if app_list %}
+                    {% for app in app_list %}
+                        {% for model in app.models %}
+                            <div class="flex items-center justify-between p-3 glass rounded-lg">
+                                <div>
+                                    <p class="font-medium">{{ model.name }}</p>
+                                    <p class="text-sm text-white/70">{{ app.name }}</p>
+                                </div>
+                                <div class="text-right">
+                                    {% if model.add_url %}
+                                        <a href="{{ model.add_url }}" class="text-sm text-blue-400 hover:text-blue-300">+ Add</a>
+                                    {% endif %}
+                                    {% if model.admin_url %}
+                                        <a href="{{ model.admin_url }}" class="text-sm text-gray-300 hover:text-white ml-3">View</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-white/70 text-center py-4">No data available</p>
+                {% endif %}
             </div>
         </div>
     </div>
