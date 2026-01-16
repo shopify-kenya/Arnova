@@ -712,24 +712,33 @@ def api_admin_user_detail(request, user_id):
         elif request.method == "PUT":
             import json
 
-            data = json.loads(request.body)
-            user.username = data.get("username", user.username)
-            user.email = data.get("email", user.email)
-            user.first_name = data.get("first_name", user.first_name)
-            user.last_name = data.get("last_name", user.last_name)
-            user.is_staff = data.get("is_staff", user.is_staff)
-            user.is_active = data.get("is_active", user.is_active)
-            user.save()
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-            profile.avatar = data.get("avatar", profile.avatar)
-            profile.phone = data.get("phone", profile.phone)
-            profile.address = data.get("address", profile.address)
-            profile.city = data.get("city", profile.city)
-            profile.country = data.get("country", profile.country)
-            profile.postal_code = data.get("postal_code", profile.postal_code)
-            profile.save()
+            try:
+                user.username = data.get("username", user.username)
+                user.email = data.get("email", user.email)
+                user.first_name = data.get("first_name", user.first_name)
+                user.last_name = data.get("last_name", user.last_name)
+                user.is_staff = data.get("is_staff", user.is_staff)
+                user.is_active = data.get("is_active", user.is_active)
+                user.save()
 
-            return JsonResponse({"success": True})
+                profile.avatar = data.get("avatar", profile.avatar)
+                profile.phone = data.get("phone", profile.phone)
+                profile.address = data.get("address", profile.address)
+                profile.city = data.get("city", profile.city)
+                profile.country = data.get("country", profile.country)
+                profile.postal_code = data.get("postal_code", profile.postal_code)
+                profile.save()
+
+                return JsonResponse({"success": True})
+            except Exception as e:
+                return JsonResponse(
+                    {"error": f"Failed to update user: {str(e)}"}, status=500
+                )
 
         elif request.method == "DELETE":
             user.delete()
