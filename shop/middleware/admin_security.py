@@ -28,10 +28,10 @@ class AdminSecurityMiddleware:
                         {"error": "Access denied. Staff privileges required."},
                         status=403,
                     )
-                # Redirect to login for web requests
+                # Redirect to frontend login page for web requests
                 from django.shortcuts import redirect
 
-                return redirect("/api/auth/login/?next=" + request.path)
+                return redirect("/login?redirect=/admin")
 
         response = self.get_response(request)
         return response
