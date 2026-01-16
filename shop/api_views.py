@@ -147,12 +147,11 @@ def api_products(request):
             price = float(p.price)
             sale_price = float(p.sale_price) if p.sale_price else None
 
-            if target_currency != p.currency:
-                rate = get_exchange_rate(p.currency, target_currency)
-                price = price * rate
-                if sale_price:
-                    sale_price = sale_price * rate
-
+            # if target_currency != p.currency:
+            #     rate = get_exchange_rate(p.currency, target_currency)
+            #     price = price * rate
+            #     if sale_price:
+            #         sale_price = sale_price * rate
             data.append(
                 {
                     "id": p.id,
