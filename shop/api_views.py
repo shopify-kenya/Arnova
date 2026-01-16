@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 
 from .forms import ProfileForm, RegistrationForm
 from .models import (
@@ -64,12 +65,21 @@ def api_csrf_token(request):
     return JsonResponse({"csrfToken": get_token(request), "success": True})
 
 
+@ratelimit(key="ip", rate="5/m", method="POST")
 @require_http_methods(["POST"])
 def api_login(request):
     import json
     import logging
 
     logger = logging.getLogger("shop")
+
+    # Check if rate limited
+    if getattr(request, "limited", False):
+        logger.warning(f"Rate limit exceeded for IP: {request.META.get('REMOTE_ADDR')}")
+        return JsonResponse(
+            {"error": "Too many login attempts. Please try again later."},
+            status=429,
+        )
 
     try:
         data = json.loads(request.body)
@@ -110,6 +120,7 @@ def api_login(request):
     return JsonResponse({"error": "Invalid credentials"}, status=401)
 
 
+@ratelimit(key="ip", rate="3/m", method="POST")
 @require_http_methods(["POST"])
 def api_register(request):
     import json
@@ -162,8 +173,12 @@ def api_logout(request):
     return JsonResponse({"success": True})
 
 
+@ratelimit(key="user_or_ip", rate="100/h", method="GET")
 @require_http_methods(["GET"])
 def api_products(request):
+    if getattr(request, "limited", False):
+        return JsonResponse({"error": "Rate limit exceeded"}, status=429)
+
     target_currency = request.GET.get("currency", "USD")
     products = Product.objects.all()
     data = []

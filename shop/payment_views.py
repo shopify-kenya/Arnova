@@ -8,6 +8,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
+from django_ratelimit.decorators import ratelimit
 
 from .models import MpesaPayment, Payment
 
@@ -56,9 +57,16 @@ def generate_mpesa_password():
     return password, timestamp
 
 
+@ratelimit(key="user_or_ip", rate="10/h", method="POST")
 @require_http_methods(["POST"])
 def process_payment(request):
     """Process payment for orders"""
+    if getattr(request, "limited", False):
+        return JsonResponse(
+            {"success": False, "error": "Too many payment attempts"},
+            status=429,
+        )
+
     try:
         data = json.loads(request.body)
         payment_method = data.get("payment_method")
