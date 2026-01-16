@@ -136,9 +136,7 @@ function CartPageContent() {
                                 className="h-8 w-8 bg-transparent"
                                 onClick={() =>
                                   updateQuantity(
-                                    item.product.id,
-                                    item.selectedSize,
-                                    item.selectedColor,
+                                    item.id,
                                     Math.max(1, item.quantity - 1)
                                   )
                                 }
@@ -153,12 +151,7 @@ function CartPageContent() {
                                 variant="outline"
                                 className="h-8 w-8 bg-transparent"
                                 onClick={() =>
-                                  updateQuantity(
-                                    item.product.id,
-                                    item.selectedSize,
-                                    item.selectedColor,
-                                    item.quantity + 1
-                                  )
+                                  updateQuantity(item.id, item.quantity + 1)
                                 }
                               >
                                 <Plus className="h-4 w-4" />
@@ -174,11 +167,7 @@ function CartPageContent() {
                           variant="ghost"
                           className="text-destructive"
                           onClick={() => {
-                            removeItem(
-                              item.product.id,
-                              item.selectedSize,
-                              item.selectedColor
-                            )
+                            removeItem(item.id)
                             toast.success("Removed from cart")
                           }}
                         >
