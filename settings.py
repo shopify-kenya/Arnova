@@ -167,6 +167,9 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = "DENY"
+else:
+    # Development: disable HTTPS redirects
+    SECURE_SSL_REDIRECT = False
 
 # Cache settings for static files
 if not DEBUG:

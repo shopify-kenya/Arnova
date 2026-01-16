@@ -6,7 +6,7 @@ from django.urls import include, path, re_path
 from django.views.static import serve
 
 import views
-from shop import admin_views, api_views, payment_views
+from shop import admin_views, api_views, payment_views, static_views
 from shop.admin import admin_site
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 
@@ -132,23 +132,10 @@ urlpatterns = [
         serve,
         {"document_root": os.path.join(settings.BASE_DIR, "build", "_next")},
     ),
+    # Service Worker and Manifest with proper MIME types
+    path("service-worker.js", static_views.serve_service_worker, name="service_worker"),
+    path("manifest.json", static_views.serve_manifest, name="manifest"),
     # Serve public assets
-    path(
-        "manifest.json",
-        serve,
-        {
-            "document_root": os.path.join(settings.BASE_DIR, "public"),
-            "path": "manifest.json",
-        },
-    ),
-    path(
-        "service-worker.js",
-        serve,
-        {
-            "document_root": os.path.join(settings.BASE_DIR, "public"),
-            "path": "service-worker.js",
-        },
-    ),
     path(
         "robots.txt",
         serve,
