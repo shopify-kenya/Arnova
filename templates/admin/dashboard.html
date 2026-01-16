@@ -3,114 +3,149 @@
 {% block title %}Dashboard - Arnova Admin{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-8">
     <!-- Header -->
-    <div class="glass-strong rounded-xl p-6">
-        <h2 class="text-2xl font-bold mb-2">Dashboard</h2>
-        <p class="text-white/70">Welcome back! Here's what's happening with your store.</p>
+    <div>
+        <h1 class="text-5xl font-bold text-foreground mb-2">Admin Dashboard</h1>
+        <p class="text-muted-foreground">Manage your e-commerce platform</p>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="glass rounded-xl p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-white/70 text-sm">Total Orders</p>
-                    <p class="text-2xl font-bold">{{ total_orders }}</p>
-                </div>
-                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                    </svg>
-                </div>
+        <div class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <svg class="h-8 w-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+                <span class="text-sm font-medium text-green-500">+12.5%</span>
             </div>
+            <h3 class="text-2xl font-bold text-foreground mb-1">${{ total_revenue|floatformat:2|default:"0.00" }}</h3>
+            <p class="text-sm text-muted-foreground">Total Revenue</p>
         </div>
 
-        <div class="glass rounded-xl p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-white/70 text-sm">Total Revenue</p>
-                    <p class="text-2xl font-bold">${{ total_revenue|floatformat:2 }}</p>
-                </div>
-                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
-                </div>
+        <div class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <svg class="h-8 w-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <span class="text-sm font-medium text-blue-500">+8.2%</span>
             </div>
+            <h3 class="text-2xl font-bold text-foreground mb-1">{{ total_orders|default:"0" }}</h3>
+            <p class="text-sm text-muted-foreground">Total Orders</p>
         </div>
 
-        <div class="glass rounded-xl p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-white/70 text-sm">Total Users</p>
-                    <p class="text-2xl font-bold">{{ total_users }}</p>
-                </div>
-                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                    </svg>
-                </div>
+        <div class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <svg class="h-8 w-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+                <span class="text-sm font-medium text-purple-500">+3.1%</span>
             </div>
+            <h3 class="text-2xl font-bold text-foreground mb-1">{{ total_products|default:"0" }}</h3>
+            <p class="text-sm text-muted-foreground">Total Products</p>
         </div>
 
-        <div class="glass rounded-xl p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-white/70 text-sm">Total Products</p>
-                    <p class="text-2xl font-bold">{{ total_products }}</p>
-                </div>
-                <div class="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                </div>
+        <div class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300">
+            <div class="flex items-center justify-between mb-4">
+                <svg class="h-8 w-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+                <span class="text-sm font-medium text-orange-500">+15.3%</span>
             </div>
+            <h3 class="text-2xl font-bold text-foreground mb-1">{{ total_users|default:"0" }}</h3>
+            <p class="text-sm text-muted-foreground">Total Customers</p>
         </div>
     </div>
 
-    <!-- Recent Orders & Popular Products -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Recent Orders -->
-        <div class="glass-strong rounded-xl p-6">
-            <h3 class="text-lg font-semibold mb-4">Recent Orders</h3>
-            <div class="space-y-3">
-                {% for order in recent_orders %}
-                <div class="flex items-center justify-between p-3 glass rounded-lg">
-                    <div>
-                        <p class="font-medium">{{ order.order_id }}</p>
-                        <p class="text-sm text-white/70">{{ order.user.username }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-medium">${{ order.total_amount|floatformat:2 }}</p>
-                        <p class="text-sm text-white/70">{{ order.created_at|date:"M d" }}</p>
-                    </div>
-                </div>
-                {% empty %}
-                <p class="text-white/70 text-center py-4">No recent orders</p>
-                {% endfor %}
-            </div>
-        </div>
+    <!-- Quick Actions -->
+    <div>
+        <h2 class="text-3xl font-bold text-foreground mb-6">Quick Actions</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <a href="{% url 'admin_products' %}" class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300 group">
+                <svg class="h-10 w-10 text-primary mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+                <h3 class="text-xl font-bold text-foreground mb-2">Manage Products</h3>
+                <p class="text-sm text-muted-foreground">Add, edit, or remove products</p>
+            </a>
 
-        <!-- Popular Products -->
-        <div class="glass-strong rounded-xl p-6">
-            <h3 class="text-lg font-semibold mb-4">Popular Products</h3>
-            <div class="space-y-3">
-                {% for product in popular_products %}
-                <div class="flex items-center justify-between p-3 glass rounded-lg">
-                    <div>
-                        <p class="font-medium">{{ product.name }}</p>
-                        <p class="text-sm text-white/70">{{ product.category.name }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-medium">{{ product.order_count }} orders</p>
-                        <p class="text-sm text-white/70">${{ product.price|floatformat:2 }}</p>
-                    </div>
+            <a href="{% url 'admin_orders' %}" class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300 group">
+                <svg class="h-10 w-10 text-primary mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <h3 class="text-xl font-bold text-foreground mb-2">View Orders</h3>
+                <p class="text-sm text-muted-foreground">Process and manage orders</p>
+            </a>
+
+            <a href="{% url 'admin_users' %}" class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300 group">
+                <svg class="h-10 w-10 text-primary mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+                <h3 class="text-xl font-bold text-foreground mb-2">Manage Users</h3>
+                <p class="text-sm text-muted-foreground">View and manage customers</p>
+            </a>
+
+            <a href="{% url 'admin_analytics' %}" class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300 group">
+                <svg class="h-10 w-10 text-primary mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                <h3 class="text-xl font-bold text-foreground mb-2">Analytics</h3>
+                <p class="text-sm text-muted-foreground">View detailed analytics</p>
+            </a>
+
+            <a href="{% url 'admin_settings' %}" class="glass rounded-2xl p-6 acrylic-card hover:scale-105 transition-transform duration-300 group">
+                <svg class="h-10 w-10 text-primary mb-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <h3 class="text-xl font-bold text-foreground mb-2">Settings</h3>
+                <p class="text-sm text-muted-foreground">Configure platform settings</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="glass-strong rounded-2xl p-6 acrylic-card">
+        <h2 class="text-2xl font-bold text-foreground mb-6">Recent Activity</h2>
+        <div class="space-y-4">
+            {% for order in recent_orders %}
+            <div class="flex items-center justify-between py-3 border-b border-border last:border-0">
+                <div>
+                    <p class="font-medium text-foreground">Order #{{ order.order_id }}</p>
+                    <p class="text-sm text-muted-foreground">{{ order.user.username }} - ${{ order.total_amount|floatformat:2 }}</p>
                 </div>
-                {% empty %}
-                <p class="text-white/70 text-center py-4">No product data</p>
-                {% endfor %}
+                <span class="text-sm text-muted-foreground">{{ order.created_at|timesince }} ago</span>
             </div>
+            {% empty %}
+            <div class="flex items-center justify-between py-3 border-b border-border">
+                <div>
+                    <p class="font-medium text-foreground">New order placed</p>
+                    <p class="text-sm text-muted-foreground">Order #1234 - $129.99</p>
+                </div>
+                <span class="text-sm text-muted-foreground">5 minutes ago</span>
+            </div>
+            <div class="flex items-center justify-between py-3 border-b border-border">
+                <div>
+                    <p class="font-medium text-foreground">Product updated</p>
+                    <p class="text-sm text-muted-foreground">Premium Cotton T-Shirt</p>
+                </div>
+                <span class="text-sm text-muted-foreground">1 hour ago</span>
+            </div>
+            <div class="flex items-center justify-between py-3 border-b border-border">
+                <div>
+                    <p class="font-medium text-foreground">New customer registered</p>
+                    <p class="text-sm text-muted-foreground">john.doe@example.com</p>
+                </div>
+                <span class="text-sm text-muted-foreground">2 hours ago</span>
+            </div>
+            <div class="flex items-center justify-between py-3">
+                <div>
+                    <p class="font-medium text-foreground">Order shipped</p>
+                    <p class="text-sm text-muted-foreground">Order #1230 - $89.99</p>
+                </div>
+                <span class="text-sm text-muted-foreground">3 hours ago</span>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
