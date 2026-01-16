@@ -9,8 +9,9 @@ def api_notifications(request):
     if not request.user.is_authenticated:
         return JsonResponse({"notifications": [], "unread_count": 0})
 
-    notifications = Notification.objects.filter(user=request.user)[:20]
-    unread_count = notifications.filter(is_read=False).count()
+    all_notifications = Notification.objects.filter(user=request.user)
+    unread_count = all_notifications.filter(is_read=False).count()
+    notifications = all_notifications[:20]
 
     return JsonResponse(
         {

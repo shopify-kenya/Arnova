@@ -72,3 +72,4 @@ ADMIN_STYLING_MIGRATION.md
 Documentations.md
 docs/*
 .env.*
+migrate_local_postgres.sh
