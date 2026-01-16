@@ -208,7 +208,9 @@ def api_cart(request):
             product = Product.objects.get(id=data["product_id"])
             quantity = int(data.get("quantity", 1))
             if quantity < 1:
-                return JsonResponse({"error": "Quantity must be at least 1"}, status=400)
+                return JsonResponse(
+                    {"error": "Quantity must be at least 1"}, status=400
+                )
         except (json.JSONDecodeError, Product.DoesNotExist, KeyError, ValueError):
             return JsonResponse({"error": "Invalid request"}, status=400)
 
@@ -241,6 +243,7 @@ def api_cart_item(request, item_id):
 
     if request.method == "PUT":
         import json
+
         try:
             data = json.loads(request.body)
             quantity = int(data.get("quantity"))
@@ -258,7 +261,6 @@ def api_cart_item(request, item_id):
     elif request.method == "DELETE":
         item.delete()
         return JsonResponse({"success": True})
-
 
 
 @login_required
@@ -295,13 +297,10 @@ def api_saved(request):
         except (json.JSONDecodeError, Product.DoesNotExist, KeyError):
             return JsonResponse({"error": "Invalid request"}, status=400)
 
-                            item, created = SavedItem.objects.get_or_create(
-
-                                user=request.user, product=product
-
-                            )
-
-                            return JsonResponse({"success": True, "item_id": item.id})
+        item, created = SavedItem.objects.get_or_create(
+            user=request.user, product=product
+        )
+        return JsonResponse({"success": True, "item_id": item.id})
 
 
 @login_required
@@ -407,7 +406,9 @@ def api_profile(request):
 
             return JsonResponse({"success": True})
         else:
-            return JsonResponse({"errors": json.loads(form.errors.as_json())}, status=400)
+            return JsonResponse(
+                {"errors": json.loads(form.errors.as_json())}, status=400
+            )
 
 
 @login_required
