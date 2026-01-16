@@ -31,7 +31,7 @@ export async function getSavedProductsFromServer(): Promise<SavedItem[]> {
  */
 export async function addToSaved(productId: string): Promise<number | null> {
   try {
-    const response = await apiClient.post("/api/saved/", {
+    const response = await apiClient.post("/api/saved/add/", {
       product_id: productId,
     })
     if (response.ok) {
