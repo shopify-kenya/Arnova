@@ -104,9 +104,14 @@ def api_login(request):
     if user:
         login(request, user)
         logger.info(f"User {user.username} logged in successfully")
+
+        # Determine redirect URL based on user role
+        redirect_url = "/admin/" if user.is_staff else "/"
+
         return JsonResponse(
             {
                 "success": True,
+                "redirect": redirect_url,
                 "user": {
                     "id": user.id,
                     "username": user.username,
