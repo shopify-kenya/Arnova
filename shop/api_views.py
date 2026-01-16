@@ -232,7 +232,7 @@ def api_products(request):
 def api_cart(request):
     """Get user's cart items"""
     if not request.user.is_authenticated:
-        return JsonResponse({"items": []})
+        return JsonResponse({"items": [], "authenticated": False})
 
     cart, _ = Cart.objects.get_or_create(user=request.user)
     items = cart.items.all().select_related("product")
@@ -251,7 +251,7 @@ def api_cart(request):
         }
         for item in items
     ]
-    return JsonResponse({"items": data})
+    return JsonResponse({"items": data, "authenticated": True})
 
 
 @login_required
@@ -344,7 +344,7 @@ def api_cart_item(request, item_id):
 def api_saved(request):
     """Get user's saved items"""
     if not request.user.is_authenticated:
-        return JsonResponse({"items": []})
+        return JsonResponse({"items": [], "authenticated": False})
 
     items = SavedItem.objects.filter(user=request.user).select_related("product")
     data = [
@@ -363,7 +363,7 @@ def api_saved(request):
         }
         for item in items
     ]
-    return JsonResponse({"items": data})
+    return JsonResponse({"items": data, "authenticated": True})
 
 
 @login_required
