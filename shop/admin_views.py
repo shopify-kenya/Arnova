@@ -115,7 +115,7 @@ def admin_product_create(request):
             description=data.get("description"),
             price=data.get("price"),
             sale_price=data.get("sale_price"),
-            currency=data.get("currency", "USD"),
+            currency=data.get("currency", "KES"),
             category=category,
             sizes=data.get("sizes", []),
             colors=data.get("colors", []),
