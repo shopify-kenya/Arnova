@@ -144,24 +144,6 @@
                 </div>
             </div>
 
-            <!-- Notifications -->
-            <div class="mb-6">
-                <button onclick="toggleNotifications()" class="flex items-center justify-between w-full h-11 px-4 rounded-lg hover:bg-muted/50 text-foreground transition-colors">
-                    <div class="flex items-center">
-                        <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                        </svg>
-                        <span class="font-medium">Notifications</span>
-                    </div>
-                    <span id="notif-badge" class="hidden px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">0</span>
-                </button>
-                <div id="notifications-panel" class="hidden mt-2 max-h-96 overflow-y-auto space-y-2">
-                    <div id="notifications-list" class="space-y-2">
-                        <p class="text-sm text-muted-foreground px-4 py-2">Loading...</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Navigation -->
             <nav class="flex-1 space-y-1">
                 <a href="{% url 'admin_dashboard' %}" class="flex items-center h-11 px-4 rounded-lg {% if request.resolver_match.url_name == 'admin_dashboard' %}bg-primary text-primary-foreground shadow-sm{% else %}hover:bg-muted/50 text-foreground{% endif %} transition-colors">
@@ -188,6 +170,22 @@
                     </svg>
                     <span class="font-medium">Orders</span>
                 </a>
+                <div class="my-2">
+                    <button onclick="toggleNotifications()" class="flex items-center justify-between w-full h-11 px-4 rounded-lg hover:bg-muted/50 text-foreground transition-colors">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <span class="font-medium">Notifications</span>
+                        </div>
+                        <span id="notif-badge" class="hidden px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">0</span>
+                    </button>
+                    <div id="notifications-panel" class="hidden mt-2 max-h-96 overflow-y-auto space-y-2">
+                        <div id="notifications-list" class="space-y-2">
+                            <p class="text-sm text-muted-foreground px-4 py-2">Loading...</p>
+                        </div>
+                    </div>
+                </div>
                 <a href="{% url 'admin_users' %}" class="flex items-center h-11 px-4 rounded-lg {% if request.resolver_match.url_name == 'admin_users' %}bg-primary text-primary-foreground shadow-sm{% else %}hover:bg-muted/50 text-foreground{% endif %} transition-colors">
                     <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
