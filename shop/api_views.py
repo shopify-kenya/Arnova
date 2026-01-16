@@ -63,12 +63,15 @@ def api_csrf_token(request):
     return JsonResponse({"csrfToken": get_token(request), "success": True})
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def api_login(request):
     import json
 
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
     username = data.get("username") or data.get("email")
     password = data.get("password")
 
