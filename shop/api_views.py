@@ -67,10 +67,14 @@ def api_csrf_token(request):
 @require_http_methods(["POST"])
 def api_login(request):
     import json
+    import logging
+
+    logger = logging.getLogger("shop")
 
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
+        logger.warning("Login attempt with invalid JSON")
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
     username = data.get("username") or data.get("email")
@@ -89,6 +93,7 @@ def api_login(request):
 
     if user:
         login(request, user)
+        logger.info(f"User {user.username} logged in successfully")
         return JsonResponse(
             {
                 "success": True,
@@ -101,6 +106,7 @@ def api_login(request):
                 },
             }
         )
+    logger.warning(f"Failed login attempt for username: {username}")
     return JsonResponse({"error": "Invalid credentials"}, status=401)
 
 

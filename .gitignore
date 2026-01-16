@@ -24,6 +24,7 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
 
 # Distribution / packaging
 dist/
@@ -57,3 +58,7 @@ cookies.txt
 admin_cookies.txt
 fresh_cookies.txt
 test_cookies.txt
+
+API_REVIEW_REPORT.md
+API_FIXES_GUIDE.md
+API_FIXES_PROGRESS.md
