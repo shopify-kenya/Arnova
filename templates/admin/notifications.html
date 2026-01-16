@@ -40,7 +40,9 @@
 
     async function loadNotifications() {
         try {
-            const response = await fetch('/api/notifications/');
+            const response = await fetch('/api/notifications/', {
+                credentials: 'same-origin'
+            });
             if (!response.ok) {
                 throw new Error('Failed to load notifications');
             }
@@ -118,7 +120,8 @@
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
             await fetch(`/api/notifications/${id}/read/`, {
                 method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken || '' }
+                headers: { 'X-CSRFToken': csrfToken || '' },
+                credentials: 'same-origin'
             });
             if (link) {
                 window.location.href = link;
@@ -135,7 +138,8 @@
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
             await fetch('/api/notifications/mark-all-read/', {
                 method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken || '' }
+                headers: { 'X-CSRFToken': csrfToken || '' },
+                credentials: 'same-origin'
             });
             loadNotifications();
         } catch (error) {

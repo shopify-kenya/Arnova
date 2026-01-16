@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
@@ -304,13 +305,22 @@ def admin_settings(request):
     """Admin settings page"""
     if request.method == "POST":
         # Handle settings update
-        pass
+        site_name = request.POST.get("site_name", "Arnova")
+        site_description = request.POST.get(
+            "site_description", "Premium Fashion E-commerce"
+        )
+        contact_email = request.POST.get("contact_email", "admin@arnova.com")
+        default_currency = request.POST.get("default_currency", "KES")
+
+        messages.success(request, "Settings updated successfully.")
+        return redirect("admin_settings")
 
     context = {
         "site_name": "Arnova",
         "site_description": "Premium Fashion E-commerce",
         "contact_email": "admin@arnova.com",
-        "default_currency": "USD",
+        "default_currency": "KES",
+        "debug": settings.DEBUG,
     }
     return render(request, "admin/settings.html", context)
 

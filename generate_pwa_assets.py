@@ -1,260 +1,66 @@
 #!/usr/bin/env python3
-"""
-Generate PWA assets and validate PWA configuration
-"""
-import json
+"""Generate PWA icons and assets"""
+import os
 from pathlib import Path
 
-
-def generate_pwa_icons():
-    """Generate PWA icons if they don't exist"""
-    public_dir = Path("public")
-
-    # Check if icons exist
-    required_icons = [
-        "icon-192x192.jpg",
-        "icon-512x512.jpg",
-        "apple-touch-icon.jpg",
-    ]
-
-    missing_icons = []
-    for icon in required_icons:
-        if not (public_dir / icon).exists():
-            missing_icons.append(icon)
-
-    if missing_icons:
-        icons_str = ", ".join(missing_icons)
-        print(f"Missing PWA icons: {icons_str}")
-        msg = "Please add these icons to the public/ directory " "for full PWA support"
-        print(msg)
-        return False
-
-    print("All PWA icons found")
-    return True
+try:
+    from PIL import Image, ImageDraw, ImageFont
+except ImportError:
+    print("⚠️  PIL not installed. Skipping PWA asset generation.")
+    exit(0)
 
 
-def validate_manifest():
-    """Validate PWA manifest.json"""
-    manifest_path = Path("public/manifest.json")
+def create_icon(size, output_path):
+    """Create a simple icon with the letter A"""
+    img = Image.new("RGB", (size, size), color="#8B7355")
+    draw = ImageDraw.Draw(img)
 
-    if not manifest_path.exists():
-        print("PWA manifest.json not found")
-        return False
-
+    # Draw letter A
+    font_size = int(size * 0.6)
     try:
-        with open(manifest_path, "r") as f:
-            manifest = json.load(f)
+        font = ImageFont.truetype(
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", font_size
+        )
+    except:
+        font = ImageFont.load_default()
 
-        # Check required fields
-        required_fields = [
-            "name",
-            "short_name",
-            "start_url",
-            "display",
-            "icons",
-        ]
-        missing_fields = [field for field in required_fields if field not in manifest]
+    text = "A"
+    bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = bbox[2] - bbox[0]
+    text_height = bbox[3] - bbox[1]
 
-        if missing_fields:
-            fields_str = ", ".join(missing_fields)
-            print(f"Missing required manifest fields: {fields_str}")
-            return False
+    x = (size - text_width) // 2
+    y = (size - text_height) // 2
 
-        # Validate icons
-        if not manifest.get("icons") or len(manifest["icons"]) == 0:
-            print("No icons defined in manifest")
-            return False
+    draw.text((x, y), text, fill="white", font=font)
 
-        print("PWA manifest validated successfully")
-        return True
-
-    except json.JSONDecodeError:
-        print("Invalid JSON in manifest.json")
-        return False
-
-
-def generate_service_worker():
-    """Generate or update service worker"""
-    sw_path = Path("public/service-worker.js")
-
-    if sw_path.exists():
-        print("Service worker already exists")
-        return True
-
-    print("Creating basic service worker...")
-
-    sw_content = """const CACHE_NAME = 'arnova-v1';
-const urlsToCache = [
-  '/',
-  '/manifest.json',
-  '/icon-192x192.jpg',
-  '/icon-512x512.jpg',
-  '/apple-touch-icon.jpg',
-  '/offline/'
-];
-
-// Install event - cache resources
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .catch(err => console.log('Cache failed:', err))
-  );
-});
-
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .catch(() => {
-            // If both cache and network fail, show offline page
-            // for navigation requests
-            if (event.request.mode === 'navigate') {
-              return caches.match('/offline/');
-            }
-          });
-      })
-  );
-});
-
-// Activate event - clean up old caches
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});"""
-
-    with open(sw_path, "w") as f:
-        f.write(sw_content)
-
-    print("Service worker created successfully")
-    return True
-
-
-def generate_robots_txt():
-    """Generate robots.txt if it doesn't exist"""
-    robots_path = Path("public/robots.txt")
-
-    if robots_path.exists():
-        print("robots.txt already exists")
-        return True
-
-    robots_content = """User-agent: *
-Allow: /
-
-Sitemap: https://arnova.com/sitemap.xml"""
-
-    with open(robots_path, "w") as f:
-        f.write(robots_content)
-
-    print("robots.txt created")
-    return True
-
-
-def generate_sitemap_xml():
-    """Generate basic sitemap.xml if it doesn't exist"""
-    sitemap_path = Path("public/sitemap.xml")
-
-    if sitemap_path.exists():
-        print("sitemap.xml already exists")
-        return True
-
-    sitemap_content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://arnova.com/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://arnova.com/new-arrivals/</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arnova.com/clothing/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arnova.com/shoes/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arnova.com/bags/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arnova.com/accessories/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://arnova.com/sale/</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-</urlset>"""
-
-    with open(sitemap_path, "w") as f:
-        f.write(sitemap_content)
-
-    print("sitemap.xml created")
-    return True
+    img.save(output_path, "PNG")
+    print(f"✅ Created {output_path}")
 
 
 def main():
-    """Main function to generate all PWA assets"""
-    print("Generating PWA assets...")
-    print("=" * 40)
+    """Generate all PWA assets"""
+    public_dir = Path(__file__).parent / "public"
+    public_dir.mkdir(exist_ok=True)
 
-    success = True
+    # Icon sizes for PWA
+    sizes = [72, 96, 128, 144, 152, 192, 384, 512]
 
-    # Validate manifest
-    if not validate_manifest():
-        success = False
+    for size in sizes:
+        icon_path = public_dir / f"icon-{size}x{size}.png"
+        if not icon_path.exists():
+            create_icon(size, icon_path)
 
-    # Generate service worker
-    if not generate_service_worker():
-        success = False
+    # Create favicon
+    favicon_path = public_dir / "favicon.ico"
+    if not favicon_path.exists():
+        img = Image.new("RGB", (32, 32), color="#8B7355")
+        draw = ImageDraw.Draw(img)
+        draw.text((8, 4), "A", fill="white")
+        img.save(favicon_path, "ICO")
+        print(f"✅ Created {favicon_path}")
 
-    # Check PWA icons
-    if not generate_pwa_icons():
-        success = False
-
-    # Generate SEO files
-    generate_robots_txt()
-    generate_sitemap_xml()
-
-    print("=" * 40)
-    if success:
-        print("PWA assets generated successfully!")
-        print("Your app is ready for PWA installation")
-    else:
-        print("PWA setup completed with warnings")
-        print("Please address the issues above for full PWA support")
-
-    return success
+    print("🎉 PWA assets generated successfully!")
 
 
 if __name__ == "__main__":

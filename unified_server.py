@@ -56,6 +56,15 @@ def run_unified_server():
     except subprocess.CalledProcessError:
         print("⚠️  Migrations failed, continuing...")
 
+    # Generate PWA assets
+    print("🎨 Generating PWA assets...")
+    try:
+        subprocess.run(
+            [sys.executable, "generate_pwa_assets.py"], check=True, cwd=base_dir
+        )
+    except subprocess.CalledProcessError:
+        print("⚠️  PWA asset generation failed, continuing...")
+
     # Check for SSL certificates and start both HTTP and HTTPS servers
     has_ssl = check_ssl_certificates()
 
