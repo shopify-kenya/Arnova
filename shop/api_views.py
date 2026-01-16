@@ -2,6 +2,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -116,14 +117,22 @@ def api_register(request):
 
     if form.is_valid():
         cleaned_data = form.cleaned_data
-        user = User.objects.create_user(
-            username=cleaned_data["username"],
-            email=cleaned_data["email"],
-            password=cleaned_data["password"],
-        )
-        UserProfile.objects.create(user=user)
-        Cart.objects.create(user=user)
-        return JsonResponse({"success": True, "message": "User created successfully"})
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=cleaned_data["username"],
+                    email=cleaned_data["email"],
+                    password=cleaned_data["password"],
+                )
+                UserProfile.objects.create(user=user)
+                Cart.objects.create(user=user)
+            return JsonResponse(
+                {"success": True, "message": "User created successfully"}
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"Failed to create user: {str(e)}"}, status=500
+            )
     else:
         # The form.errors dictionary contains validation errors.
         # .as_json() provides a serializable format.
@@ -611,26 +620,40 @@ def api_admin_users(request):
     elif request.method == "POST":
         import json
 
-        data = json.loads(request.body)
-        user = User.objects.create_user(
-            username=data["username"],
-            email=data["email"],
-            password=data["password"],
-            first_name=data.get("first_name", ""),
-            last_name=data.get("last_name", ""),
-            is_staff=data.get("is_staff", False),
-        )
-        profile = UserProfile.objects.create(
-            user=user,
-            avatar=data.get("avatar", ""),
-            phone=data.get("phone", ""),
-            address=data.get("address", ""),
-            city=data.get("city", ""),
-            country=data.get("country", ""),
-            postal_code=data.get("postal_code", ""),
-        )
-        Cart.objects.create(user=user)
-        return JsonResponse({"success": True, "user_id": user.id})
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=data["username"],
+                    email=data["email"],
+                    password=data["password"],
+                    first_name=data.get("first_name", ""),
+                    last_name=data.get("last_name", ""),
+                    is_staff=data.get("is_staff", False),
+                )
+                UserProfile.objects.create(
+                    user=user,
+                    avatar=data.get("avatar", ""),
+                    phone=data.get("phone", ""),
+                    address=data.get("address", ""),
+                    city=data.get("city", ""),
+                    country=data.get("country", ""),
+                    postal_code=data.get("postal_code", ""),
+                )
+                Cart.objects.create(user=user)
+            return JsonResponse({"success": True, "user_id": user.id})
+        except KeyError as e:
+            return JsonResponse(
+                {"error": f"Missing required field: {str(e)}"}, status=400
+            )
+        except Exception as e:
+            return JsonResponse(
+                {"error": f"Failed to create user: {str(e)}"}, status=500
+            )
 
 
 @staff_member_required
