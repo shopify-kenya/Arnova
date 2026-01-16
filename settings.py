@@ -173,19 +173,17 @@ if not DEBUG:
 # CSRF Configuration for Unified Frontend-Backend
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
-CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access
+CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=not DEBUG, cast=bool)
 CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_USE_SESSIONS = False
-CSRF_COOKIE_AGE = 86400  # 24 hours
+CSRF_COOKIE_AGE = 86400
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     default="http://127.0.0.1:8000,https://127.0.0.1:8443,http://localhost:8000,https://localhost:8443",
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
-
-# Allow same-origin requests without CSRF for GET requests
-CSRF_COOKIE_DOMAIN = None  # Use default domain
+CSRF_FAILURE_VIEW = "django.views.csrf.csrf_failure"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

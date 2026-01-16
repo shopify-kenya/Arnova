@@ -20,6 +20,7 @@ class ArnovaAdminSite(AdminSite):
     site_title = "Arnova Admin Portal"
     index_title = "Welcome to Arnova Administration"
     site_url = "/"
+    login_template = None
 
     def index(self, request, extra_context=None):
         """Redirect admin index to custom dashboard"""

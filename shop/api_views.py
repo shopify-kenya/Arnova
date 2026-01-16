@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from .forms import ProfileForm, RegistrationForm
@@ -63,6 +63,7 @@ def api_csrf_token(request):
     return JsonResponse({"csrfToken": get_token(request), "success": True})
 
 
+@csrf_exempt
 @require_http_methods(["POST"])
 def api_login(request):
     import json
@@ -181,9 +182,11 @@ def api_products(request):
     return JsonResponse({"products": data})
 
 
-@login_required
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def api_cart(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"items": []})
+
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
     if request.method == "GET":
@@ -268,9 +271,11 @@ def api_cart_item(request, item_id):
         return JsonResponse({"success": True})
 
 
-@login_required
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["GET"])
 def api_saved(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"items": []})
+
     if request.method == "GET":
         items = SavedItem.objects.filter(user=request.user).select_related("product")
         data = [
