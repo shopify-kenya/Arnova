@@ -93,25 +93,42 @@ WSGI_APPLICATION = "wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         default=config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
-        conn_max_age=0,  # Disable persistent connections for pooler
-        conn_health_checks=False,
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
 
+# Validate DATABASE_URL format
+db_url = config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+if db_url.startswith("http://") or db_url.startswith("https://"):
+    # Invalid URL format - use SQLite as fallback
+    import sys
+
+    print(
+        "WARNING: DATABASE_URL has invalid format (http/https). Using SQLite.",
+        file=sys.stderr,
+    )
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
 # Add SSL certificate for Supabase (PostgreSQL only)
-if config("SSL_SUPABASE", default=None) and "postgresql" in DATABASES["default"].get(
-    "ENGINE", ""
-):
-    ssl_cert_path = BASE_DIR / config("SSL_SUPABASE")
-    if ssl_cert_path.exists():
-        if "OPTIONS" not in DATABASES["default"]:
-            DATABASES["default"]["OPTIONS"] = {}
-        DATABASES["default"]["OPTIONS"].update(
-            {
-                "sslmode": "require",
-                "sslrootcert": str(ssl_cert_path),
-            }
-        )
+if config("SSL_SUPABASE", default=None):
+    db_engine = DATABASES["default"].get("ENGINE", "")
+    if "postgresql" in db_engine or "postgres" in db_engine:
+        ssl_cert_path = BASE_DIR / config("SSL_SUPABASE")
+        if ssl_cert_path.exists():
+            if "OPTIONS" not in DATABASES["default"]:
+                DATABASES["default"]["OPTIONS"] = {}
+            DATABASES["default"]["OPTIONS"].update(
+                {
+                    "sslmode": "require",
+                    "sslrootcert": str(ssl_cert_path),
+                }
+            )
 
 
 # Password validation
