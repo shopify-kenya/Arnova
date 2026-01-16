@@ -5,42 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Arnova Admin{% endblock %}</title>
     {% load static %}
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS is provided by Next.js build -->
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        manrope: ['Manrope', 'sans-serif'],
-                    },
-                    colors: {
-                        border: 'hsl(var(--border))',
-                        background: 'hsl(var(--background))',
-                        foreground: 'hsl(var(--foreground))',
-                        primary: {
-                            DEFAULT: 'hsl(var(--primary))',
-                            foreground: 'hsl(var(--primary-foreground))',
-                        },
-                        secondary: {
-                            DEFAULT: 'hsl(var(--secondary))',
-                            foreground: 'hsl(var(--secondary-foreground))',
-                        },
-                        muted: {
-                            DEFAULT: 'hsl(var(--muted))',
-                            foreground: 'hsl(var(--muted-foreground))',
-                        },
-                        accent: {
-                            DEFAULT: 'hsl(var(--accent))',
-                            foreground: 'hsl(var(--accent-foreground))',
-                        },
-                    }
-                }
-            }
-        }
-    </script>
     <style>
+        @import url('/static/css/tailwind.css');
+
         :root {
             --background: 60 9% 98%;
             --foreground: 24 10% 10%;
@@ -171,7 +140,7 @@
                     <span class="font-medium">Orders</span>
                 </a>
                 <div class="my-2">
-                    <button onclick="toggleNotifications()" class="flex items-center justify-between w-full h-11 px-4 rounded-lg hover:bg-muted/50 text-foreground transition-colors">
+                    <a href="{% url 'admin_notifications' %}" class="flex items-center justify-between w-full h-11 px-4 rounded-lg {% if request.resolver_match.url_name == 'admin_notifications' %}bg-primary text-primary-foreground shadow-sm{% else %}hover:bg-muted/50 text-foreground{% endif %} transition-colors">
                         <div class="flex items-center">
                             <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
@@ -179,12 +148,7 @@
                             <span class="font-medium">Notifications</span>
                         </div>
                         <span id="notif-badge" class="hidden px-2 py-0.5 text-xs bg-red-500 text-white rounded-full">0</span>
-                    </button>
-                    <div id="notifications-panel" class="hidden mt-2 max-h-96 overflow-y-auto space-y-2">
-                        <div id="notifications-list" class="space-y-2">
-                            <p class="text-sm text-muted-foreground px-4 py-2">Loading...</p>
-                        </div>
-                    </div>
+                    </a>
                 </div>
                 <a href="{% url 'admin_users' %}" class="flex items-center h-11 px-4 rounded-lg {% if request.resolver_match.url_name == 'admin_users' %}bg-primary text-primary-foreground shadow-sm{% else %}hover:bg-muted/50 text-foreground{% endif %} transition-colors">
                     <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -47,6 +47,7 @@ admin_patterns = [
         admin_views.admin_order_update_status,
         name="admin_order_update_status",
     ),
+    path("notifications/", admin_views.admin_notifications, name="admin_notifications"),
     path("users/", admin_views.admin_users, name="admin_users"),
     path(
         "users/<int:user_id>/", admin_views.admin_user_detail, name="admin_user_detail"

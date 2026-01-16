@@ -309,3 +309,9 @@ def admin_settings(request):
         "default_currency": "USD",
     }
     return render(request, "admin/settings.html", context)
+
+
+@staff_member_required
+def admin_notifications(request):
+    """Admin notifications page"""
+    return render(request, "admin/notifications.html")
