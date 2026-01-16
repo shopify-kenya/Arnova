@@ -1,16 +1,14 @@
-import json
-
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import Notification
 
 
-@login_required
 def api_notifications(request):
     """Get user notifications"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"notifications": [], "unread_count": 0})
+
     notifications = Notification.objects.filter(user=request.user)[:20]
     unread_count = notifications.filter(is_read=False).count()
 
@@ -33,10 +31,14 @@ def api_notifications(request):
     )
 
 
-@login_required
 @require_http_methods(["POST"])
 def api_notification_mark_read(request, notification_id):
     """Mark notification as read"""
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"success": False, "error": "Not authenticated"}, status=401
+        )
+
     try:
         notification = Notification.objects.get(id=notification_id, user=request.user)
         notification.is_read = True
@@ -48,10 +50,14 @@ def api_notification_mark_read(request, notification_id):
         )
 
 
-@login_required
 @require_http_methods(["POST"])
 def api_notifications_mark_all_read(request):
     """Mark all notifications as read"""
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"success": False, "error": "Not authenticated"}, status=401
+        )
+
     Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
     return JsonResponse({"success": True})
 
