@@ -1,0 +1,195 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ title }} - Arnova Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="glass-strong rounded-xl p-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold mb-2">{{ title }}</h2>
+            <p class="text-white/70">{{ subtitle }}</p>
+        </div>
+        <a href="{% url 'admin_products' %}" class="text-white/70 hover:text-white">← Back</a>
+    </div>
+
+    <div class="glass-strong rounded-xl p-6">
+        <form method="post" id="productForm">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Basic Info -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">Product ID</label>
+                    <input type="text" name="id" value="{{ product.id|default:'' }}" required
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Name</label>
+                    <input type="text" name="name" value="{{ product.name|default:'' }}" required
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2">Description</label>
+                    <textarea name="description" rows="3" required
+                              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">{{ product.description|default:'' }}</textarea>
+                </div>
+
+                <!-- Pricing -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">Price</label>
+                    <input type="number" name="price" value="{{ product.price|default:'' }}" step="0.01" required
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Sale Price (optional)</label>
+                    <input type="number" name="sale_price" value="{{ product.sale_price|default:'' }}" step="0.01"
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Currency</label>
+                    <select name="currency" class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                        <option value="USD">USD</option>
+                        <option value="KES">KES</option>
+                        <option value="EUR">EUR</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Category</label>
+                    <select name="category_id" required class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sizes (Checkboxes) -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-3">Sizes</label>
+                    <div class="grid grid-cols-4 md:grid-cols-8 gap-3">
+                        {% for size in available_sizes %}
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" name="sizes" value="{{ size }}" class="size-checkbox">
+                            <span class="text-sm">{{ size }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Colors (Checkboxes) -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-3">Colors</label>
+                    <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+                        {% for color in available_colors %}
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" name="colors" value="{{ color }}" class="color-checkbox">
+                            <span class="text-sm">{{ color }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-2">Image URLs (one per line)</label>
+                    <textarea name="images" rows="3" id="imageUrls" placeholder="Leave empty to auto-fetch from Unsplash"
+                              class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">{{ product.images|join:'\n'|default:'' }}</textarea>
+                    <p class="text-xs text-white/50 mt-1">💡 Leave empty to automatically fetch images based on product name</p>
+                </div>
+
+                <!-- Status Checkboxes -->
+                <div class="flex flex-col space-y-3">
+                    <label class="block text-sm font-medium">Status</label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" name="in_stock" checked class="mr-2">
+                        <span class="text-sm">In Stock</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" name="is_new" class="mr-2">
+                        <span class="text-sm">New Product</span>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" name="on_sale" class="mr-2">
+                        <span class="text-sm">On Sale</span>
+                    </label>
+                </div>
+
+                <!-- Rating -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">Rating (0-5)</label>
+                    <input type="number" name="rating" value="{{ product.rating|default:'4.5' }}" step="0.1" min="0" max="5"
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-8">
+                <a href="{% url 'admin_products' %}" class="px-6 py-2 text-white/70 hover:text-white border border-white/20 rounded-lg">Cancel</a>
+                <button type="submit" class="bg-purple-500 hover:bg-purple-600 px-6 py-2 rounded-lg font-medium">
+                    {{ button_text }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    // Collect selected sizes
+    const sizes = Array.from(document.querySelectorAll('.size-checkbox:checked')).map(cb => cb.value);
+
+    // Collect selected colors
+    const colors = Array.from(document.querySelectorAll('.color-checkbox:checked')).map(cb => cb.value);
+
+    // Collect image URLs
+    const imageText = document.getElementById('imageUrls').value.trim();
+    const images = imageText ? imageText.split('\n').filter(url => url.trim()) : [];
+
+    // Build JSON payload
+    const data = {
+        id: formData.get('id'),
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: parseFloat(formData.get('price')),
+        sale_price: formData.get('sale_price') ? parseFloat(formData.get('sale_price')) : null,
+        currency: formData.get('currency'),
+        category_id: parseInt(formData.get('category_id')),
+        sizes: sizes,
+        colors: colors,
+        images: images,
+        in_stock: formData.get('in_stock') === 'on',
+        is_new: formData.get('is_new') === 'on',
+        on_sale: formData.get('on_sale') === 'on',
+        rating: parseFloat(formData.get('rating'))
+    };
+
+    // Submit via fetch
+    fetch(this.action || window.location.href, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = "{% url 'admin_products' %}";
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+});
+</script>
+{% endblock %}

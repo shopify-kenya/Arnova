@@ -1,12 +1,10 @@
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Count, Sum
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import Category, Order, Product, UserProfile
@@ -67,28 +65,66 @@ def admin_products(request):
 
 
 @staff_member_required
-@require_http_methods(["POST"])
 def admin_product_create(request):
     """Create new product"""
+    if request.method == "GET":
+        categories = Category.objects.all()
+        context = {
+            "title": "Create Product",
+            "subtitle": "Add a new product to the store",
+            "button_text": "Create Product",
+            "categories": categories,
+            "available_sizes": ["XS", "S", "M", "L", "XL", "XXL", "XXXL"],
+            "available_colors": [
+                "Black",
+                "White",
+                "Red",
+                "Blue",
+                "Green",
+                "Yellow",
+                "Pink",
+                "Purple",
+                "Gray",
+                "Brown",
+            ],
+        }
+        return render(request, "admin/product_form.html", context)
+
+    # Handle POST with JSON
+    import json
+
     try:
-        category = get_object_or_404(Category, id=request.POST.get("category_id"))
+        data = json.loads(request.body)
+        category = get_object_or_404(Category, id=data.get("category_id"))
+
+        # Auto-fetch images if not provided
+        images = data.get("images", [])
+        if not images:
+            from fetch_product_images import fetch_multiple_images
+
+            images = fetch_multiple_images(data.get("name"), count=3)
+            if not images:
+                images = ["/api/placeholder/300/400"]
 
         product = Product.objects.create(
-            name=request.POST.get("name"),
-            description=request.POST.get("description"),
-            price=request.POST.get("price"),
-            sale_price=request.POST.get("sale_price") or None,
-            currency=request.POST.get("currency", "USD"),
+            id=data.get("id"),
+            name=data.get("name"),
+            description=data.get("description"),
+            price=data.get("price"),
+            sale_price=data.get("sale_price"),
+            currency=data.get("currency", "USD"),
             category=category,
-            in_stock=request.POST.get("in_stock") == "on",
-            is_new=request.POST.get("is_new") == "on",
-            on_sale=request.POST.get("on_sale") == "on",
+            sizes=data.get("sizes", []),
+            colors=data.get("colors", []),
+            images=images,
+            in_stock=data.get("in_stock", True),
+            is_new=data.get("is_new", False),
+            on_sale=data.get("on_sale", False),
+            rating=data.get("rating", 4.5),
         )
-        messages.success(request, f'Product "{product.name}" created successfully.')
-        return redirect("admin_products")
+        return JsonResponse({"success": True, "product_id": product.id})
     except Exception as e:
-        messages.error(request, f"Error creating product: {str(e)}")
-        return redirect("admin_products")
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
 
 
 @staff_member_required
