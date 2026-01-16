@@ -1,107 +1,108 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block title %}{{ title }} | Arnova Admin{% endblock %}
+{% block title %}Dashboard | Arnova Admin{% endblock %}
 
 {% block content %}
-<div class="dashboard">
-    <!-- Welcome Section -->
-    <div class="glass-card p-8 mb-8">
-        <h1 class="text-4xl font-bold text-white mb-2">Welcome to Arnova Admin</h1>
-        <p class="text-gray-200">Manage your premium fashion e-commerce platform</p>
+<div class="dashboard space-y-6">
+    <!-- Header -->
+    <div class="glass-card p-6">
+        <h2 class="text-2xl font-bold text-white mb-2">Dashboard</h2>
+        <p class="text-gray-200">Welcome back! Here's what's happening with your store.</p>
     </div>
 
     <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="glass-card p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-green-500 bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-white/70 text-sm">Total Orders</p>
+                    <p class="text-2xl font-bold text-white">0</p>
                 </div>
-                <span class="text-sm font-medium text-green-400">+12.5%</span>
-            </div>
-            <h3 class="text-2xl font-bold text-white mb-1">$45,231</h3>
-            <p class="text-sm text-gray-300">Total Revenue</p>
-        </div>
-
-        <div class="glass-card p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-lg flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                     <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-blue-400">+8.2%</span>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-1">1,234</h3>
-            <p class="text-sm text-gray-300">Total Orders</p>
         </div>
 
         <div class="glass-card p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-purple-500 bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-white/70 text-sm">Total Revenue</p>
+                    <p class="text-2xl font-bold text-white">$0.00</p>
+                </div>
+                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-purple-400">+3.1%</span>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-1">156</h3>
-            <p class="text-sm text-gray-300">Total Products</p>
         </div>
 
         <div class="glass-card p-6">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-orange-500 bg-opacity-20 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-white/70 text-sm">Total Users</p>
+                    <p class="text-2xl font-bold text-white">0</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
                     </svg>
                 </div>
-                <span class="text-sm font-medium text-orange-400">+15.3%</span>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-1">892</h3>
-            <p class="text-sm text-gray-300">Total Customers</p>
+        </div>
+
+        <div class="glass-card p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-white/70 text-sm">Total Products</p>
+                    <p class="text-2xl font-bold text-white">0</p>
+                </div>
+                <div class="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- App List -->
         <div class="glass-card p-6">
-            <h2 class="text-2xl font-bold text-white mb-6">Quick Actions</h2>
+            <h3 class="text-lg font-semibold text-white mb-4">Quick Actions</h3>
             {% if app_list %}
                 {% for app in app_list %}
                     <div class="mb-6">
-                        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
-                            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
-                                <span class="text-white font-bold text-sm">{{ app.name|first|upper }}</span>
+                        <h4 class="text-md font-medium text-white mb-3 flex items-center">
+                            <div class="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center mr-2">
+                                <span class="text-white font-bold text-xs">{{ app.name|first|upper }}</span>
                             </div>
                             {{ app.name|capfirst|escape }}
-                        </h3>
-                        <div class="grid grid-cols-1 gap-3">
+                        </h4>
+                        <div class="space-y-2">
                             {% for model in app.models %}
-                                <div class="bg-white bg-opacity-5 rounded-lg p-4 hover:bg-opacity-10 transition-all duration-300">
+                                <div class="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-all">
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <h4 class="font-medium text-white">{{ model.name }}</h4>
+                                            <p class="font-medium text-white text-sm">{{ model.name }}</p>
                                             {% if model.admin_url %}
-                                                <div class="flex space-x-4 mt-2">
+                                                <div class="flex space-x-3 mt-1">
                                                     {% if model.add_url %}
-                                                        <a href="{{ model.add_url }}" class="text-sm text-blue-400 hover:text-blue-300">
-                                                            + Add {{ model.name|lower }}
+                                                        <a href="{{ model.add_url }}" class="text-xs text-blue-400 hover:text-blue-300">
+                                                            + Add
                                                         </a>
                                                     {% endif %}
-                                                    <a href="{{ model.admin_url }}" class="text-sm text-gray-300 hover:text-white">
+                                                    <a href="{{ model.admin_url }}" class="text-xs text-gray-300 hover:text-white">
                                                         View all
                                                     </a>
                                                 </div>
                                             {% endif %}
                                         </div>
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -109,42 +110,15 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <p class="text-gray-300">{% trans "You don't have permission to view or edit anything." %}</p>
+                <p class="text-gray-300 text-center py-4">{% trans "You don't have permission to view or edit anything." %}</p>
             {% endif %}
         </div>
 
         <!-- Recent Activity -->
         <div class="glass-card p-6">
-            <h2 class="text-2xl font-bold text-white mb-6">Recent Activity</h2>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between py-3 border-b border-white border-opacity-10">
-                    <div>
-                        <p class="font-medium text-white">New order placed</p>
-                        <p class="text-sm text-gray-300">Order #1234 - $129.99</p>
-                    </div>
-                    <span class="text-sm text-gray-400">5 min ago</span>
-                </div>
-                <div class="flex items-center justify-between py-3 border-b border-white border-opacity-10">
-                    <div>
-                        <p class="font-medium text-white">Product updated</p>
-                        <p class="text-sm text-gray-300">Premium Cotton T-Shirt</p>
-                    </div>
-                    <span class="text-sm text-gray-400">1 hour ago</span>
-                </div>
-                <div class="flex items-center justify-between py-3 border-b border-white border-opacity-10">
-                    <div>
-                        <p class="font-medium text-white">New customer registered</p>
-                        <p class="text-sm text-gray-300">john.doe@example.com</p>
-                    </div>
-                    <span class="text-sm text-gray-400">2 hours ago</span>
-                </div>
-                <div class="flex items-center justify-between py-3">
-                    <div>
-                        <p class="font-medium text-white">Order shipped</p>
-                        <p class="text-sm text-gray-300">Order #1230 - $89.99</p>
-                    </div>
-                    <span class="text-sm text-gray-400">3 hours ago</span>
-                </div>
+            <h3 class="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+            <div class="space-y-3">
+                <p class="text-white/70 text-center py-4">No recent activity</p>
             </div>
         </div>
     </div>
