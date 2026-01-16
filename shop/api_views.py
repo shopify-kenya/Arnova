@@ -136,52 +136,59 @@ def api_logout(request):
     return JsonResponse({"success": True})
 
 
+import traceback  # Import traceback at the top
+
+# ... (other imports)
+
+
 @require_http_methods(["GET"])
 def api_products(request):
-    target_currency = request.GET.get("currency", "USD")
-    products = Product.objects.all()
-    data = []
+    try:  # Full try-except for the entire function
+        target_currency = request.GET.get("currency", "USD")
+        products = Product.objects.all()
+        data = []
 
-    for p in products:
-        try:  # Add try-except for individual product processing
-            price = float(p.price)
-            sale_price = float(p.sale_price) if p.sale_price else None
+        for p in products:
+            try:
+                price = float(p.price)
+                sale_price = float(p.sale_price) if p.sale_price else None
 
-            # if target_currency != p.currency:
-            #     rate = get_exchange_rate(p.currency, target_currency)
-            #     price = price * rate
-            #     if sale_price:
-            #         sale_price = sale_price * rate
-            data.append(
-                {
-                    "id": p.id,
-                    "name": p.name,
-                    "description": p.description,
-                    "price": round(price, 2),
-                    "sale_price": round(sale_price, 2) if sale_price else None,
-                    "currency": target_currency,
-                    "base_currency": p.currency,
-                    "category": (
-                        p.category.name if p.category else None
-                    ),  # Safely get category name
-                    "sizes": p.sizes if p.sizes is not None else [],
-                    "colors": p.colors if p.colors is not None else [],
-                    "images": (
-                        p.images if p.images is not None else []
-                    ),  # Safely get images
-                    "in_stock": p.in_stock,
-                    "is_new": p.is_new,
-                    "on_sale": p.on_sale,
-                    "rating": float(p.rating),
-                    "reviews": p.reviews,
-                }
-            )
-        except Exception as e:
-            # Log the error for this specific product and continue with others
-            print(f"Error processing product {p.id}: {e}")
-            continue
+                # Currency conversion commented out for debugging:
+                # if target_currency != p.currency:
+                #     rate = get_exchange_rate(p.currency, target_currency)
+                #     price = price * rate
+                #     if sale_price:
+                #         sale_price = sale_price * rate
 
-    return JsonResponse({"products": data})
+                data.append(
+                    {
+                        "id": p.id,
+                        "name": p.name,
+                        "description": p.description,
+                        "price": round(price, 2),
+                        "sale_price": round(sale_price, 2) if sale_price else None,
+                        "currency": target_currency,
+                        "base_currency": p.currency,
+                        "category": p.category.name if p.category else None,
+                        "sizes": p.sizes if p.sizes is not None else [],
+                        "colors": p.colors if p.colors is not None else [],
+                        "images": p.images if p.images is not None else [],
+                        "in_stock": p.in_stock,
+                        "is_new": p.is_new,
+                        "on_sale": p.on_sale,
+                        "rating": float(p.rating),
+                        "reviews": p.reviews,
+                    }
+                )
+            except Exception as e:
+                print(f"Error processing product {p.id}: {e}")
+                traceback.print_exc()  # Print full traceback for this product
+                continue
+        return JsonResponse({"products": data})
+    except Exception as e:
+        print(f"CRITICAL ERROR in api_products: {e}")
+        traceback.print_exc()  # Print full traceback for the entire function
+        return JsonResponse({"error": "Internal Server Error"}, status=500)
 
 
 @login_required
