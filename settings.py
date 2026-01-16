@@ -183,11 +183,12 @@ USE_GZIP = True
 
 # Session security
 SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=not DEBUG, cast=bool)
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_HTTPONLY = False  # Allow JavaScript access for frontend
+SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Allow persistent sessions
 SESSION_COOKIE_AGE = 2592000  # 30 days for remember me
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_DOMAIN = None  # Allow cross-subdomain
 
 # HTTPS Security Headers
 if not DEBUG:

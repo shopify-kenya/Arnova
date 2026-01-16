@@ -24,14 +24,25 @@ class CorsMiddleware(MiddlewareMixin):
     def add_cors_headers(self, request, response):
         origin = request.META.get("HTTP_ORIGIN")
 
-        # Check if the origin is in the trusted list from settings
-        if origin and origin in settings.CSRF_TRUSTED_ORIGINS:
+        # Allow localhost and HTTPS variants
+        allowed_origins = [
+            "http://localhost:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:8000",
+            "https://localhost:8443",
+            "https://127.0.0.1:8443",
+            "https://arnova-207y.onrender.com",
+        ]
+
+        # Check if the origin is in the allowed list
+        if origin and origin in allowed_origins:
             response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Credentials"] = "true"
 
         response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response["Access-control-allow-headers"] = (
-            "Accept, Content-Type, X-CSRFToken, Authorization, " "X-Requested-With"
+        response["Access-Control-Allow-Headers"] = (
+            "Accept, Content-Type, X-CSRFToken, Authorization, X-Requested-With"
         )
         response["Access-Control-Max-Age"] = "3600"
 
