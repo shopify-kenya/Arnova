@@ -113,10 +113,10 @@ admin_api_patterns = [
 ]
 
 urlpatterns = [
-    # Django admin for staff login with custom redirect
-    path("admin/", admin_site.urls),
-    # Admin dashboard - staff only
-    path("dashboard/", include(admin_patterns)),
+    # Admin dashboard - staff only (secured)
+    path("admin/", include(admin_patterns)),
+    # Django admin site
+    path("django-admin/", admin_site.urls),
     # Buyer API endpoints
     path("api/", include(api_patterns)),
     # Admin API endpoints - staff only
