@@ -410,6 +410,9 @@ def api_profile(request):
     elif request.method == "PUT":
         import json
 
+        import bleach
+        from django.utils.html import escape
+
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
@@ -421,19 +424,23 @@ def api_profile(request):
             cleaned_data = form.cleaned_data
             user = request.user
 
-            # Update user fields from cleaned data
-            user.first_name = cleaned_data.get("first_name", user.first_name)
-            user.last_name = cleaned_data.get("last_name", user.last_name)
+            # Update user fields with sanitization
+            user.first_name = escape(cleaned_data.get("first_name", user.first_name))
+            user.last_name = escape(cleaned_data.get("last_name", user.last_name))
             user.email = cleaned_data.get("email", user.email)
             user.save()
 
-            # Update profile fields from cleaned data
+            # Update profile fields with sanitization
             profile.avatar = cleaned_data.get("avatar", profile.avatar)
-            profile.phone = cleaned_data.get("phone", profile.phone)
-            profile.address = cleaned_data.get("address", profile.address)
-            profile.city = cleaned_data.get("city", profile.city)
-            profile.country = cleaned_data.get("country", profile.country)
-            profile.postal_code = cleaned_data.get("postal_code", profile.postal_code)
+            profile.phone = escape(cleaned_data.get("phone", profile.phone))
+            profile.address = bleach.clean(
+                cleaned_data.get("address", profile.address), tags=[], strip=True
+            )
+            profile.city = escape(cleaned_data.get("city", profile.city))
+            profile.country = escape(cleaned_data.get("country", profile.country))
+            profile.postal_code = escape(
+                cleaned_data.get("postal_code", profile.postal_code)
+            )
             profile.save()
 
             return JsonResponse({"success": True})
