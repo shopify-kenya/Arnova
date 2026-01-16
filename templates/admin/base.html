@@ -1,39 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Arnova Admin{% endblock %}</title>
     {% load static %}
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{% static 'admin/css/admin-theme.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
                         manrope: ['Manrope', 'sans-serif'],
                     },
                     colors: {
-                        border: 'hsl(20, 6%, 90%)',
-                        background: 'hsl(60, 9%, 98%)',
-                        foreground: 'hsl(24, 10%, 10%)',
+                        border: 'hsl(var(--border))',
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
                         primary: {
-                            DEFAULT: 'hsl(24, 45%, 20%)',
-                            foreground: 'hsl(60, 9%, 98%)',
+                            DEFAULT: 'hsl(var(--primary))',
+                            foreground: 'hsl(var(--primary-foreground))',
                         },
                         secondary: {
-                            DEFAULT: 'hsl(60, 5%, 96%)',
-                            foreground: 'hsl(24, 10%, 10%)',
+                            DEFAULT: 'hsl(var(--secondary))',
+                            foreground: 'hsl(var(--secondary-foreground))',
                         },
                         muted: {
-                            DEFAULT: 'hsl(60, 5%, 96%)',
-                            foreground: 'hsl(25, 5%, 45%)',
+                            DEFAULT: 'hsl(var(--muted))',
+                            foreground: 'hsl(var(--muted-foreground))',
                         },
                         accent: {
-                            DEFAULT: 'hsl(36, 64%, 57%)',
-                            foreground: 'hsl(24, 10%, 10%)',
+                            DEFAULT: 'hsl(var(--accent))',
+                            foreground: 'hsl(var(--accent-foreground))',
                         },
                     }
                 }
@@ -41,10 +41,34 @@
         }
     </script>
     <style>
+        :root {
+            --background: 60 9% 98%;
+            --foreground: 24 10% 10%;
+            --primary: 24 45% 20%;
+            --primary-foreground: 60 9% 98%;
+            --secondary: 60 5% 96%;
+            --secondary-foreground: 24 10% 10%;
+            --muted: 60 5% 96%;
+            --muted-foreground: 25 5% 45%;
+            --accent: 36 64% 57%;
+            --accent-foreground: 24 10% 10%;
+            --border: 20 6% 90%;
+        }
+        .dark {
+            --background: 24 60% 11%;
+            --foreground: 60 100% 94%;
+            --primary: 60 100% 94%;
+            --primary-foreground: 24 60% 11%;
+            --secondary: 24 45% 20%;
+            --secondary-foreground: 60 100% 94%;
+            --muted: 24 45% 20%;
+            --muted-foreground: 60 20% 70%;
+            --accent: 36 64% 57%;
+            --accent-foreground: 24 60% 11%;
+            --border: 24 45% 20%;
+        }
         body {
             font-family: 'Manrope', sans-serif;
-            background: hsl(60, 9%, 98%);
-            color: hsl(24, 10%, 10%);
         }
         .glass {
             background: rgba(255, 255, 255, 0.8);
@@ -58,12 +82,37 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
+        .dark .glass {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark .glass-strong {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
         .acrylic-card {
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid hsl(36, 64%, 57%, 0.9);
+            border: 1px solid hsl(var(--accent) / 0.9);
         }
     </style>
+    <script>
+        // Theme management
+        (function() {
+            const theme = localStorage.getItem('admin-theme') || 'system';
+            const applyTheme = (t) => {
+                if (t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            };
+            applyTheme(theme);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (localStorage.getItem('admin-theme') === 'system') applyTheme('system');
+            });
+        })();
+    </script>
 </head>
 <body class="bg-background text-foreground">
     <!-- Sidebar -->
@@ -138,6 +187,18 @@
 
             <!-- Bottom Actions -->
             <div class="space-y-2 pt-4 border-t border-border/50">
+                <button onclick="cycleTheme()" class="flex items-center h-11 px-4 rounded-lg hover:bg-muted/50 text-foreground transition-colors w-full text-left">
+                    <svg id="theme-icon-sun" class="mr-3 h-4 w-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <svg id="theme-icon-moon" class="mr-3 h-4 w-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                    <svg id="theme-icon-system" class="mr-3 h-4 w-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="font-medium" id="theme-text">Theme</span>
+                </button>
                 <a href="/" class="flex items-center h-11 px-4 rounded-lg hover:bg-muted/50 text-foreground transition-colors">
                     <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
@@ -171,6 +232,37 @@
     </main>
 
     <script>
+        function cycleTheme() {
+            const themes = ['system', 'dark', 'light'];
+            const current = localStorage.getItem('admin-theme') || 'system';
+            const next = themes[(themes.indexOf(current) + 1) % themes.length];
+            localStorage.setItem('admin-theme', next);
+            applyTheme(next);
+            updateThemeUI(next);
+        }
+
+        function applyTheme(theme) {
+            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function updateThemeUI(theme) {
+            document.getElementById('theme-icon-sun').classList.toggle('hidden', theme !== 'light');
+            document.getElementById('theme-icon-moon').classList.toggle('hidden', theme !== 'dark');
+            document.getElementById('theme-icon-system').classList.toggle('hidden', theme !== 'system');
+            const labels = { system: 'System', dark: 'Dark', light: 'Light' };
+            document.getElementById('theme-text').textContent = labels[theme];
+        }
+
+        // Initialize theme UI
+        document.addEventListener('DOMContentLoaded', () => {
+            const theme = localStorage.getItem('admin-theme') || 'system';
+            updateThemeUI(theme);
+        });
+
         function validateForm(form) {
             const required = form.querySelectorAll('[required]');
             for (let field of required) {

@@ -95,9 +95,18 @@
         </div>
 
         <div class="glass-strong rounded-2xl p-6 acrylic-card">
-            <h4 class="font-semibold text-foreground mb-3">Growth Rate</h4>
-            <div class="text-2xl font-bold text-purple-600">+12.5%</div>
-            <p class="text-sm text-muted-foreground">Month over month</p>
+            <h4 class="font-semibold text-foreground mb-3">Total Revenue</h4>
+            <div class="text-2xl font-bold text-purple-600">
+                {% if sales_trends %}
+                    ${% widthratio sales_trends|length 1 1 as total_months %}
+                    {% for trend in sales_trends %}
+                        {% if forloop.first %}{{ trend.sales|floatformat:0 }}{% endif %}
+                    {% endfor %}
+                {% else %}
+                    $0
+                {% endif %}
+            </div>
+            <p class="text-sm text-muted-foreground">Last 6 months</p>
         </div>
     </div>
 </div>
