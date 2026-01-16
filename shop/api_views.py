@@ -8,7 +8,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from djangoratelimit.decorators import ratelimit
 
-from .forms import RegistrationForm
+from .forms import ProfileForm, RegistrationForm
 from .models import (
     Cart,
     CartItem,
@@ -177,11 +177,13 @@ def api_products(request):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def api_cart(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
 
     if request.method == "GET":
-        items = [
+        items = cart.items.all().select_related("product")
+        data = [
             {
                 "id": item.id,
                 "product": {
@@ -194,35 +196,76 @@ def api_cart(request):
                 "selected_size": item.selected_size,
                 "selected_color": item.selected_color,
             }
-            for item in cart.items.all()
+            for item in items
         ]
-        return JsonResponse({"items": items})
+        return JsonResponse({"items": data})
 
     elif request.method == "POST":
         import json
 
-        data = json.loads(request.body)
-        product = Product.objects.get(id=data["product_id"])
+        try:
+            data = json.loads(request.body)
+            product = Product.objects.get(id=data["product_id"])
+            quantity = int(data.get("quantity", 1))
+            if quantity < 1:
+                return JsonResponse({"error": "Quantity must be at least 1"}, status=400)
+        except (json.JSONDecodeError, Product.DoesNotExist, KeyError, ValueError):
+            return JsonResponse({"error": "Invalid request"}, status=400)
 
         item, created = CartItem.objects.get_or_create(
             cart=cart,
             product=product,
             selected_size=data["selected_size"],
             selected_color=data["selected_color"],
-            defaults={"quantity": data["quantity"]},
+            defaults={"quantity": quantity},
         )
 
         if not created:
-            item.quantity += data["quantity"]
+            item.quantity = quantity
             item.save()
 
-        return JsonResponse({"success": True})
+        return JsonResponse({"success": True, "item_id": item.id})
 
 
 @login_required
+@require_http_methods(["PUT", "DELETE"])
+def api_cart_item(request, item_id):
+    """
+    Update or delete a specific item in the user's cart.
+    """
+    try:
+        # Security check: ensure the item belongs to the current user's cart.
+        item = CartItem.objects.get(id=item_id, cart__user=request.user)
+    except CartItem.DoesNotExist:
+        return JsonResponse({"error": "Cart item not found"}, status=404)
+
+    if request.method == "PUT":
+        import json
+        try:
+            data = json.loads(request.body)
+            quantity = int(data.get("quantity"))
+            if quantity > 0:
+                item.quantity = quantity
+                item.save()
+                return JsonResponse({"success": True})
+            else:
+                # If quantity is 0 or less, treat it as a deletion
+                item.delete()
+                return JsonResponse({"success": True, "deleted": True})
+        except (json.JSONDecodeError, ValueError, KeyError):
+            return JsonResponse({"error": "Invalid request"}, status=400)
+
+    elif request.method == "DELETE":
+        item.delete()
+        return JsonResponse({"success": True})
+
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
 def api_saved(request):
     if request.method == "GET":
-        items = SavedItem.objects.filter(user=request.user)
+        items = SavedItem.objects.filter(user=request.user).select_related("product")
         data = [
             {
                 "id": item.id,
@@ -230,7 +273,13 @@ def api_saved(request):
                     "id": item.product.id,
                     "name": item.product.name,
                     "price": float(item.product.price),
+                    "sale_price": (
+                        float(item.product.sale_price)
+                        if item.product.sale_price
+                        else None
+                    ),
                     "images": item.product.images,
+                    "on_sale": item.product.on_sale,
                 },
             }
             for item in items
@@ -240,10 +289,35 @@ def api_saved(request):
     elif request.method == "POST":
         import json
 
-        data = json.loads(request.body)
-        product = Product.objects.get(id=data["product_id"])
-        SavedItem.objects.get_or_create(user=request.user, product=product)
-        return JsonResponse({"success": True})
+        try:
+            data = json.loads(request.body)
+            product = Product.objects.get(id=data["product_id"])
+        except (json.JSONDecodeError, Product.DoesNotExist, KeyError):
+            return JsonResponse({"error": "Invalid request"}, status=400)
+
+                            item, created = SavedItem.objects.get_or_create(
+
+                                user=request.user, product=product
+
+                            )
+
+                            return JsonResponse({"success": True, "item_id": item.id})
+
+
+@login_required
+@require_http_methods(["DELETE"])
+def api_saved_item(request, item_id):
+    """
+    Delete a specific item from the user's saved items.
+    """
+    try:
+        # Security check: ensure the item belongs to the current user.
+        item = SavedItem.objects.get(id=item_id, user=request.user)
+    except SavedItem.DoesNotExist:
+        return JsonResponse({"error": "Saved item not found"}, status=404)
+
+    item.delete()
+    return JsonResponse({"success": True})
 
 
 @require_http_methods(["GET"])
@@ -280,8 +354,9 @@ def api_categories(request):
 
 @login_required
 def api_profile(request):
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+
     if request.method == "GET":
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
         data = {
             "user": {
                 "id": request.user.id,
@@ -300,35 +375,39 @@ def api_profile(request):
             },
         }
         return JsonResponse(data)
+
     elif request.method == "PUT":
         import json
 
-        data = json.loads(request.body)
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-        # Update user fields
-        if "first_name" in data:
-            request.user.first_name = data["first_name"]
-        if "last_name" in data:
-            request.user.last_name = data["last_name"]
-        if "email" in data:
-            request.user.email = data["email"]
-        request.user.save()
+        form = ProfileForm(data, user=request.user)
 
-        # Update profile fields
-        for field in [
-            "avatar",
-            "phone",
-            "address",
-            "city",
-            "country",
-            "postal_code",
-        ]:
-            if field in data:
-                setattr(profile, field, data[field])
-        profile.save()
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            user = request.user
 
-        return JsonResponse({"success": True})
+            # Update user fields from cleaned data
+            user.first_name = cleaned_data.get("first_name", user.first_name)
+            user.last_name = cleaned_data.get("last_name", user.last_name)
+            user.email = cleaned_data.get("email", user.email)
+            user.save()
+
+            # Update profile fields from cleaned data
+            profile.avatar = cleaned_data.get("avatar", profile.avatar)
+            profile.phone = cleaned_data.get("phone", profile.phone)
+            profile.address = cleaned_data.get("address", profile.address)
+            profile.city = cleaned_data.get("city", profile.city)
+            profile.country = cleaned_data.get("country", profile.country)
+            profile.postal_code = cleaned_data.get("postal_code", profile.postal_code)
+            profile.save()
+
+            return JsonResponse({"success": True})
+        else:
+            return JsonResponse({"errors": json.loads(form.errors.as_json())}, status=400)
 
 
 @login_required

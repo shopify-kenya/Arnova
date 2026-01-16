@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Heart, ShoppingBag } from "lucide-react"
+import { Heart, ShoppingBag, Loader2 } from "lucide-react"
 import { BuyerNavbar } from "@/components/buyer-navbar"
 import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
 import { Footer } from "@/components/footer"
@@ -13,13 +13,13 @@ import { ProductCard } from "@/components/product-card"
 import { Button } from "@/components/ui/button"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
-import { getSavedProducts } from "@/lib/saved"
-import type { Product } from "@/lib/products"
+import { getSavedProductsFromServer, type SavedItem } from "@/lib/saved"
 
 export default function SavedPage() {
   const router = useRouter()
   const { isAuthenticated } = useAuth()
-  const [savedProducts, setSavedProducts] = useState<Product[]>([])
+  const [savedItems, setSavedItems] = useState<SavedItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   useEffect(() => {
@@ -27,12 +27,38 @@ export default function SavedPage() {
       router.push("/login")
       return
     }
-    setSavedProducts(getSavedProducts())
+
+    const fetchSavedItems = async () => {
+      setIsLoading(true)
+      const items = await getSavedProductsFromServer()
+      setSavedItems(items)
+      setIsLoading(false)
+    }
+
+    fetchSavedItems()
   }, [isAuthenticated, router])
 
   if (!isAuthenticated) return null
 
-  if (savedProducts.length === 0) {
+  if (isLoading) {
+    return (
+      <CurrencyProvider>
+        <div className="min-h-screen flex flex-col">
+          <BuyerNavbar
+            title="Saved Items"
+            subtitle="Loading your wishlist..."
+            onMenuToggle={() => setIsFilterOpen(true)}
+          />
+          <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          </main>
+          <Footer />
+        </div>
+      </CurrencyProvider>
+    )
+  }
+
+  if (savedItems.length === 0) {
     return (
       <CurrencyProvider>
         <div className="min-h-screen">
@@ -80,7 +106,7 @@ export default function SavedPage() {
       <div className="min-h-screen">
         <BuyerNavbar
           title="Saved Items"
-          subtitle={`${savedProducts.length} items saved`}
+          subtitle={`${savedItems.length} items saved`}
           onMenuToggle={() => setIsFilterOpen(true)}
         />
         <BuyerFilterSidebar
@@ -94,8 +120,12 @@ export default function SavedPage() {
             transition={{ duration: 0.6 }}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {savedProducts.map((product, index) => (
-                <ProductCard key={product.id} product={product} index={index} />
+              {savedItems.map((item, index) => (
+                <ProductCard
+                  key={item.id}
+                  product={item.product}
+                  index={index}
+                />
               ))}
             </div>
           </motion.div>

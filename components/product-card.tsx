@@ -1,8 +1,6 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -14,7 +12,7 @@ import type { Product } from "@/lib/products"
 import { useCurrency } from "@/components/currency-provider"
 import { useCart } from "@/components/cart-provider"
 import { useAuth } from "@/components/auth-provider"
-import { addToSaved, removeFromSaved, isProductSaved } from "@/lib/saved"
+import { useSavedItems } from "@/components/saved-items-provider"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
@@ -27,14 +25,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { formatPrice } = useCurrency()
   const { addItem } = useCart()
   const { isAuthenticated } = useAuth()
+  const { addSavedItem, removeSavedItem, isProductSaved } = useSavedItems()
   const router = useRouter()
-  const [isSaved, setIsSaved] = useState(false)
 
-  useEffect(() => {
-    setIsSaved(isProductSaved(product.id))
-  }, [product.id])
+  const isSaved = isProductSaved(product.id)
 
-  const handleSave = (e: React.MouseEvent) => {
+  const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -45,13 +41,9 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     }
 
     if (isSaved) {
-      removeFromSaved(product.id)
-      setIsSaved(false)
-      toast.success("Removed from saved")
+      await removeSavedItem(product.id)
     } else {
-      addToSaved(product)
-      setIsSaved(true)
-      toast.success("Added to saved")
+      await addSavedItem(product.id)
     }
   }
 
@@ -79,7 +71,6 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       selectedSize: product.sizes[0] || "M",
       selectedColor: product.colors[0] || "Black",
     })
-    toast.success("Added to cart")
   }
 
   return (
@@ -115,7 +106,9 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                 onClick={handleSave}
               >
                 <Heart
-                  className={`h-4 w-4 ${isSaved ? "fill-current text-red-500" : ""}`}
+                  className={`h-4 w-4 ${
+                    isSaved ? "fill-current text-red-500" : ""
+                  }`}
                 />
               </Button>
             </div>

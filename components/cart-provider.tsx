@@ -1,95 +1,121 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react"
+import { toast } from "sonner"
 import type { CartItem } from "@/lib/cart"
-import { getCart, saveCart, getCartTotal } from "@/lib/cart"
+import {
+  getCartFromServer,
+  addToCart,
+  removeFromCart,
+  updateCartItemQuantity,
+  clearCart as clearCartFromServer,
+  getCartTotal,
+} from "@/lib/cart"
+import { useAuth } from "./auth-provider"
 
 interface CartContextType {
   cart: CartItem[]
-  addItem: (item: CartItem) => void
-  removeItem: (productId: string, size: string, color: string) => void
-  updateQuantity: (
-    productId: string,
-    size: string,
-    color: string,
-    quantity: number
-  ) => void
-  clearCart: () => void
+  addItem: (item: CartItem) => Promise<void>
+  removeItem: (itemId: number) => Promise<void>
+  updateQuantity: (itemId: number, quantity: number) => Promise<void>
+  clearCart: () => Promise<void>
   total: number
   itemCount: number
+  isLoading: boolean
+  error: string | null
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth()
   const [cart, setCart] = useState<CartItem[]>([])
-  const [mounted, setMounted] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchCart = useCallback(async () => {
+    if (!isAuthenticated) {
+      setCart([])
+      setIsLoading(false)
+      return
+    }
+    setIsLoading(true)
+    setError(null)
+    try {
+      const serverCart = await getCartFromServer()
+      setCart(serverCart)
+    } catch (e) {
+      setError("Failed to load cart.")
+      toast.error("Failed to load your cart from the server.")
+    } finally {
+      setIsLoading(false)
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
-    setMounted(true)
-    setCart(getCart())
-  }, [])
+    fetchCart()
+  }, [fetchCart])
 
-  const addItem = (item: CartItem) => {
-    const existingIndex = cart.findIndex(
-      i =>
-        i.product.id === item.product.id &&
-        i.selectedSize === item.selectedSize &&
-        i.selectedColor === item.selectedColor
-    )
-
-    let newCart: CartItem[]
-    if (existingIndex >= 0) {
-      newCart = [...cart]
-      newCart[existingIndex].quantity += item.quantity
-    } else {
-      newCart = [...cart, item]
-    }
-
-    setCart(newCart)
-    saveCart(newCart)
-  }
-
-  const removeItem = (productId: string, size: string, color: string) => {
-    const newCart = cart.filter(
-      item =>
-        !(
-          item.product.id === productId &&
-          item.selectedSize === size &&
-          item.selectedColor === color
-        )
-    )
-    setCart(newCart)
-    saveCart(newCart)
-  }
-
-  const updateQuantity = (
-    productId: string,
-    size: string,
-    color: string,
-    quantity: number
+  const performCartAction = async (
+    action: Promise<boolean>,
+    successMessage: string,
+    errorMessage: string
   ) => {
-    const newCart = cart.map(item => {
-      if (
-        item.product.id === productId &&
-        item.selectedSize === size &&
-        item.selectedColor === color
-      ) {
-        return { ...item, quantity }
+    try {
+      const success = await action
+      if (success) {
+        toast.success(successMessage)
+        await fetchCart() // Refresh cart from server
+      } else {
+        toast.error(errorMessage)
       }
-      return item
-    })
-    setCart(newCart)
-    saveCart(newCart)
+    } catch {
+      toast.error(errorMessage)
+    }
   }
 
-  const clearCartFn = () => {
-    setCart([])
-    saveCart([])
+  const addItem = async (item: CartItem) => {
+    await performCartAction(
+      addToCart(item),
+      "Item added to cart!",
+      "Failed to add item to cart."
+    )
   }
 
-  if (!mounted) return null
+  const removeItem = async (itemId: number) => {
+    await performCartAction(
+      removeFromCart(itemId),
+      "Item removed from cart.",
+      "Failed to remove item from cart."
+    )
+  }
+
+  const updateQuantity = async (itemId: number, quantity: number) => {
+    if (quantity < 1) {
+      await removeItem(itemId)
+      return
+    }
+    await performCartAction(
+      updateCartItemQuantity(itemId, quantity),
+      "Cart updated.",
+      "Failed to update cart."
+    )
+  }
+
+  const clearCart = async () => {
+    await performCartAction(
+      clearCartFromServer(cart),
+      "Cart cleared.",
+      "Failed to clear cart."
+    )
+  }
 
   return (
     <CartContext.Provider
@@ -98,9 +124,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addItem,
         removeItem,
         updateQuantity,
-        clearCart: clearCartFn,
+        clearCart,
         total: getCartTotal(cart),
         itemCount: cart.reduce((sum, item) => sum + item.quantity, 0),
+        isLoading,
+        error,
       }}
     >
       {children}
@@ -111,7 +139,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 export function useCart() {
   const context = useContext(CartContext)
   if (!context) {
-    throw new Error("useCart must be used within CartProvider")
+    throw new Error("useCart must be used within a CartProvider")
   }
   return context
 }

@@ -1,0 +1,11 @@
+feat: Integrate 'Saved Items' with backend API
+ This commit resolves the final major inconsistency by migrating the 'Saved Items' feature from a
+      localStorage-based implementation to a persistent, API-driven one.
+ **API:** The backend API in `shop/api_views.py` and `urls.py` was enhanced to support fetching, adding, and
+      securely deleting saved items.
+ **Frontend Logic:** `lib/saved.ts` was refactored to use the new asynchronous API endpoints.
+ **State Management:** A new `SavedItemsProvider` was created to manage the global state of saved items, fetchi
+      data on load for authenticated users.
+ **UI Integration:** The `app/saved/page.tsx` and `components/product-card.tsx` components were refactored to u
+      the new `useSavedItems` hook, ensuring a reactive and consistent user experience. The provider was added to the
+      root `layout.tsx`.

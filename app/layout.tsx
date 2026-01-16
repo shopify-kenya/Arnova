@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/components/language-provider"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { AuthProvider } from "@/components/auth-provider"
 import { CartProvider } from "@/components/cart-provider"
+import { SavedItemsProvider } from "@/components/saved-items-provider"
 import { PWAInstaller } from "@/components/pwa-installer"
 import { ClientRouter } from "@/components/client-router"
 import { Toaster } from "@/components/ui/sonner"
@@ -120,12 +121,14 @@ export default function RootLayout({
           <LanguageProvider>
             <CurrencyProvider>
               <AuthProvider>
-                <CartProvider>
-                  <ClientRouter />
-                  {children}
-                  <Toaster />
-                  <PWAInstaller />
-                </CartProvider>
+                <SavedItemsProvider>
+                  <CartProvider>
+                    <ClientRouter />
+                    {children}
+                    <Toaster />
+                    <PWAInstaller />
+                  </CartProvider>
+                </SavedItemsProvider>
               </AuthProvider>
             </CurrencyProvider>
           </LanguageProvider>

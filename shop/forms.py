@@ -56,3 +56,38 @@ class RegistrationForm(forms.Form):
         #         self.add_error('password', e)
 
         return cleaned_data
+
+
+class ProfileForm(forms.Form):
+    """
+    A form for updating user profile information.
+    """
+
+    first_name = forms.CharField(max_length=150, required=False)
+    last_name = forms.CharField(max_length=150, required=False)
+    email = forms.EmailField(required=False)
+    avatar = forms.CharField(required=False)  # Assuming base64 or URL
+    phone = forms.CharField(max_length=20, required=False)
+    address = forms.CharField(max_length=255, required=False)
+    city = forms.CharField(max_length=100, required=False)
+    country = forms.CharField(max_length=100, required=False)
+    postal_code = forms.CharField(max_length=20, required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+    def clean_email(self):
+        """
+        Validate that the new email is not already in use by another user.
+        """
+        email = self.cleaned_data.get("email")
+        if (
+            self.user
+            and email
+            and User.objects.filter(email=email).exclude(pk=self.user.pk).exists()
+        ):
+            raise ValidationError(
+                "This email address is already in use by another account."
+            )
+        return email
