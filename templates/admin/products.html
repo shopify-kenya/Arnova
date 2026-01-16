@@ -142,23 +142,28 @@
                 <div>
                     <label class="block text-sm font-medium mb-2">Sizes</label>
                     <div class="grid grid-cols-4 gap-2">
-                        {% for size in 'XS,S,M,L,XL,XXL,XXXL'|split:',' %}
-                        <label class="flex items-center">
-                            <input type="checkbox" name="sizes" value="{{ size }}" class="mr-2">
-                            <span class="text-sm">{{ size }}</span>
-                        </label>
-                        {% endfor %}
+                        <label class="flex items-center"><input type="checkbox" name="sizes" value="XS" class="mr-2"><span class="text-sm">XS</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="sizes" value="S" class="mr-2"><span class="text-sm">S</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="sizes" value="M" class="mr-2"><span class="text-sm">M</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="sizes" value="L" class="mr-2"><span class="text-sm">L</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="sizes" value="XL" class="mr-2"><span class="text-sm">XL</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="sizes" value="XXL" class="mr-2"><span class="text-sm">XXL</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="sizes" value="XXXL" class="mr-2"><span class="text-sm">XXXL</span></label>
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Colors</label>
                     <div class="grid grid-cols-3 gap-2">
-                        {% for color in 'Black,White,Red,Blue,Green,Yellow,Pink,Purple,Gray,Brown'|split:',' %}
-                        <label class="flex items-center">
-                            <input type="checkbox" name="colors" value="{{ color }}" class="mr-2">
-                            <span class="text-sm">{{ color }}</span>
-                        </label>
-                        {% endfor %}
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Black" class="mr-2"><span class="text-sm">Black</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="White" class="mr-2"><span class="text-sm">White</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Red" class="mr-2"><span class="text-sm">Red</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Blue" class="mr-2"><span class="text-sm">Blue</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Green" class="mr-2"><span class="text-sm">Green</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Yellow" class="mr-2"><span class="text-sm">Yellow</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Pink" class="mr-2"><span class="text-sm">Pink</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Purple" class="mr-2"><span class="text-sm">Purple</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Gray" class="mr-2"><span class="text-sm">Gray</span></label>
+                        <label class="flex items-center"><input type="checkbox" name="colors" value="Brown" class="mr-2"><span class="text-sm">Brown</span></label>
                     </div>
                 </div>
                 <div>
