@@ -98,32 +98,46 @@
 </div>
 
 <!-- Add Product Modal -->
-<div id="addProductModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
-    <div class="glass-strong rounded-xl p-6 w-full max-w-md">
+<div id="addProductModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-strong rounded-xl p-6 w-full max-w-2xl my-8">
         <h3 class="text-lg font-semibold mb-4">Add New Product</h3>
-        <form method="post" action="{% url 'admin_product_create' %}" onsubmit="return validateForm(this)">
+        <form id="addProductForm" method="post" action="{% url 'admin_product_create' %}">
             {% csrf_token %}
             <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Name</label>
-                    <input type="text" name="name" required class="form-input w-full px-3 py-2 rounded-lg">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Description</label>
-                    <textarea name="description" rows="3" class="form-input w-full px-3 py-2 rounded-lg"></textarea>
-                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium mb-1">Price</label>
+                        <label class="block text-sm font-medium mb-1">Product ID *</label>
+                        <input type="text" name="id" required class="form-input w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Name *</label>
+                        <input type="text" name="name" required class="form-input w-full px-3 py-2 rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Description *</label>
+                    <textarea name="description" rows="3" required class="form-input w-full px-3 py-2 rounded-lg"></textarea>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Price *</label>
                         <input type="number" name="price" step="0.01" required class="form-input w-full px-3 py-2 rounded-lg">
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Sale Price</label>
                         <input type="number" name="sale_price" step="0.01" class="form-input w-full px-3 py-2 rounded-lg">
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Currency *</label>
+                        <select name="currency" required class="form-input w-full px-3 py-2 rounded-lg">
+                            <option value="USD">USD</option>
+                            <option value="KES">KES</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1">Category</label>
+                    <label class="block text-sm font-medium mb-1">Category *</label>
                     <select name="category_id" required class="form-input w-full px-3 py-2 rounded-lg">
                         <option value="">Select Category</option>
                         {% for category in categories %}
@@ -131,9 +145,46 @@
                         {% endfor %}
                     </select>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Sizes</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        {% for size in 'XS,S,M,L,XL,XXL,XXXL'|split:',' %}
+                        <label class="flex items-center">
+                            <input type="checkbox" name="sizes" value="{{ size }}" class="mr-2">
+                            <span class="text-sm">{{ size }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Colors</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        {% for color in 'Black,White,Red,Blue,Green,Yellow,Pink,Purple,Gray,Brown'|split:',' %}
+                        <label class="flex items-center">
+                            <input type="checkbox" name="colors" value="{{ color }}" class="mr-2">
+                            <span class="text-sm">{{ color }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Image URLs (optional, one per line)</label>
+                    <textarea name="images" rows="2" placeholder="Leave empty to auto-fetch" class="form-input w-full px-3 py-2 rounded-lg"></textarea>
+                    <p class="text-xs text-white/50 mt-1">💡 Auto-fetches from Unsplash if empty</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Rating (0-5)</label>
+                        <input type="number" name="rating" step="0.1" min="0" max="5" value="4.5" class="form-input w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Reviews Count</label>
+                        <input type="number" name="reviews" min="0" value="0" class="form-input w-full px-3 py-2 rounded-lg">
+                    </div>
+                </div>
                 <div class="flex space-x-4">
                     <label class="flex items-center">
-                        <input type="checkbox" name="in_stock" class="mr-2">
+                        <input type="checkbox" name="in_stock" checked class="mr-2">
                         <span class="text-sm">In Stock</span>
                     </label>
                     <label class="flex items-center">
@@ -153,6 +204,55 @@
         </form>
     </div>
 </div>
+
+<script>
+document.getElementById('addProductForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const sizes = Array.from(document.querySelectorAll('input[name="sizes"]:checked')).map(cb => cb.value);
+    const colors = Array.from(document.querySelectorAll('input[name="colors"]:checked')).map(cb => cb.value);
+    const imageText = formData.get('images').trim();
+    const images = imageText ? imageText.split('\n').filter(url => url.trim()) : [];
+
+    const data = {
+        id: formData.get('id'),
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: parseFloat(formData.get('price')),
+        sale_price: formData.get('sale_price') ? parseFloat(formData.get('sale_price')) : null,
+        currency: formData.get('currency'),
+        category_id: parseInt(formData.get('category_id')),
+        sizes: sizes,
+        colors: colors,
+        images: images,
+        in_stock: formData.get('in_stock') === 'on',
+        is_new: formData.get('is_new') === 'on',
+        on_sale: formData.get('on_sale') === 'on',
+        rating: parseFloat(formData.get('rating')),
+        reviews: parseInt(formData.get('reviews')) || 0
+    };
+
+    fetch(this.action, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+});
+</script>
 
 
 {% endblock %}
