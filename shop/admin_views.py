@@ -99,10 +99,14 @@ def admin_product_create(request):
 
         # Auto-fetch images if not provided
         images = data.get("images", [])
-        if not images:
-            from fetch_product_images import fetch_multiple_images
+        if not images or len(images) == 0:
+            try:
+                from fetch_product_images import fetch_multiple_images
 
-            images = fetch_multiple_images(data.get("name"), count=3)
+                images = fetch_multiple_images(data.get("name"), count=3)
+            except Exception as e:
+                print(f"Failed to fetch images: {e}")
+
             if not images:
                 images = ["/api/placeholder/300/400"]
 
