@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
+import { toast } from "sonner"
 
 interface Order {
   id: string
