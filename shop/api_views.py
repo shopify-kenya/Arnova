@@ -460,7 +460,7 @@ def api_profile(request):
                 "last_name": request.user.last_name,
             },
             "profile": {
-                "avatar": profile.avatar,
+                "avatar": str(profile.avatar) if profile.avatar else "",
                 "phone": profile.phone,
                 "address": profile.address,
                 "city": profile.city,
@@ -494,7 +494,8 @@ def api_profile(request):
             user.save()
 
             # Update profile fields with sanitization
-            profile.avatar = cleaned_data.get("avatar", profile.avatar)
+            if "avatar" in cleaned_data:
+                profile.avatar = cleaned_data.get("avatar")
             profile.phone = escape(cleaned_data.get("phone", profile.phone))
             profile.address = bleach.clean(
                 cleaned_data.get("address", profile.address), tags=[], strip=True
@@ -779,7 +780,7 @@ def api_admin_user_detail(request, user_id):
                 "is_staff": user.is_staff,
                 "is_active": user.is_active,
                 "profile": {
-                    "avatar": profile.avatar,
+                    "avatar": str(profile.avatar) if profile.avatar else "",
                     "phone": profile.phone,
                     "address": profile.address,
                     "city": profile.city,
@@ -806,7 +807,8 @@ def api_admin_user_detail(request, user_id):
                 user.is_active = data.get("is_active", user.is_active)
                 user.save()
 
-                profile.avatar = data.get("avatar", profile.avatar)
+                if "avatar" in data:
+                    profile.avatar = data.get("avatar")
                 profile.phone = data.get("phone", profile.phone)
                 profile.address = data.get("address", profile.address)
                 profile.city = data.get("city", profile.city)
