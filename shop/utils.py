@@ -22,3 +22,29 @@ def serialize_queryset(queryset, fields=None):
     if fields:
         return list(queryset.values(*fields))
     return list(queryset.values())
+
+
+def error_response(message, status=400, errors=None, code=None):
+    """Standardized error response format"""
+    response_data = {
+        "success": False,
+        "error": {"message": message, "code": code or f"ERROR_{status}"},
+    }
+
+    if errors:
+        response_data["error"]["details"] = errors
+
+    return JsonResponse(response_data, status=status)
+
+
+def success_response(data=None, message=None):
+    """Standardized success response format"""
+    response_data = {"success": True}
+
+    if message:
+        response_data["message"] = message
+
+    if data:
+        response_data["data"] = data
+
+    return JsonResponse(response_data)
