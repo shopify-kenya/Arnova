@@ -6,7 +6,6 @@ from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from djangoratelimit.decorators import ratelimit
 
 from .forms import ProfileForm, RegistrationForm
 from .models import (
@@ -64,7 +63,6 @@ def api_csrf_token(request):
     return JsonResponse({"csrfToken": get_token(request), "success": True})
 
 
-@ratelimit(key="ip", rate="10/h", block=True)
 @require_http_methods(["POST"])
 def api_login(request):
     import json
@@ -101,7 +99,6 @@ def api_login(request):
     return JsonResponse({"error": "Invalid credentials"}, status=401)
 
 
-@ratelimit(key="ip", rate="10/h", block=True)
 @require_http_methods(["POST"])
 def api_register(request):
     import json
