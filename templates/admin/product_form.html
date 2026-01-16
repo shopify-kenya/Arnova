@@ -124,6 +124,13 @@
                     <input type="number" name="rating" value="{{ product.rating|default:'4.5' }}" step="0.1" min="0" max="5"
                            class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
                 </div>
+
+                <!-- Reviews Count -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">Reviews Count</label>
+                    <input type="number" name="reviews" value="{{ product.reviews|default:'0' }}" min="0"
+                           class="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg">
+                </div>
             </div>
 
             <div class="flex justify-end space-x-3 mt-8">
@@ -167,7 +174,8 @@ document.getElementById('productForm').addEventListener('submit', function(e) {
         in_stock: formData.get('in_stock') === 'on',
         is_new: formData.get('is_new') === 'on',
         on_sale: formData.get('on_sale') === 'on',
-        rating: parseFloat(formData.get('rating'))
+        rating: parseFloat(formData.get('rating')),
+        reviews: parseInt(formData.get('reviews')) || 0
     };
 
     // Submit via fetch

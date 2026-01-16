@@ -121,6 +121,7 @@ def admin_product_create(request):
             is_new=data.get("is_new", False),
             on_sale=data.get("on_sale", False),
             rating=data.get("rating", 4.5),
+            reviews=data.get("reviews", 0),
         )
         return JsonResponse({"success": True, "product_id": product.id})
     except Exception as e:
