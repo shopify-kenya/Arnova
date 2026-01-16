@@ -20,7 +20,7 @@ import { products } from "@/lib/products"
 import { useCurrency } from "@/components/currency-provider"
 import { useCart } from "@/components/cart-provider"
 import { useAuth } from "@/components/auth-provider"
-import { addToSaved, removeFromSaved, isProductSaved } from "@/lib/saved"
+import { useSavedItems } from "@/components/saved-items-provider"
 import { toast } from "sonner"
 
 export default function ProductDetail({ productId }: { productId: string }) {
@@ -28,6 +28,11 @@ export default function ProductDetail({ productId }: { productId: string }) {
   const { formatPrice } = useCurrency()
   const { addItem } = useCart()
   const { isAuthenticated } = useAuth()
+  const {
+    addSavedItem,
+    removeSavedItem,
+    isProductSaved: checkProductSaved,
+  } = useSavedItems()
 
   const product = products.find(p => p.id === productId)
 
@@ -41,7 +46,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
     if (product) {
       setSelectedSize(product.sizes[0] || "")
       setSelectedColor(product.colors[0] || "")
-      setIsSaved(isProductSaved(product.id))
+      setIsSaved(checkProductSaved(product.id))
     }
   }, [product])
 
@@ -56,7 +61,7 @@ export default function ProductDetail({ productId }: { productId: string }) {
     )
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to save items")
       router.push("/login")
@@ -64,13 +69,11 @@ export default function ProductDetail({ productId }: { productId: string }) {
     }
 
     if (isSaved) {
-      removeFromSaved(product.id)
-      setIsSaved(false)
-      toast.success("Removed from saved")
+      await removeSavedItem(product.id)
+      setIsSaved(false) // Optimistically update, actual state will refresh from context
     } else {
-      addToSaved(product)
-      setIsSaved(true)
-      toast.success("Added to saved")
+      await addSavedItem(product.id)
+      setIsSaved(true) // Optimistically update, actual state will refresh from context
     }
   }
 
