@@ -25,13 +25,21 @@ class AdminSecurityMiddleware:
                 # Return JSON for API requests
                 if request.path.startswith("/api/"):
                     return JsonResponse(
-                        {"error": "Access denied. Staff privileges required."},
+                        {
+                            "error": "Access denied. Staff privileges required.",
+                            "redirect": "/login?redirect=/admin",
+                        },
                         status=403,
                     )
-                # Redirect to frontend login page for web requests
-                from django.shortcuts import redirect
-
-                return redirect("/login?redirect=/admin")
+                # For web requests, let Next.js handle the redirect
+                # Return 403 and let frontend redirect to login
+                return JsonResponse(
+                    {
+                        "error": "Authentication required",
+                        "redirect": "/login?redirect=/admin",
+                    },
+                    status=403,
+                )
 
         response = self.get_response(request)
         return response
