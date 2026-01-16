@@ -169,5 +169,27 @@
 
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        function validateForm(form) {
+            const required = form.querySelectorAll('[required]');
+            for (let field of required) {
+                if (!field.value.trim()) {
+                    alert(`${field.name} is required`);
+                    field.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function confirmDelete(message = 'Are you sure?') {
+            return confirm(message);
+        }
+
+        function toggleModal(modalId) {
+            document.getElementById(modalId).classList.toggle('hidden');
+        }
+    </script>
 </body>
 </html>
