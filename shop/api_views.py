@@ -143,35 +143,45 @@ def api_products(request):
     data = []
 
     for p in products:
-        # Convert price if different currency requested
-        price = float(p.price)
-        sale_price = float(p.sale_price) if p.sale_price else None
+        try:  # Add try-except for individual product processing
+            price = float(p.price)
+            sale_price = float(p.sale_price) if p.sale_price else None
 
-        if target_currency != p.currency:
-            rate = get_exchange_rate(p.currency, target_currency)
-            if rate:
+            if target_currency != p.currency:
+                rate = get_exchange_rate(p.currency, target_currency)
                 price = price * rate
                 if sale_price:
                     sale_price = sale_price * rate
-        data.append(
-            {
-                "id": p.id,
-                "name": p.name,
-                "description": p.description,
-                "price": round(price, 2),
-                "sale_price": round(sale_price, 2) if sale_price else None,
-                "currency": target_currency,
-                "base_currency": p.currency,
-                "sizes": p.sizes if p.sizes is not None else [],
-                "colors": p.colors if p.colors is not None else [],
-                "images": p.images,
-                "in_stock": p.in_stock,
-                "is_new": p.is_new,
-                "on_sale": p.on_sale,
-                "rating": float(p.rating),
-                "reviews": p.reviews,
-            }
-        )
+
+            data.append(
+                {
+                    "id": p.id,
+                    "name": p.name,
+                    "description": p.description,
+                    "price": round(price, 2),
+                    "sale_price": round(sale_price, 2) if sale_price else None,
+                    "currency": target_currency,
+                    "base_currency": p.currency,
+                    "category": (
+                        p.category.name if p.category else None
+                    ),  # Safely get category name
+                    "sizes": p.sizes if p.sizes is not None else [],
+                    "colors": p.colors if p.colors is not None else [],
+                    "images": (
+                        p.images if p.images is not None else []
+                    ),  # Safely get images
+                    "in_stock": p.in_stock,
+                    "is_new": p.is_new,
+                    "on_sale": p.on_sale,
+                    "rating": float(p.rating),
+                    "reviews": p.reviews,
+                }
+            )
+        except Exception as e:
+            # Log the error for this specific product and continue with others
+            print(f"Error processing product {p.id}: {e}")
+            continue
+
     return JsonResponse({"products": data})
 
 
