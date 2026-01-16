@@ -423,18 +423,18 @@ def api_product_detail(request, product_id):
             "name": product.name,
             "description": product.description,
             "price": float(product.price),
-            "sale_price": (float(product.sale_price) if product.sale_price else None),
+            "salePrice": (float(product.sale_price) if product.sale_price else None),
             "category": product.category.name,
             "sizes": product.sizes,
             "colors": product.colors,
             "images": product.images,
-            "in_stock": product.in_stock,
-            "is_new": product.is_new,
-            "on_sale": product.on_sale,
+            "inStock": product.in_stock,
+            "isNew": product.is_new,
+            "onSale": product.on_sale,
             "rating": float(product.rating),
             "reviews": product.reviews,
         }
-        return JsonResponse({"product": data})
+        return JsonResponse(data)
     except Product.DoesNotExist:
         return JsonResponse({"error": "Product not found"}, status=404)
 

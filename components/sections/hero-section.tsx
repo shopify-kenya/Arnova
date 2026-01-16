@@ -120,7 +120,7 @@ export function HeroSection() {
               size="lg"
               className="group px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg rounded-full bg-accent hover:bg-accent/90 text-accent-foreground"
             >
-              <Link href="/new-arrivals">
+              <Link href="/store">
                 Shop Now
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
