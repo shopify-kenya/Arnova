@@ -1,5 +1,6 @@
 import base64
 import json
+import logging
 from datetime import datetime
 from decimal import Decimal
 
@@ -11,6 +12,8 @@ from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
 
 from .models import MpesaPayment, Payment
+
+logger = logging.getLogger("shop")
 
 
 def get_mpesa_access_token():
@@ -165,7 +168,7 @@ def process_mpesa_payment(data, amount):
                     merchant_request_id=result.get("MerchantRequestID"),
                 )
             except Exception as e:
-                print(f"Error creating payment record: {str(e)}")
+                logger.error(f"Error creating payment record: {str(e)}")
 
             return JsonResponse(
                 {
@@ -242,12 +245,12 @@ def mpesa_callback(request):
                 mpesa_payment.payment.save()
 
             except MpesaPayment.DoesNotExist:
-                print(
+                logger.warning(
                     f"M-Pesa payment record not found for "
                     f"checkout_request_id: {checkout_request_id}"
                 )
 
-            print(f"M-Pesa payment successful: {payment_data}")
+            logger.info(f"M-Pesa payment successful: {payment_data}")
         else:
             # Payment failed
             try:
@@ -263,17 +266,17 @@ def mpesa_callback(request):
                 mpesa_payment.payment.save()
 
             except MpesaPayment.DoesNotExist:
-                print(
+                logger.warning(
                     f"M-Pesa payment record not found for "
                     f"checkout_request_id: {checkout_request_id}"
                 )
 
-            print(f"M-Pesa payment failed: {result_desc}")
+            logger.warning(f"M-Pesa payment failed: {result_desc}")
 
         return JsonResponse({"ResultCode": 0, "ResultDesc": "Success"})
 
     except Exception as e:
-        print(f"M-Pesa callback error: {str(e)}")
+        logger.error(f"M-Pesa callback error: {str(e)}")
         return JsonResponse({"ResultCode": 1, "ResultDesc": "Error"})
 
 

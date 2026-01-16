@@ -220,7 +220,10 @@ def api_products(request):
             )
         except Exception as e:
             # Log the error for this specific product and continue with others
-            print(f"Error processing product {p.id}: {e}")
+            import logging
+
+            logger = logging.getLogger("shop")
+            logger.error(f"Error processing product {p.id}: {e}")
             continue
     return JsonResponse({"products": data})
 

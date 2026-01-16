@@ -1,4 +1,4 @@
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 
 
 class AdminSecurityMiddleware:
@@ -9,11 +9,15 @@ class AdminSecurityMiddleware:
 
     def __call__(self, request):
         # Check if accessing admin endpoints
-        if request.path.startswith("/dashboard/") or request.path.startswith(
-            "/api/admin/"
-        ):
+        if request.path.startswith("/admin/") or request.path.startswith("/api/admin/"):
             # Require staff authentication for admin endpoints
             if not (request.user.is_authenticated and request.user.is_staff):
+                # Return JSON for API requests
+                if request.path.startswith("/api/"):
+                    return JsonResponse(
+                        {"error": "Access denied. Staff privileges required."},
+                        status=403,
+                    )
                 return HttpResponseForbidden(
                     "Access denied. Staff privileges required."
                 )

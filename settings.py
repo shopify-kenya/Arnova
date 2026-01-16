@@ -27,11 +27,11 @@ BASE_DIR = Path(__file__).resolve().parent
 SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config(
     "DJANGO_ALLOWED_HOSTS",
-    default="127.0.0.1,localhost,arnova-207y.onrender.com",
+    default="127.0.0.1,localhost,testserver,arnova-207y.onrender.com",
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
@@ -93,8 +93,8 @@ WSGI_APPLICATION = "wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         default=config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
-        conn_max_age=600,
-        conn_health_checks=True,
+        conn_max_age=0,  # Disable persistent connections for pooler
+        conn_health_checks=False,
     )
 }
 
@@ -165,7 +165,7 @@ USE_ETAGS = True
 USE_GZIP = True
 
 # Session security
-SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=not DEBUG, cast=bool)
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Allow persistent sessions
@@ -185,6 +185,7 @@ if not DEBUG:
 else:
     # Development: disable HTTPS redirects
     SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
 
 # Cache settings for static files
 if not DEBUG:

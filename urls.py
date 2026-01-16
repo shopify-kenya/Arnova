@@ -8,6 +8,7 @@ import views
 from shop import admin_views, api_views, payment_views, static_views
 from shop.admin import admin_site
 from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
+from shop.error_handlers import handler400, handler403, handler404, handler500
 
 # Admin URLs - separate namespace for security
 admin_patterns = [
@@ -170,3 +171,9 @@ urlpatterns = [
     # Catch-all for any remaining routes (MUST BE LAST)
     re_path(r"^.*$", views.index, name="catch_all"),
 ]
+
+# Error handlers
+handler404 = handler404
+handler500 = handler500
+handler403 = handler403
+handler400 = handler400
