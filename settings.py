@@ -92,11 +92,26 @@ WSGI_APPLICATION = "wsgi.application"
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
         conn_max_age=600,
         conn_health_checks=True,
     )
 }
+
+# Add SSL certificate for Supabase (PostgreSQL only)
+if config("SSL_SUPABASE", default=None) and "postgresql" in DATABASES["default"].get(
+    "ENGINE", ""
+):
+    ssl_cert_path = BASE_DIR / config("SSL_SUPABASE")
+    if ssl_cert_path.exists():
+        if "OPTIONS" not in DATABASES["default"]:
+            DATABASES["default"]["OPTIONS"] = {}
+        DATABASES["default"]["OPTIONS"].update(
+            {
+                "sslmode": "require",
+                "sslrootcert": str(ssl_cert_path),
+            }
+        )
 
 
 # Password validation
