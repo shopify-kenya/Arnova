@@ -227,57 +227,80 @@ def api_products(request):
 
 @require_http_methods(["GET"])
 def api_cart(request):
+    """Get user's cart items"""
     if not request.user.is_authenticated:
         return JsonResponse({"items": []})
 
     cart, _ = Cart.objects.get_or_create(user=request.user)
+    items = cart.items.all().select_related("product")
+    data = [
+        {
+            "id": item.id,
+            "product": {
+                "id": item.product.id,
+                "name": item.product.name,
+                "price": float(item.product.price),
+                "images": item.product.images,
+            },
+            "quantity": item.quantity,
+            "selected_size": item.selected_size,
+            "selected_color": item.selected_color,
+        }
+        for item in items
+    ]
+    return JsonResponse({"items": data})
 
-    if request.method == "GET":
-        items = cart.items.all().select_related("product")
-        data = [
-            {
-                "id": item.id,
-                "product": {
-                    "id": item.product.id,
-                    "name": item.product.name,
-                    "price": float(item.product.price),
-                    "images": item.product.images,
-                },
-                "quantity": item.quantity,
-                "selected_size": item.selected_size,
-                "selected_color": item.selected_color,
-            }
-            for item in items
-        ]
-        return JsonResponse({"items": data})
 
-    elif request.method == "POST":
-        import json
+@login_required
+@require_http_methods(["POST"])
+def api_cart_add(request):
+    """Add item to cart"""
+    import json
+    import logging
 
-        try:
-            data = json.loads(request.body)
-            product = Product.objects.get(id=data["product_id"])
-            quantity = int(data.get("quantity", 1))
-            if quantity < 1:
-                return JsonResponse(
-                    {"error": "Quantity must be at least 1"}, status=400
-                )
-        except (json.JSONDecodeError, Product.DoesNotExist, KeyError, ValueError):
-            return JsonResponse({"error": "Invalid request"}, status=400)
+    logger = logging.getLogger("shop")
 
-        item, created = CartItem.objects.get_or_create(
-            cart=cart,
-            product=product,
-            selected_size=data["selected_size"],
-            selected_color=data["selected_color"],
-            defaults={"quantity": quantity},
-        )
+    try:
+        data = json.loads(request.body)
+        product = Product.objects.get(id=data["product_id"])
+        quantity = int(data.get("quantity", 1))
+        selected_size = data.get("selected_size", "")
+        selected_color = data.get("selected_color", "")
 
-        if not created:
-            item.quantity = quantity
-            item.save()
+        if quantity < 1:
+            return JsonResponse({"error": "Quantity must be at least 1"}, status=400)
 
-        return JsonResponse({"success": True, "item_id": item.id})
+        # Validate size and color if provided
+        if selected_size and selected_size not in product.sizes:
+            return JsonResponse({"error": f"Invalid size: {selected_size}"}, status=400)
+        if selected_color and selected_color not in product.colors:
+            return JsonResponse(
+                {"error": f"Invalid color: {selected_color}"}, status=400
+            )
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found"}, status=404)
+    except (KeyError, ValueError) as e:
+        return JsonResponse({"error": f"Invalid request: {str(e)}"}, status=400)
+
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+
+    item, created = CartItem.objects.get_or_create(
+        cart=cart,
+        product=product,
+        selected_size=selected_size,
+        selected_color=selected_color,
+        defaults={"quantity": quantity},
+    )
+
+    if not created:
+        item.quantity = quantity
+        item.save()
+
+    logger.info(f"User {request.user.username} added product {product.id} to cart")
+    return JsonResponse({"success": True, "item_id": item.id})
 
 
 @login_required
@@ -316,44 +339,55 @@ def api_cart_item(request, item_id):
 
 @require_http_methods(["GET"])
 def api_saved(request):
+    """Get user's saved items"""
     if not request.user.is_authenticated:
         return JsonResponse({"items": []})
 
-    if request.method == "GET":
-        items = SavedItem.objects.filter(user=request.user).select_related("product")
-        data = [
-            {
-                "id": item.id,
-                "product": {
-                    "id": item.product.id,
-                    "name": item.product.name,
-                    "price": float(item.product.price),
-                    "sale_price": (
-                        float(item.product.sale_price)
-                        if item.product.sale_price
-                        else None
-                    ),
-                    "images": item.product.images,
-                    "on_sale": item.product.on_sale,
-                },
-            }
-            for item in items
-        ]
-        return JsonResponse({"items": data})
+    items = SavedItem.objects.filter(user=request.user).select_related("product")
+    data = [
+        {
+            "id": item.id,
+            "product": {
+                "id": item.product.id,
+                "name": item.product.name,
+                "price": float(item.product.price),
+                "sale_price": (
+                    float(item.product.sale_price) if item.product.sale_price else None
+                ),
+                "images": item.product.images,
+                "on_sale": item.product.on_sale,
+            },
+        }
+        for item in items
+    ]
+    return JsonResponse({"items": data})
 
-    elif request.method == "POST":
-        import json
 
-        try:
-            data = json.loads(request.body)
-            product = Product.objects.get(id=data["product_id"])
-        except (json.JSONDecodeError, Product.DoesNotExist, KeyError):
-            return JsonResponse({"error": "Invalid request"}, status=400)
+@login_required
+@require_http_methods(["POST"])
+def api_saved_add(request):
+    """Add item to saved items"""
+    import json
+    import logging
 
-        item, created = SavedItem.objects.get_or_create(
-            user=request.user, product=product
-        )
-        return JsonResponse({"success": True, "item_id": item.id})
+    logger = logging.getLogger("shop")
+
+    try:
+        data = json.loads(request.body)
+        product = Product.objects.get(id=data["product_id"])
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found"}, status=404)
+    except KeyError:
+        return JsonResponse({"error": "Missing product_id"}, status=400)
+
+    item, created = SavedItem.objects.get_or_create(user=request.user, product=product)
+
+    if created:
+        logger.info(f"User {request.user.username} saved product {product.id}")
+
+    return JsonResponse({"success": True, "item_id": item.id, "created": created})
 
 
 @login_required

@@ -59,6 +59,8 @@ admin_cookies.txt
 fresh_cookies.txt
 test_cookies.txt
 
+# Documentation (local only)
 API_REVIEW_REPORT.md
 API_FIXES_GUIDE.md
 API_FIXES_PROGRESS.md
+SECURITY_HARDENING_COMPLETE.md
