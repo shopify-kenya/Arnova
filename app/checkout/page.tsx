@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
@@ -83,6 +83,14 @@ function CheckoutPageContent() {
       }))
     }
   }, [isAuthenticated, cart.length, user, router, orderComplete])
+
+  const handleFormChange = useCallback(
+    (field: keyof typeof formData) =>
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData(prev => ({ ...prev, [field]: e.target.value }))
+      },
+    []
+  )
 
   const handleMpesaSuccess = () => {
     setShowMpesaModal(false)
@@ -311,12 +319,7 @@ function CheckoutPageContent() {
                         <Input
                           id="firstName"
                           value={formData.firstName}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              firstName: e.target.value,
-                            })
-                          }
+                          onChange={handleFormChange("firstName")}
                           required
                           className="glass"
                         />
@@ -326,12 +329,7 @@ function CheckoutPageContent() {
                         <Input
                           id="lastName"
                           value={formData.lastName}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              lastName: e.target.value,
-                            })
-                          }
+                          onChange={handleFormChange("lastName")}
                           required
                           className="glass"
                         />
@@ -344,9 +342,7 @@ function CheckoutPageContent() {
                         id="email"
                         type="email"
                         value={formData.email}
-                        onChange={e =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
+                        onChange={handleFormChange("email")}
                         required
                         className="glass"
                       />
@@ -358,9 +354,7 @@ function CheckoutPageContent() {
                         id="phone"
                         type="tel"
                         value={formData.phone}
-                        onChange={e =>
-                          setFormData({ ...formData, phone: e.target.value })
-                        }
+                        onChange={handleFormChange("phone")}
                         required
                         className="glass"
                       />
@@ -371,9 +365,7 @@ function CheckoutPageContent() {
                       <Input
                         id="address"
                         value={formData.address}
-                        onChange={e =>
-                          setFormData({ ...formData, address: e.target.value })
-                        }
+                        onChange={handleFormChange("address")}
                         required
                         className="glass"
                       />
@@ -385,9 +377,7 @@ function CheckoutPageContent() {
                         <Input
                           id="city"
                           value={formData.city}
-                          onChange={e =>
-                            setFormData({ ...formData, city: e.target.value })
-                          }
+                          onChange={handleFormChange("city")}
                           required
                           className="glass"
                         />
@@ -397,9 +387,7 @@ function CheckoutPageContent() {
                         <Input
                           id="state"
                           value={formData.state}
-                          onChange={e =>
-                            setFormData({ ...formData, state: e.target.value })
-                          }
+                          onChange={handleFormChange("state")}
                           required
                           className="glass"
                         />
@@ -412,12 +400,7 @@ function CheckoutPageContent() {
                         <Input
                           id="zipCode"
                           value={formData.zipCode}
-                          onChange={e =>
-                            setFormData({
-                              ...formData,
-                              zipCode: e.target.value,
-                            })
-                          }
+                          onChange={handleFormChange("zipCode")}
                           required
                           className="glass"
                         />
