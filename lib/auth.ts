@@ -1,5 +1,7 @@
 "use client"
 
+import { apiFetch } from "./api"
+
 // Mock authentication - Replace with actual backend API calls
 export interface User {
   id: string
@@ -57,9 +59,7 @@ export function getCurrentUser(): User | null {
 
 export async function checkAuthStatus(): Promise<User | null> {
   try {
-    const response = await fetch("/api/auth/status/", {
-      credentials: "include",
-    })
+    const response = await apiFetch("api/auth/status/")
     const data = await response.json()
 
     if (data.authenticated && data.user) {
@@ -97,13 +97,12 @@ export function login(
   rememberMe: boolean = false
 ): User | null {
   // Use Django API for authentication
-  fetch("/api/auth/login/", {
+  apiFetch("api/auth/login/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": getCsrfToken(),
     },
-    credentials: "include",
     body: JSON.stringify({ email, password }),
   })
     .then(response => response.json())

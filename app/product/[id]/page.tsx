@@ -15,6 +15,7 @@ import { useSavedItems } from "@/components/saved-items-provider"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import type { Product } from "@/lib/products"
+import { apiFetch } from "@/lib/api"
 
 export default function ProductPage() {
   const params = useParams()
@@ -29,7 +30,7 @@ export default function ProductPage() {
   const router = useRouter()
 
   useEffect(() => {
-    fetch(`/api/products/${params.id}/`)
+    apiFetch(`api/products/${params.id}/`)
       .then(res => res.json())
       .then(data => {
         setProduct(data)

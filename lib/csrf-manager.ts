@@ -1,3 +1,5 @@
+import { apiFetch } from "./api"
+
 class CSRFTokenManager {
   private static instance: CSRFTokenManager
   private token: string = ""
@@ -36,9 +38,7 @@ class CSRFTokenManager {
   }
 
   private async fetchToken(): Promise<string> {
-    const response = await fetch("/api/csrf-token/", {
-      credentials: "include",
-    })
+    const response = await apiFetch("api/csrf-token/")
 
     if (!response.ok) {
       throw new Error(`CSRF token fetch failed: ${response.status}`)

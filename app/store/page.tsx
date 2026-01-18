@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ProductCard } from "@/components/product-card"
 import { useAuth } from "@/components/auth-provider"
+import { apiFetch } from "@/lib/api"
 
 interface Product {
   id: string
@@ -37,13 +38,7 @@ export default function StorePage() {
     // Fetch products from Django API
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/products/", {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-        })
+        const response = await apiFetch("api/products/")
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
