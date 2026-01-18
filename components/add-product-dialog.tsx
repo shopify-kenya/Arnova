@@ -53,7 +53,6 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
   const [images, setImages] = useState<string[]>([])
   const [imageUrl, setImageUrl] = useState("")
   const [formData, setFormData] = useState({
-    id: "",
     name: "",
     description: "",
     price: "",
@@ -118,7 +117,6 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
 
     // Validation - all fields are now mandatory
     if (
-      !formData.id ||
       !formData.name ||
       !formData.description ||
       !formData.price ||
@@ -145,7 +143,6 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
               ?.split("=")[1] || "",
         },
         body: JSON.stringify({
-          id: formData.id,
           name: formData.name,
           description: formData.description,
           price: parseFloat(formData.price),
@@ -161,7 +158,6 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
         toast.success("Product added successfully!")
         setOpen(false)
         setFormData({
-          id: "",
           name: "",
           description: "",
           price: "",
@@ -201,20 +197,6 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="id">
-              Product ID <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="id"
-              value={formData.id}
-              onChange={e => setFormData({ ...formData, id: e.target.value })}
-              placeholder="CL-001"
-              className="glass"
-              required
-            />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="name">
               Product Name <span className="text-destructive">*</span>
