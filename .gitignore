@@ -75,3 +75,4 @@ DEPLOYMENT_*.md
 ADMIN_*.md
 Documentations.md
 VERCEL_DEPLOY.md
+.env.*
