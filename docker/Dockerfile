@@ -5,6 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=settings
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 WORKDIR /app
 
@@ -18,16 +19,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get update && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY ../requirements.txt .
-RUN python -m pip install --upgrade pip
+# Copy package files first for better caching
+COPY ../package*.json ./
 
+# Install Node.js dependencies
+RUN npm ci --legacy-peer-deps
 
 # Copy application code
 COPY .. .
 
-# Install Node.js dependencies and build frontend
-RUN npm ci && npm run build
+# Build Next.js frontend
+RUN npm run build
+
+# Install Python dependencies
+RUN python -m pip install --upgrade pip && \
+    pip install -r requirements.txt
 
 # Create directories and user
 RUN mkdir -p staticfiles ssl && \
