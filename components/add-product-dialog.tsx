@@ -185,7 +185,7 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg">
+        <Button variant="gradient" size="lg">
           <Plus className="mr-2 h-5 w-5" />
           Add Product
         </Button>
@@ -415,12 +415,14 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
           <DialogFooter>
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               onClick={() => setOpen(false)}
             >
               Cancel
             </Button>
-            <Button type="submit">Add Product</Button>
+            <Button type="submit" variant="success">
+              Add Product
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

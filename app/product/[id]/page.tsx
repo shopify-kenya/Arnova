@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import type { Product } from "@/lib/products"
 import { apiFetch } from "@/lib/api"
+import { ProductReviews } from "@/components/product-reviews"
 
 export default function ProductPage() {
   const params = useParams()
@@ -213,6 +214,16 @@ export default function ProductPage() {
             Add to Cart
           </Button>
         </div>
+      </div>
+
+      <div className="mt-12">
+        <ProductReviews
+          productId={params.id as string}
+          reviews={[]}
+          averageRating={product.rating || 0}
+          isAuthenticated={isAuthenticated}
+          onReviewAdded={() => window.location.reload()}
+        />
       </div>
     </div>
   )
