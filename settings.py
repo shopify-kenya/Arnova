@@ -48,12 +48,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_extensions",
     "shop",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "shop.middleware.cors.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -183,7 +184,7 @@ USE_GZIP = True
 # Session security
 SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=not DEBUG, cast=bool)
 SESSION_COOKIE_HTTPONLY = False  # Allow JavaScript access for frontend
-SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
+SESSION_COOKIE_SAMESITE = "None"  # Required for cross-origin requests
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Allow persistent sessions
 SESSION_COOKIE_AGE = 2592000  # 30 days for remember me
 SESSION_SAVE_EVERY_REQUEST = True
@@ -215,7 +216,7 @@ CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", default=not DEBUG, cast=bool)
-CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "None"  # Required for cross-origin requests
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_AGE = 86400
 CSRF_TRUSTED_ORIGINS = config(
@@ -298,3 +299,40 @@ LOGGING = {
         },
     },
 }
+
+# CORS Configuration for Vercel Frontend
+CORS_ALLOWED_ORIGINS = [
+    "https://arnova-207y.onrender.com",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:8000",
+    "https://localhost:8443",
+    "https://127.0.0.1:8443",
+]
+
+# Allow all Vercel domains
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
