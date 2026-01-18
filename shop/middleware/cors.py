@@ -24,7 +24,7 @@ class CorsMiddleware(MiddlewareMixin):
     def add_cors_headers(self, request, response):
         origin = request.META.get("HTTP_ORIGIN")
 
-        # Allow localhost and HTTPS variants
+        # Allow localhost, Render, and Vercel origins
         allowed_origins = [
             "http://localhost:3000",
             "http://localhost:8000",
@@ -35,8 +35,8 @@ class CorsMiddleware(MiddlewareMixin):
             "https://arnova-207y.onrender.com",
         ]
 
-        # Check if the origin is in the allowed list
-        if origin and origin in allowed_origins:
+        # Allow all Vercel preview and production domains
+        if origin and (origin in allowed_origins or origin.endswith(".vercel.app")):
             response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Credentials"] = "true"
 
