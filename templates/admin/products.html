@@ -172,16 +172,6 @@
                     <textarea name="images" rows="2" placeholder="Leave empty to auto-fetch" class="form-input w-full px-3 py-2 rounded-lg"></textarea>
                     <p class="text-xs text-white/50 mt-1">💡 Auto-fetches from Unsplash if empty</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Rating (0-5)</label>
-                        <input type="number" name="rating" step="0.1" min="0" max="5" class="form-input w-full px-3 py-2 rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Reviews Count</label>
-                        <input type="number" name="reviews" min="0" class="form-input w-full px-3 py-2 rounded-lg">
-                    </div>
-                </div>
                 <div class="flex space-x-4">
                     <label class="flex items-center">
                         <input type="checkbox" name="in_stock" checked class="mr-2">
@@ -226,9 +216,7 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
         images: images,
         in_stock: formData.get('in_stock') === 'on',
         is_new: formData.get('is_new') === 'on',
-        on_sale: formData.get('on_sale') === 'on',
-        rating: parseFloat(formData.get('rating')),
-        reviews: parseInt(formData.get('reviews')) || 0
+        on_sale: formData.get('on_sale') === 'on'
     };
 
     fetch(this.action, {
