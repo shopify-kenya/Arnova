@@ -16,6 +16,7 @@ import { CurrencyProvider, useCurrency } from "@/components/currency-provider"
 import { useAuth } from "@/components/auth-provider"
 import { useCart } from "@/components/cart-provider"
 import { toast } from "sonner"
+import { DeleteDialog } from "@/components/delete-dialog"
 
 function CartPageContent() {
   const router = useRouter()
@@ -23,6 +24,10 @@ function CartPageContent() {
   const { cart, removeItem, updateQuantity, total, itemCount } = useCart()
   const { formatPrice } = useCurrency()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [deleteItem, setDeleteItem] = useState<{
+    id: string
+    name: string
+  } | null>(null)
 
   useEffect(() => {
     if (!isAuthenticated && cart.length > 0) {
@@ -67,7 +72,7 @@ function CartPageContent() {
                 Start shopping to add items to your cart
               </p>
               <Link href="/store">
-                <Button size="lg">
+                <Button variant="gradient" size="lg">
                   Browse Products
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -166,10 +171,12 @@ function CartPageContent() {
                           size="icon"
                           variant="ghost"
                           className="text-destructive"
-                          onClick={() => {
-                            removeItem(item.id!)
-                            toast.success("Removed from cart")
-                          }}
+                          onClick={() =>
+                            setDeleteItem({
+                              id: item.id!,
+                              name: item.product.name,
+                            })
+                          }
                         >
                           <Trash2 className="h-5 w-5" />
                         </Button>
@@ -206,15 +213,17 @@ function CartPageContent() {
                     </div>
                   </div>
                 </div>
-                <Button className="w-full" size="lg" onClick={handleCheckout}>
+                <Button
+                  variant="gradient"
+                  className="w-full"
+                  size="lg"
+                  onClick={handleCheckout}
+                >
                   Proceed to Checkout
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
                 <Link href="/store">
-                  <Button
-                    variant="outline"
-                    className="w-full mt-3 bg-transparent"
-                  >
+                  <Button variant="glass" className="w-full mt-3">
                     Continue Shopping
                   </Button>
                 </Link>
@@ -223,6 +232,22 @@ function CartPageContent() {
           </div>
         </motion.div>
       </main>
+
+      <DeleteDialog
+        open={!!deleteItem}
+        onOpenChange={open => !open && setDeleteItem(null)}
+        onConfirm={() => {
+          if (deleteItem) {
+            removeItem(deleteItem.id)
+            toast.success("Removed from cart")
+            setDeleteItem(null)
+          }
+        }}
+        title="Remove from Cart"
+        description="Are you sure you want to remove this item from your cart?"
+        itemName={deleteItem?.name}
+      />
+
       <Footer />
     </div>
   )
