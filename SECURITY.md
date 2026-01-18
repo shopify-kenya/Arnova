@@ -53,7 +53,7 @@ Allowed origins:
 
 Trusted origins configured in `.env`:
 
-```
+```txt
 CSRF_TRUSTED_ORIGINS=https://arnova-207y.onrender.com,https://*.vercel.app
 ```
 

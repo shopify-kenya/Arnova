@@ -8,7 +8,7 @@ python quick-start.py
 
 ## Project Structure
 
-```
+```txt
 Arnova/
 ├── app/                    # Next.js app directory
 ├── components/             # React components

@@ -100,10 +100,10 @@ Services:
 
 ## 🌐 URLs
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **Admin Panel**: http://localhost:8000/admin
-- **Production**: http://localhost (via Nginx)
+- **Frontend**: <http://localhost:3000>
+- **Backend API**: <http://localhost:8000>
+- **Admin Panel**: <http://localhost:8000/admin>
+- **Production**: <http://localhost> (via Nginx)
 
 ## 📱 PWA Features
 

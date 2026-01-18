@@ -1,16 +1,21 @@
 # Environment variables
 .env
+.env.local
+.env.*.local
 
 # Virtual environment
 venv/
 env/
+.venv/
 
 # Django
 *.pyc
 __pycache__/
 db.sqlite3
+db.sqlite3-*
 media/
 staticfiles/
+static/
 
 # IDE
 .vscode/
@@ -36,41 +41,37 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
 
-# Next.js build files
+# Next.js
 .next/
 out/
 next-env.d.ts
-
-# Build files (generated)
-build/
-static/
 *.tsbuildinfo
 
-# Database
-db.sqlite3
-
+# SSL Certificates
 *.pem
+*.key
+*.crt
+ssl/
 
+# Temporary/Test files
 PR.md
 payment.md
-cookies.txt
-admin_cookies.txt
-fresh_cookies.txt
-test_cookies.txt
+*.txt
+!requirements.txt
+!package.json
 
-# Documentation (local only)
-API_REVIEW_REPORT.md
-API_FIXES_GUIDE.md
-API_FIXES_PROGRESS.md
-SECURITY_HARDENING_COMPLETE.md
-DEPLOYMENT_FIXES.md
-
+# Scripts (local only)
 start_server.py
 test_api_endpoints.py
-ADMIN_STYLING_MIGRATION.md
-Documentations.md
-docs/*
-.env.*
 migrate_local_postgres.sh
-db.*
+
+# Documentation (local only)
+docs/
+API_*.md
+SECURITY_HARDENING_*.md
+DEPLOYMENT_*.md
+ADMIN_*.md
+Documentations.md
+VERCEL_DEPLOY.md
