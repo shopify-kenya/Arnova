@@ -252,12 +252,16 @@ function CheckoutPageContent() {
                 email to {user?.email}
               </p>
               <div className="flex gap-4 justify-center">
-                <Button size="lg" onClick={() => router.push("/orders")}>
+                <Button
+                  variant="success"
+                  size="lg"
+                  onClick={() => router.push("/orders")}
+                >
                   View Orders
                 </Button>
                 <Button
                   size="lg"
-                  variant="outline"
+                  variant="glass"
                   onClick={() => router.push("/")}
                 >
                   Continue Shopping
@@ -499,6 +503,7 @@ function CheckoutPageContent() {
 
                   <Button
                     type="submit"
+                    variant="gradient"
                     className="w-full"
                     size="lg"
                     disabled={isProcessing}

@@ -203,6 +203,7 @@ export default function ProductPage() {
           )}
 
           <Button
+            variant="gradient"
             size="lg"
             className="w-full"
             onClick={handleAddToCart}
