@@ -11,17 +11,7 @@ export type Currency = {
 }
 
 export const currencies: Currency[] = [
-  { code: "USD", symbol: "$", name: "US Dollar", rate: 1 },
-  { code: "EUR", symbol: "€", name: "Euro", rate: 0.92 },
-  { code: "GBP", symbol: "£", name: "British Pound", rate: 0.79 },
-  { code: "KES", symbol: "KSh", name: "Kenyan Shilling", rate: 129.5 },
-  { code: "TZS", symbol: "TSh", name: "Tanzanian Shilling", rate: 2520 },
-  { code: "UGX", symbol: "USh", name: "Ugandan Shilling", rate: 3720 },
-  { code: "JPY", symbol: "¥", name: "Japanese Yen", rate: 149.5 },
-  { code: "CNY", symbol: "¥", name: "Chinese Yuan", rate: 7.24 },
-  { code: "INR", symbol: "₹", name: "Indian Rupee", rate: 83.12 },
-  { code: "AUD", symbol: "A$", name: "Australian Dollar", rate: 1.52 },
-  { code: "CAD", symbol: "C$", name: "Canadian Dollar", rate: 1.36 },
+  { code: "KES", symbol: "KES", name: "Kenyan Shilling", rate: 1 },
 ]
 
 interface CurrencyContextType {
@@ -56,7 +46,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
   const formatPrice = (price: number): string => {
     const converted = price * currency.rate
-    return `${currency.symbol}${converted.toFixed(2)}`
+    return `${currency.symbol} ${converted.toFixed(2)}`
   }
 
   return (
