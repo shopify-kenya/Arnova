@@ -25,7 +25,7 @@ function CartPageContent() {
   const { formatPrice } = useCurrency()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [deleteItem, setDeleteItem] = useState<{
-    id: string
+    id: number
     name: string
   } | null>(null)
 
