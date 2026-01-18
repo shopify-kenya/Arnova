@@ -185,7 +185,7 @@ def api_products(request):
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
     target_currency = request.GET.get("currency", "USD")
-    products = Product.objects.all()
+    products = Product.objects.all().order_by("-created_at")  # Latest first
     data = []
 
     for p in products:
@@ -198,6 +198,11 @@ def api_products(request):
                 price = price * rate
                 if sale_price:
                     sale_price = sale_price * rate
+
+            # Process images with fallback
+            images = p.images if p.images is not None else []
+            if not images:
+                images = ["/placeholder.svg"]
 
             data.append(
                 {
@@ -213,9 +218,7 @@ def api_products(request):
                     ),  # Safely get category name
                     "sizes": p.sizes if p.sizes is not None else [],
                     "colors": p.colors if p.colors is not None else [],
-                    "images": (
-                        p.images if p.images is not None else []
-                    ),  # Safely get images
+                    "images": images,
                     "in_stock": p.in_stock,
                     "is_new": p.is_new,
                     "on_sale": p.on_sale,

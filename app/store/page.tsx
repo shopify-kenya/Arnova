@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import useSWR from "swr"
 import { motion } from "framer-motion"
 import { BuyerNavbar } from "@/components/buyer-navbar"
 import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
@@ -25,38 +26,29 @@ interface Product {
 
 export default function StorePage() {
   const { user } = useAuth()
-  const [products, setProducts] = useState<Product[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [isLoading, setIsLoading] = useState(true)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   const categories = ["all", "clothing", "accessories", "shoes", "bags"]
 
-  useEffect(() => {
-    // Fetch products from Django API
-    const fetchProducts = async () => {
-      try {
-        const response = await apiFetch("api/products/")
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const data = await response.json()
-        setProducts(data.products || [])
-      } catch (error) {
-        console.error("Failed to fetch products:", error)
-        // Fallback to empty array on error
-        setProducts([])
-      } finally {
-        setIsLoading(false)
-      }
+  // Fetch products with SWR for auto-refresh
+  const { data, error, isLoading } = useSWR(
+    "api/products/",
+    async url => {
+      const response = await apiFetch(url)
+      if (!response.ok) throw new Error("Failed to fetch")
+      const data = await response.json()
+      return data.products || []
+    },
+    {
+      refreshInterval: 30000, // Refresh every 30 seconds
+      revalidateOnFocus: true, // Refresh when window regains focus
     }
+  )
 
-    fetchProducts()
-  }, [])
+  const products = data || []
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name

@@ -15,6 +15,7 @@ import { useAuth } from "@/components/auth-provider"
 import { useSavedItems } from "@/components/saved-items-provider"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { getProductImageUrl } from "@/lib/image-utils"
 
 interface ProductCardProps {
   product: Product
@@ -83,7 +84,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <GlassCard className="group overflow-hidden h-full">
           <div className="relative aspect-square overflow-hidden">
             <Image
-              src={product.images[0] || "/placeholder.svg"}
+              src={getProductImageUrl(product.images[0])}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-110"
