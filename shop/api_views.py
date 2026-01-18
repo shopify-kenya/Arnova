@@ -185,11 +185,15 @@ def api_products(request):
         return JsonResponse({"error": "Rate limit exceeded"}, status=429)
 
     target_currency = request.GET.get("currency", "USD")
-    products = Product.objects.all().order_by("-created_at")  # Latest first
+    products = (
+        Product.objects.select_related("category")
+        .prefetch_related("product_reviews")
+        .order_by("-created_at")
+    )
     data = []
 
     for p in products:
-        try:  # Add try-except for individual product processing
+        try:
             price = float(p.price)
             sale_price = float(p.sale_price) if p.sale_price else None
 
@@ -199,7 +203,6 @@ def api_products(request):
                 if sale_price:
                     sale_price = sale_price * rate
 
-            # Process images with fallback
             images = p.images if p.images is not None else []
             if not images:
                 images = ["/placeholder.svg"]
@@ -213,21 +216,18 @@ def api_products(request):
                     "sale_price": round(sale_price, 2) if sale_price else None,
                     "currency": target_currency,
                     "base_currency": p.currency,
-                    "category": (
-                        p.category.name if p.category else None
-                    ),  # Safely get category name
+                    "category": p.category.name if p.category else None,
                     "sizes": p.sizes if p.sizes is not None else [],
                     "colors": p.colors if p.colors is not None else [],
                     "images": images,
                     "in_stock": p.in_stock,
                     "is_new": p.is_new,
                     "on_sale": p.on_sale,
-                    "rating": float(p.rating),
-                    "reviews": p.reviews,
+                    "rating": p.average_rating,
+                    "reviews": p.review_count,
                 }
             )
         except Exception as e:
-            # Log the error for this specific product and continue with others
             import logging
 
             logger = logging.getLogger("shop")

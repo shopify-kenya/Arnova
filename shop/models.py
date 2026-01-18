@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 
@@ -29,13 +30,22 @@ class Product(models.Model):
     in_stock = models.BooleanField(default=True)
     is_new = models.BooleanField(default=False)
     on_sale = models.BooleanField(default=False)
-    rating = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
-    reviews = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def average_rating(self):
+        reviews = self.product_reviews.all()
+        if not reviews:
+            return 0.0
+        return round(sum(r.rating for r in reviews) / len(reviews), 1)
+
+    @property
+    def review_count(self):
+        return self.product_reviews.count()
 
 
 class UserProfile(models.Model):
@@ -192,3 +202,22 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.user.username}"
+
+
+class Review(models.Model):
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="product_reviews"
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("product", "user")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name} ({self.rating}★)"

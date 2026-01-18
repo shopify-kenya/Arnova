@@ -3,7 +3,12 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true,
+    formats: ["image/webp"],
   },
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
+  swcMinify: true,
   async rewrites() {
     return [
       {

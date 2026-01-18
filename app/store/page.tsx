@@ -43,8 +43,11 @@ export default function StorePage() {
       return data.products || []
     },
     {
-      refreshInterval: 30000, // Refresh every 30 seconds
-      revalidateOnFocus: true, // Refresh when window regains focus
+      refreshInterval: 30000,
+      revalidateOnFocus: true,
+      dedupingInterval: 10000,
+      revalidateOnMount: true,
+      fallbackData: [],
     }
   )
 
