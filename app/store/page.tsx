@@ -53,7 +53,7 @@ export default function StorePage() {
 
   const products = data || []
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = products.filter((product: Product) => {
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
@@ -156,7 +156,7 @@ export default function StorePage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              {filteredProducts.map((product, index) => (
+              {filteredProducts.map((product: Product, index: number) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
