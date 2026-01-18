@@ -171,7 +171,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [
-    BASE_DIR / "build",
     BASE_DIR / ".next" / "static",
     BASE_DIR / "public",
 ]

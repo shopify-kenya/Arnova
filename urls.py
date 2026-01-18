@@ -151,12 +151,12 @@ urlpatterns = [
     re_path(
         r"^_next/static/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, "build", "_next", "static")},
+        {"document_root": os.path.join(settings.BASE_DIR, ".next", "static")},
     ),
     re_path(
         r"^_next/(?P<path>.*)$",
         serve,
-        {"document_root": os.path.join(settings.BASE_DIR, "build", "_next")},
+        {"document_root": os.path.join(settings.BASE_DIR, ".next")},
     ),
     # Service Worker and Manifest with proper MIME types
     path("service-worker.js", static_views.serve_service_worker, name="service_worker"),
