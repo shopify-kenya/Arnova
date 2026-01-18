@@ -397,12 +397,12 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
           <DialogFooter>
             <Button
               type="button"
-              variant="ghost"
+              variant="destructive"
               onClick={() => setOpen(false)}
             >
               Cancel
             </Button>
-            <Button type="submit" variant="success">
+            <Button type="submit" variant="default">
               Add Product
             </Button>
           </DialogFooter>

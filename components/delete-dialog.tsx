@@ -45,7 +45,7 @@ export function DeleteDialog({
         </DialogHeader>
         <DialogFooter>
           <Button
-            variant="outline"
+            variant="destructive"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
           >
