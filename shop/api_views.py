@@ -1106,3 +1106,79 @@ def api_placeholder_image(request, width, height):
     except ImportError:
         # Fallback if PIL is not available
         return HttpResponse(b"", content_type="image/png", status=404)
+
+
+@login_required
+@require_http_methods(["POST"])
+def api_product_review(request, product_id):
+    """Submit a product review"""
+    import json
+
+    from .models import Review
+
+    try:
+        data = json.loads(request.body)
+        product = Product.objects.get(id=product_id)
+        rating = int(data.get("rating"))
+        comment = data.get("comment", "").strip()
+
+        if not 1 <= rating <= 5:
+            return JsonResponse({"error": "Rating must be between 1 and 5"}, status=400)
+
+        review, created = Review.objects.update_or_create(
+            product=product,
+            user=request.user,
+            defaults={"rating": rating, "comment": comment},
+        )
+
+        return JsonResponse(
+            {
+                "success": True,
+                "review": {
+                    "id": review.id,
+                    "rating": review.rating,
+                    "comment": review.comment,
+                    "user": request.user.username,
+                    "created_at": review.created_at.isoformat(),
+                },
+            }
+        )
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found"}, status=404)
+    except (json.JSONDecodeError, ValueError, KeyError) as e:
+        return JsonResponse({"error": f"Invalid request: {str(e)}"}, status=400)
+
+
+@require_http_methods(["GET"])
+def api_product_reviews(request, product_id):
+    """Get all reviews for a product"""
+    from .models import Review
+
+    try:
+        product = Product.objects.get(id=product_id)
+        reviews = (
+            Review.objects.filter(product=product)
+            .select_related("user")
+            .order_by("-created_at")
+        )
+
+        data = [
+            {
+                "id": review.id,
+                "user": review.user.username,
+                "rating": review.rating,
+                "comment": review.comment,
+                "created_at": review.created_at.isoformat(),
+            }
+            for review in reviews
+        ]
+
+        return JsonResponse(
+            {
+                "reviews": data,
+                "average_rating": product.average_rating,
+                "review_count": product.review_count,
+            }
+        )
+    except Product.DoesNotExist:
+        return JsonResponse({"error": "Product not found"}, status=404)

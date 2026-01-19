@@ -71,6 +71,16 @@ api_patterns = [
         api_views.api_product_detail,
         name="api_product_detail",
     ),
+    path(
+        "products/<str:product_id>/reviews/",
+        api_views.api_product_reviews,
+        name="api_product_reviews",
+    ),
+    path(
+        "products/<str:product_id>/review/",
+        api_views.api_product_review,
+        name="api_product_review",
+    ),
     path("categories/", api_views.api_categories, name="api_categories"),
     path("cart/", api_views.api_cart, name="api_cart"),
     path("cart/add/", api_views.api_cart_add, name="api_cart_add"),

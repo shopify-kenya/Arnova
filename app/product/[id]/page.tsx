@@ -21,6 +21,7 @@ import { ProductReviews } from "@/components/product-reviews"
 export default function ProductPage() {
   const params = useParams()
   const [product, setProduct] = useState<Product | null>(null)
+  const [reviews, setReviews] = useState<any[]>([])
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedSize, setSelectedSize] = useState("")
   const [selectedColor, setSelectedColor] = useState("")
@@ -29,6 +30,13 @@ export default function ProductPage() {
   const { isAuthenticated } = useAuth()
   const { addSavedItem, removeSavedItem, isProductSaved } = useSavedItems()
   const router = useRouter()
+
+  const fetchReviews = () => {
+    apiFetch(`api/products/${params.id}/reviews/`)
+      .then(res => res.json())
+      .then(data => setReviews(data.reviews || []))
+      .catch(() => {})
+  }
 
   useEffect(() => {
     apiFetch(`api/products/${params.id}/`)
@@ -39,6 +47,8 @@ export default function ProductPage() {
         setSelectedColor(data.colors[0] || "")
       })
       .catch(() => toast.error("Failed to load product"))
+
+    fetchReviews()
   }, [params.id])
 
   if (!product) return <div className="container py-20">Loading...</div>
@@ -219,10 +229,10 @@ export default function ProductPage() {
       <div className="mt-12">
         <ProductReviews
           productId={params.id as string}
-          reviews={[]}
+          reviews={reviews}
           averageRating={product.rating || 0}
           isAuthenticated={isAuthenticated}
-          onReviewAdded={() => window.location.reload()}
+          onReviewAdded={fetchReviews}
         />
       </div>
     </div>
