@@ -32,8 +32,8 @@ class AdminProductsView(APIView):
                 "in_stock": p.in_stock,
                 "is_new": p.is_new,
                 "on_sale": p.on_sale,
-                "rating": float(p.rating),
-                "reviews": p.reviews,
+                "rating": p.average_rating,
+                "reviews": p.review_count,
                 "sizes": p.sizes,
                 "colors": p.colors,
                 "images": p.images,
@@ -60,8 +60,6 @@ class AdminProductsView(APIView):
             in_stock=data.get("in_stock", True),
             is_new=data.get("is_new", False),
             on_sale=data.get("on_sale", False),
-            rating=data.get("rating", 0.0),
-            reviews=data.get("reviews", 0),
         )
         return Response({"success": True, "product_id": product.id})
 
