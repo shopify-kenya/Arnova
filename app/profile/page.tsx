@@ -93,7 +93,7 @@ export default function ProfilePage() {
       <GlassCard className="max-w-2xl mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Profile</h1>
-          <Button onClick={() => setEditing(!editing)}>
+          <Button variant="default" onClick={() => setEditing(!editing)}>
             {editing ? "Cancel" : "Edit"}
           </Button>
         </div>
@@ -198,7 +198,7 @@ export default function ProfilePage() {
           </div>
 
           {editing && (
-            <Button type="submit" className="w-full">
+            <Button variant="default" type="submit" className="w-full">
               Save Changes
             </Button>
           )}

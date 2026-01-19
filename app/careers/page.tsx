@@ -107,7 +107,7 @@ export default function CareersPage() {
                       <span>{job.type}</span>
                     </div>
                   </div>
-                  <Button>Apply Now</Button>
+                  <Button variant="default">Apply Now</Button>
                 </div>
               </GlassCard>
             ))}

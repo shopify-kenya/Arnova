@@ -145,7 +145,11 @@ function OrdersPageContent() {
                   You haven't placed any orders yet. Start shopping to see your
                   order history here.
                 </p>
-                <Button size="lg" onClick={() => router.push("/store")}>
+                <Button
+                  variant="gradient"
+                  size="lg"
+                  onClick={() => router.push("/store")}
+                >
                   Start Shopping
                 </Button>
               </GlassCard>

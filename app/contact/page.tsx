@@ -32,7 +32,9 @@ export default function ContactPage() {
                 <Input type="email" placeholder="Your Email" />
                 <Input placeholder="Subject" />
                 <Textarea placeholder="Your Message" rows={5} />
-                <Button className="w-full">Send Message</Button>
+                <Button variant="default" className="w-full">
+                  Send Message
+                </Button>
               </form>
             </GlassCard>
 

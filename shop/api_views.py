@@ -434,8 +434,8 @@ def api_product_detail(request, product_id):
             "inStock": product.in_stock,
             "isNew": product.is_new,
             "onSale": product.on_sale,
-            "rating": float(product.rating),
-            "reviews": product.reviews,
+            "rating": product.average_rating,
+            "reviews": product.review_count,
         }
         return JsonResponse(data)
     except Product.DoesNotExist:
@@ -613,8 +613,6 @@ def api_admin_products(request):
                     in_stock=data.get("in_stock", True),
                     is_new=data.get("is_new", False),
                     on_sale=data.get("on_sale", False),
-                    rating=data.get("rating", 0.0),
-                    reviews=data.get("reviews", 0),
                 )
             return JsonResponse({"success": True, "product_id": product.id})
         except Category.DoesNotExist:
@@ -648,8 +646,8 @@ def api_admin_product_detail(request, product_id):
                 "in_stock": product.in_stock,
                 "is_new": product.is_new,
                 "on_sale": product.on_sale,
-                "rating": float(product.rating),
-                "reviews": product.reviews,
+                "rating": product.average_rating,
+                "reviews": product.review_count,
                 "sizes": product.sizes,
                 "colors": product.colors,
                 "images": product.images,
@@ -673,11 +671,6 @@ def api_admin_product_detail(request, product_id):
                 product.in_stock = data.get("in_stock", product.in_stock)
                 product.is_new = data.get("is_new", product.is_new)
                 product.on_sale = data.get("on_sale", product.on_sale)
-                product.rating = data.get("rating", product.rating)
-                product.reviews = data.get("reviews", product.reviews)
-                product.sizes = data.get("sizes", product.sizes)
-                product.colors = data.get("colors", product.colors)
-                product.images = data.get("images", product.images)
                 if "category_id" in data:
                     product.category = Category.objects.get(id=data["category_id"])
                 product.save()
