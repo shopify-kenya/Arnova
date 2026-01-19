@@ -106,6 +106,7 @@ export default function ProfilePage() {
               </label>
               <input
                 name="first_name"
+                placeholder="Enter your first name"
                 defaultValue={profile?.user.first_name}
                 disabled={!editing}
                 className="w-full px-4 py-2 rounded-lg border bg-background disabled:opacity-60"
@@ -117,6 +118,7 @@ export default function ProfilePage() {
               </label>
               <input
                 name="last_name"
+                placeholder="Enter your last name"
                 defaultValue={profile?.user.last_name}
                 disabled={!editing}
                 className="w-full px-4 py-2 rounded-lg border bg-background disabled:opacity-60"
@@ -127,6 +129,7 @@ export default function ProfilePage() {
           <div>
             <label className="block text-sm font-medium mb-2">Username</label>
             <input
+              placeholder="Username (read-only)"
               value={profile?.user.username}
               disabled
               className="w-full px-4 py-2 rounded-lg border bg-background opacity-60"
@@ -138,6 +141,7 @@ export default function ProfilePage() {
             <input
               name="email"
               type="email"
+              placeholder="your.email@example.com"
               defaultValue={profile?.user.email}
               disabled={!editing}
               className="w-full px-4 py-2 rounded-lg border bg-background disabled:opacity-60"
@@ -148,6 +152,7 @@ export default function ProfilePage() {
             <label className="block text-sm font-medium mb-2">Phone</label>
             <input
               name="phone"
+              placeholder="+254 712 345 678"
               defaultValue={profile?.profile.phone}
               disabled={!editing}
               className="w-full px-4 py-2 rounded-lg border bg-background disabled:opacity-60"
@@ -158,6 +163,7 @@ export default function ProfilePage() {
             <label className="block text-sm font-medium mb-2">Address</label>
             <textarea
               name="address"
+              placeholder="Enter your full address"
               defaultValue={profile?.profile.address}
               disabled={!editing}
               rows={3}
@@ -170,6 +176,7 @@ export default function ProfilePage() {
               <label className="block text-sm font-medium mb-2">City</label>
               <input
                 name="city"
+                placeholder="City"
                 defaultValue={profile?.profile.city}
                 disabled={!editing}
                 className="w-full px-4 py-2 rounded-lg border bg-background disabled:opacity-60"
@@ -179,6 +186,7 @@ export default function ProfilePage() {
               <label className="block text-sm font-medium mb-2">Country</label>
               <input
                 name="country"
+                placeholder="Country"
                 defaultValue={profile?.profile.country}
                 disabled={!editing}
                 className="w-full px-4 py-2 rounded-lg border bg-background disabled:opacity-60"
@@ -190,6 +198,7 @@ export default function ProfilePage() {
               </label>
               <input
                 name="postal_code"
+                placeholder="Postal code"
                 defaultValue={profile?.profile.postal_code}
                 disabled={!editing}
                 className="w-full px-4 py-2 rounded-lg border bg-background disabled:opacity-60"

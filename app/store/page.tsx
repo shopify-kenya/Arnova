@@ -100,7 +100,11 @@ export default function StorePage() {
                 {/* Category Filter */}
                 <div className="flex items-center gap-2">
                   <Filter className="h-5 w-5 text-muted-foreground" />
+                  <label htmlFor="category-filter" className="sr-only">
+                    Filter by category
+                  </label>
                   <select
+                    id="category-filter"
                     value={selectedCategory}
                     onChange={e => setSelectedCategory(e.target.value)}
                     className="bg-background/50 border border-border rounded-md px-3 py-2 text-sm"
