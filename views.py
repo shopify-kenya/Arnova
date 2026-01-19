@@ -57,20 +57,7 @@ def index(request):
             response["Cache-Control"] = "public, max-age=3600"
             return response
 
-    # Final fallback - serve a simple landing page
-    return HttpResponse(
-        """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Arnova API</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body style="font-family:Arial;text-align:center;padding:50px;">
-    <h1>🛍️ Arnova API</h1>
-    <p><a href="/admin/login/">Admin Login</a> | <a href="/api/products/">API</a></p>
-</body>
-</html>
-        """,
-        content_type="text/html",
-    )
+    # Final fallback - serve homepage
+    from django.shortcuts import render
+
+    return render(request, "home.html")
