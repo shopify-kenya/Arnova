@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arnova API - Testing Interface</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .subtitle { opacity: 0.9; }
+        .endpoint-group { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .endpoint-group h2 { margin-bottom: 1rem; color: #667eea; }
+        .endpoint {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .endpoint-header {
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fafafa;
+            transition: background 0.2s;
+        }
+        .endpoint-header:hover { background: #f0f0f0; }
+        .method {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 70px;
+            text-align: center;
+        }
+        .method.get { background: #61affe; color: white; }
+        .method.post { background: #49cc90; color: white; }
+        .method.put { background: #fca130; color: white; }
+        .method.delete { background: #f93e3e; color: white; }
+        .endpoint-path { flex: 1; font-family: 'Courier New', monospace; font-weight: 500; }
+        .endpoint-body {
+            padding: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+        }
+        .endpoint-body.active { display: block; }
+        .test-form { margin-top: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; transform: translateY(-1px); }
+        .response {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f8f8;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+        .response pre {
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        .auth-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .param-table th, .param-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .param-table th { background: #f8f8f8; font-weight: 600; }
+        .required { color: #f93e3e; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🚀 Arnova API Documentation</h1>
+            <p class="subtitle">Interactive API testing interface</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="auth-info">
+            <strong>🔐 Authentication:</strong> Most endpoints require authentication. Use <code>/api/auth/login/</code> to get session cookies.
+        </div>
+
+        <!-- Authentication Endpoints -->
+        <div class="endpoint-group">
+            <h2>🔑 Authentication</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/auth/login/</span>
+                    <span>Login user</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Authenticate user and create session</p>
+                    <table class="param-table">
+                        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                        <tr><td>username</td><td>string</td><td class="required">Yes</td><td>Username or email</td></tr>
+                        <tr><td>password</td><td>string</td><td class="required">Yes</td><td>User password</td></tr>
+                    </table>
+                    <div class="test-form">
+                        <div class="form-group">
+                            <label>Request Body (JSON):</label>
+                            <textarea rows="4" id="login-body">{"username": "buyer@arnova.com", "password": "Buyer@010126"}</textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="testAPI('/api/auth/login/', 'POST', 'login-body', 'login-response')">Send Request</button>
+                        <div id="login-response" class="response" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/auth/logout/</span>
+                    <span>Logout user</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>End user session</p>
+                    <button class="btn btn-primary" onclick="testAPI('/api/auth/logout/', 'POST', null, 'logout-response')">Send Request</button>
+                    <div id="logout-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/auth/status/</span>
+                    <span>Check auth status</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Get current authentication status and user info</p>
+                    <button class="btn btn-primary" onclick="testAPI('/api/auth/status/', 'GET', null, 'status-response')">Send Request</button>
+                    <div id="status-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Endpoints -->
+        <div class="endpoint-group">
+            <h2>🛍️ Products</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/products/</span>
+                    <span>Get all products</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Retrieve list of all products with ratings and reviews</p>
+                    <button class="btn btn-primary" onclick="testAPI('/api/products/', 'GET', null, 'products-response')">Send Request</button>
+                    <div id="products-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/products/{id}/</span>
+                    <span>Get product details</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Get detailed information about a specific product</p>
+                    <div class="form-group">
+                        <label>Product ID:</label>
+                        <input type="text" id="product-id" value="1" placeholder="Enter product ID">
+                    </div>
+                    <button class="btn btn-primary" onclick="testAPIWithParam('/api/products/', 'GET', 'product-id', 'product-detail-response')">Send Request</button>
+                    <div id="product-detail-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/products/{id}/reviews/</span>
+                    <span>Get product reviews</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Get all reviews for a product</p>
+                    <div class="form-group">
+                        <label>Product ID:</label>
+                        <input type="text" id="reviews-id" value="1" placeholder="Enter product ID">
+                    </div>
+                    <button class="btn btn-primary" onclick="testAPIWithParam('/api/products/', 'GET', 'reviews-id', 'reviews-response', '/reviews/')">Send Request</button>
+                    <div id="reviews-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/products/{id}/review/</span>
+                    <span>Submit product review</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Submit a review for a product (requires authentication)</p>
+                    <div class="form-group">
+                        <label>Product ID:</label>
+                        <input type="text" id="review-product-id" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Request Body (JSON):</label>
+                        <textarea rows="3" id="review-body">{"rating": 5, "comment": "Great product!"}</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="testReviewAPI()">Send Request</button>
+                    <div id="review-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Endpoints -->
+        <div class="endpoint-group">
+            <h2>🛒 Cart</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/cart/</span>
+                    <span>Get cart items</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Get current user's cart items (requires authentication)</p>
+                    <button class="btn btn-primary" onclick="testAPI('/api/cart/', 'GET', null, 'cart-response')">Send Request</button>
+                    <div id="cart-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/cart/add/</span>
+                    <span>Add item to cart</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Add a product to cart (requires authentication)</p>
+                    <div class="form-group">
+                        <label>Request Body (JSON):</label>
+                        <textarea rows="6" id="cart-add-body">{"product_id": "1", "quantity": 1, "selected_size": "M", "selected_color": "Black"}</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="testAPI('/api/cart/add/', 'POST', 'cart-add-body', 'cart-add-response')">Send Request</button>
+                    <div id="cart-add-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Endpoints -->
+        <div class="endpoint-group">
+            <h2>📦 Orders</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/orders/</span>
+                    <span>Get user orders</span>
+                </div>
+                <div class="endpoint-body">
+                    <p>Get all orders for current user (requires authentication)</p>
+                    <button class="btn btn-primary" onclick="testAPI('/api/orders/', 'GET', null, 'orders-response')">Send Request</button>
+                    <div id="orders-response" class="response" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleEndpoint(header) {
+            const body = header.nextElementSibling;
+            body.classList.toggle('active');
+        }
+
+        async function testAPI(url, method, bodyId, responseId) {
+            const responseDiv = document.getElementById(responseId);
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = '<p>Loading...</p>';
+
+            try {
+                const options = {
+                    method: method,
+                    credentials: 'include',
+                    headers: {'Content-Type': 'application/json'}
+                };
+
+                if (bodyId) {
+                    const bodyText = document.getElementById(bodyId).value;
+                    options.body = bodyText;
+                }
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                responseDiv.innerHTML = `
+                    <strong>Status:</strong> ${response.status} ${response.statusText}<br>
+                    <strong>Response:</strong>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                responseDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+
+        async function testAPIWithParam(baseUrl, method, paramId, responseId, suffix = '/') {
+            const param = document.getElementById(paramId).value;
+            const url = baseUrl + param + suffix;
+            await testAPI(url, method, null, responseId);
+        }
+
+        async function testReviewAPI() {
+            const productId = document.getElementById('review-product-id').value;
+            const url = `/api/products/${productId}/review/`;
+            await testAPI(url, 'POST', 'review-body', 'review-response');
+        }
+    </script>
+</body>
+</html>

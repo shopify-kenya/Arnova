@@ -8,6 +8,7 @@ import views
 from shop import (
     admin_auth_views,
     admin_views,
+    api_docs_view,
     api_views,
     notification_views,
     payment_views,
@@ -59,6 +60,7 @@ admin_patterns = [
 
 # API URLs - separate namespace for buyers
 api_patterns = [
+    path("docs/", api_docs_view.api_docs, name="api_docs"),
     path("health/", api_views.api_health_check, name="api_health_check"),
     path("auth/status/", api_views.api_auth_status, name="api_auth_status"),
     path("csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
