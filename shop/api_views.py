@@ -1110,6 +1110,7 @@ def api_placeholder_image(request, width, height):
 
 @login_required
 @require_http_methods(["POST"])
+@ensure_csrf_cookie
 def api_product_review(request, product_id):
     """Submit a product review"""
     import json

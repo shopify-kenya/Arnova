@@ -49,5 +49,7 @@ def admin_logout(request):
     """Admin logout view"""
     from django.contrib.auth import logout
 
-    logout(request)
-    return redirect("/admin/login/")
+    if request.method == "POST" or request.method == "GET":
+        logout(request)
+        return redirect("/admin/login/")
+    return redirect("/admin/")
