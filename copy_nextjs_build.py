@@ -13,9 +13,16 @@ def copy_nextjs_build():
     next_static = base_dir / ".next" / "static"
 
     if not out_dir.exists():
+        # In modern Next.js builds (app router), output lives in .next/ not out/
+        if (base_dir / ".next").exists():
+            print(
+                "INFO: Next.js 'out' directory not found. "
+                "Using .next output directly; skipping copy."
+            )
+            return
         print(
-            "❌ Next.js 'out' directory not found. "
-            "Make sure 'npm run build' completed successfully."
+            "❌ Next.js build output not found. "
+            "Run 'npm run build' before starting the server."
         )
         return
 

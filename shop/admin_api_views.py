@@ -115,8 +115,8 @@ class AdminUsersView(APIView):
                     "is_staff": user.is_staff,
                     "is_active": user.is_active,
                     "date_joined": user.date_joined.isoformat(),
-                    "profile": {
-                        "avatar": profile.avatar,
+                        "profile": {
+                        "avatar": str(profile.avatar) if profile.avatar else "",
                         "phone": profile.phone,
                         "address": profile.address,
                         "city": profile.city,

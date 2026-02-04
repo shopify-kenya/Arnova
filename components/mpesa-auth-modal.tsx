@@ -38,9 +38,6 @@ export function MpesaAuthModal({
       return
     }
 
-    let pollInterval: NodeJS.Timeout
-    let countdownInterval: NodeJS.Timeout
-
     // Start polling for payment status
     const pollPaymentStatus = async () => {
       try {
@@ -65,13 +62,13 @@ export function MpesaAuthModal({
     }
 
     // Start polling every 2 seconds
-    pollInterval = setInterval(pollPaymentStatus, 2000)
+    const pollInterval = setInterval(pollPaymentStatus, 2000)
 
     // Initial check
     pollPaymentStatus()
 
     // Countdown timer
-    countdownInterval = setInterval(() => {
+    const countdownInterval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
           setStatus("failed")

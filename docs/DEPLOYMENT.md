@@ -5,16 +5,15 @@
 ### Development (Automated)
 
 ```bash
-./start.sh
+python unified_server.py
 ```
 
 This script will:
 
-- Install all dependencies
-- Run migrations
 - Build the frontend
-- Create admin user (admin/admin123)
-- Start both Django (port 8000) and Next.js (port 3000) servers
+- Run migrations
+- Generate PWA assets
+- Start Django on port 8000 (and 8443 if SSL is configured)
 
 ### Production (Docker)
 
@@ -31,15 +30,21 @@ docker-compose up --build
 
 ## 🏗️ Architecture
 
+Arnova supports two deployment models:
+
+1. **Unified**: Django serves the API and prebuilt Next.js frontend
+2. **Split**: Next.js on Vercel, Django on Render (see `docs/DEPLOYMENT_ARCHITECTURE.md`)
+
 ```
-┌─────────────────┐    ┌─────────────────┐
-│   Next.js App   │    │  Django API     │
-│   (Port 3000)   │◄──►│  (Port 8000)    │
-│                 │    │                 │
-│ • React UI      │    │ • REST API      │
-│ • TypeScript    │    │ • Admin Panel   │
-│ • TailwindCSS   │    │ • Database      │
-└─────────────────┘    └─────────────────┘
+┌─────────────────────────────────────────┐
+│            Django Server               │
+│         (Port 8000/8443)               │
+├─────────────────────────────────────────┤
+│  Next.js Frontend + Django API         │
+│  • React UI (prebuilt)                 │
+│  • REST API                            │
+│  • Admin Dashboard                     │
+└─────────────────────────────────────────┘
 ```
 
 ## 🔧 Environment Variables
@@ -47,13 +52,11 @@ docker-compose up --build
 Create `.env` file:
 
 ```env
-DB_NAME=arnova_db
-DB_USER=arnova_user
-DB_PASSWORD=arnova_password
-DB_HOST=localhost
-DB_PORT=5432
 SECRET_KEY=your-secret-key-here
 DEBUG=true
+DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+# DATABASE_URL=postgresql://user:pass@host:5432/dbname
 ```
 
 ## 📦 Manual Setup
@@ -82,7 +85,7 @@ npm run dev
 ### Single Container
 
 ```bash
-docker build -t arnova-shop .
+docker build -t arnova-shop -f docker/Dockerfile .
 docker run -p 8000:8000 arnova-shop
 ```
 
@@ -100,10 +103,10 @@ Services:
 
 ## 🌐 URLs
 
-- **Frontend**: <http://localhost:3000>
-- **Backend API**: <http://localhost:8000>
-- **Admin Panel**: <http://localhost:8000/admin>
-- **Production**: <http://localhost> (via Nginx)
+- **Unified App**: <http://127.0.0.1:8000>
+- **Admin Panel**: <http://127.0.0.1:8000/admin/>
+- **API**: <http://127.0.0.1:8000/api/>
+- **Split Frontend (dev)**: <http://localhost:3000>
 
 ## 📱 PWA Features
 
@@ -144,8 +147,8 @@ The app includes a PWA manifest for mobile installation:
 
 ```bash
 # Kill processes on ports
-sudo lsof -ti:3000 | xargs kill -9
 sudo lsof -ti:8000 | xargs kill -9
+sudo lsof -ti:3000 | xargs kill -9
 ```
 
 ### Database Issues

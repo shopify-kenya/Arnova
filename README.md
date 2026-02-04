@@ -46,24 +46,24 @@ python unified_server.py
 
 ## Documentation
 
-- [Developer Guide](DEVELOPER_GUIDE.md) - Technical documentation for developers
-- [User Guide](USER_GUIDE.md) - Comprehensive guide for end users
-- [API Documentation](API_DOCUMENTATION.md) - REST API reference
-- [Deployment Guide](DEPLOYMENT.md) - Production deployment instructions
+- [Developer Guide](docs/DEVELOPER_GUIDE.md) - Technical documentation for developers
+- [User Guide](docs/USER_GUIDE.md) - Comprehensive guide for end users
+- [API Documentation](docs/API_DOCUMENTATION.md) - REST API reference
+- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment instructions
 
 ## Technology Stack
 
 **Frontend:**
 
-- Next.js 14
-- React 18
+- Next.js 16
+- React 19
 - TypeScript
 - Tailwind CSS
 - Framer Motion
 
 **Backend:**
 
-- Django 4.2
+- Django 5.2
 - Django REST Framework
 - SQLite (development)
 - PostgreSQL (production)

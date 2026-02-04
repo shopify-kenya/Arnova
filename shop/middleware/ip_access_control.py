@@ -21,9 +21,11 @@ class IPAccessControlMiddleware:
         )
 
     def __call__(self, request):
-        # Check if accessing admin or dashboard endpoints
-        if request.path.startswith("/dashboard/") or request.path.startswith(
-            "/api/admin/"
+        # Check if accessing admin or admin API endpoints
+        if (
+            request.path.startswith("/admin/")
+            or request.path.startswith("/django-admin/")
+            or request.path.startswith("/api/admin/")
         ):
             client_ip = self.get_client_ip(request)
 

@@ -39,9 +39,9 @@ def test_permissions():
 
         # Permissions
         print("\nPermissions:")
-        print(f"  - Can access /dashboard/*: {admin.is_staff}")
+        print(f"  - Can access /admin/*: {admin.is_staff}")
         print(f"  - Can access /api/admin/*: {admin.is_staff}")
-        print(f"  - Can access /admin/: {admin.is_staff}")
+        print(f"  - Can access /django-admin/: {admin.is_staff}")
         print(f"  - Can access /api/cart/: {admin.is_authenticated}")
         print(f"  - Can access /api/saved/: {admin.is_authenticated}")
     else:
@@ -69,9 +69,9 @@ def test_permissions():
 
         # Permissions
         print("\nPermissions:")
-        print(f"  - Can access /dashboard/*: {buyer.is_staff}")
+        print(f"  - Can access /admin/*: {buyer.is_staff}")
         print(f"  - Can access /api/admin/*: {buyer.is_staff}")
-        print(f"  - Can access /admin/: {buyer.is_staff}")
+        print(f"  - Can access /django-admin/: {buyer.is_staff}")
         print(f"  - Can access /api/cart/: {buyer.is_authenticated}")
         print(f"  - Can access /api/saved/: {buyer.is_authenticated}")
     else:
@@ -97,14 +97,18 @@ def test_permissions():
     print("  - GET /api/csrf-token/")
 
     print("\nAuthenticated endpoints (login required):")
-    print("  - GET/POST /api/cart/")
-    print("  - GET/POST /api/saved/")
+    print("  - GET /api/cart/")
+    print("  - POST /api/cart/add/")
+    print("  - PUT/DELETE /api/cart/<id>/")
+    print("  - GET /api/saved/")
+    print("  - POST /api/saved/add/")
+    print("  - DELETE /api/saved/<id>/")
     print("  - GET/PUT /api/profile/")
     print("  - GET /api/orders/")
     print("  - POST /api/auth/logout/")
 
     print("\nAdmin-only endpoints (staff required):")
-    print("  - /dashboard/*")
+    print("  - /admin/*")
     print("  - /api/admin/*")
     print("  - /admin/")
 

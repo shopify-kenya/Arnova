@@ -3,7 +3,7 @@
 ## Quick Start
 
 ```bash
-python quick-start.py
+python unified_server.py
 ```
 
 ## Project Structure
@@ -18,7 +18,8 @@ Arnova/
 ├── ssl/                   # SSL certificates (generated)
 ├── .env                   # Environment variables
 ├── manage.py              # Django management
-├── quick-start.py         # Development setup
+├── unified_server.py      # Builds frontend + runs Django
+├── start_dev.sh           # Run Django + Next.js dev servers
 └── requirements.txt       # Python dependencies
 ```
 
@@ -35,21 +36,19 @@ Arnova/
 Configure `.env` file:
 
 ```env
-DB_NAME=shop_db
-DB_USER=shop_user
-DB_PASSWORD=shop_password
-DB_HOST=localhost
-DB_PORT=5432
 SECRET_KEY=your-secret-key
 DEBUG=true
-DEV_MODE=true
-SSL_ENABLED=false
-PWA_ENABLED=true
+DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+# DATABASE_URL=postgresql://user:pass@host:5432/dbname
+SESSION_COOKIE_SECURE=false
+CSRF_COOKIE_SECURE=false
 ```
 
 ### Scripts
 
-- `python quick-start.py` - Full development setup
+- `python unified_server.py` - Build frontend + run Django (HTTP/HTTPS)
+- `./start_dev.sh` - Run Django + Next.js dev servers separately
 - `python generate_ssl.py` - Generate SSL certificates
 - `python generate_pwa_assets.py` - Setup PWA assets
 - `python update_translations.py` - Find untranslated strings
@@ -70,10 +69,17 @@ PWA_ENABLED=true
 
 ### User
 
-- `GET/POST /api/cart/` - Cart operations
-- `GET/POST /api/saved/` - Saved items
+- `GET /api/cart/` - Cart items (returns empty when unauthenticated)
+- `POST /api/cart/add/` - Add item to cart
+- `PUT/DELETE /api/cart/<id>/` - Update/remove cart item
+- `GET /api/saved/` - Saved items (returns empty when unauthenticated)
+- `POST /api/saved/add/` - Add to saved
+- `DELETE /api/saved/<id>/` - Remove from saved
 - `GET/PUT /api/profile/` - User profile
 - `GET /api/orders/` - Order history
+- `GET /api/notifications/` - Notifications
+- `POST /api/notifications/<id>/read/` - Mark notification as read
+- `POST /api/notifications/mark-all-read/` - Mark all notifications as read
 
 ### Admin
 
@@ -113,7 +119,7 @@ python manage.py migrate
 - `app/page.tsx` - Homepage
 - `app/login/page.tsx` - Authentication
 - `app/product/[id]/page.tsx` - Product details
-- `app/admin/page.tsx` - Admin dashboard
+- `templates/admin/*.html` - Admin dashboard (Django templates)
 
 ### Styling
 

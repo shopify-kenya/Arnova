@@ -1,7 +1,7 @@
 #!/bin/bash
 # Comprehensive API endpoint testing script
 
-BASE_URL="https://127.0.0.1:8443"
+BASE_URL="${BASE_URL:-https://127.0.0.1:8443}"
 COOKIE_JAR="test_cookies.txt"
 
 echo "🧪 Testing all Arnova API endpoints..."
@@ -14,17 +14,23 @@ rm -f $COOKIE_JAR
 echo "1. Testing CSRF Token endpoint..."
 CSRF_RESPONSE=$(curl -k -s -c $COOKIE_JAR "$BASE_URL/api/csrf-token/")
 echo "Response: $CSRF_RESPONSE"
-CSRF_TOKEN=$(echo $CSRF_RESPONSE | grep -o '"csrfToken":"[^"]*' | cut -d'"' -f4)
+CSRF_TOKEN=$(python -c 'import json,sys; 
+import sys
+import json
+data = json.loads(sys.stdin.read() or "{}")
+print(data.get("csrfToken",""))' <<< "$CSRF_RESPONSE")
 echo "CSRF Token: $CSRF_TOKEN"
 echo ""
 
 # Test 2: Public endpoints (no auth required)
 echo "2. Testing public endpoints..."
 echo "   - Products:"
-curl -k -s -b $COOKIE_JAR "$BASE_URL/api/products/" | head -100
+PRODUCTS_RESPONSE=$(curl -k -s -b $COOKIE_JAR "$BASE_URL/api/products/")
+echo "$PRODUCTS_RESPONSE" | head -100
 echo ""
 echo "   - Categories:"
-curl -k -s -b $COOKIE_JAR "$BASE_URL/api/categories/"
+categories_response=$(curl -k -s -b $COOKIE_JAR "$BASE_URL/api/categories/")
+echo "$categories_response"
 echo ""
 echo "   - Health check:"
 curl -k -s -b $COOKIE_JAR "$BASE_URL/api/health/"
@@ -42,6 +48,12 @@ LOGIN_RESPONSE=$(curl -k -s -X POST \
 echo "Login Response: $LOGIN_RESPONSE"
 echo ""
 
+# Refresh CSRF token after login (token can rotate on auth)
+CSRF_RESPONSE=$(curl -k -s -b $COOKIE_JAR -c $COOKIE_JAR "$BASE_URL/api/csrf-token/")
+CSRF_TOKEN=$(python -c 'import json,sys; 
+data=json.loads(sys.stdin.read() or "{}");
+print(data.get("csrfToken",""))' <<< "$CSRF_RESPONSE")
+
 # Test 4: Admin endpoints (require auth + admin)
 echo "4. Testing admin endpoints..."
 echo "   - Admin Analytics:"
@@ -57,27 +69,56 @@ echo "   - Admin Orders:"
 curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/admin/orders/"
 echo ""
 
+# Extract a category id for product creation
+CATEGORY_ID=$(python -c 'import json,sys; 
+data=json.loads(sys.stdin.read() or "{}"); 
+categories=data.get("categories") or [];
+print(categories[0].get("id","") if categories else "")' <<< "$categories_response")
+
+# Extract a product id/size/color for cart tests
+PRODUCT_ID=$(python -c 'import json,sys; 
+data=json.loads(sys.stdin.read() or "{}"); 
+products=data.get("products") or [];
+print(products[0].get("id","") if products else "")' <<< "$PRODUCTS_RESPONSE")
+
+SELECTED_SIZE=$(python -c 'import json,sys; 
+data=json.loads(sys.stdin.read() or "{}");
+products=data.get("products") or [];
+sizes=(products[0].get("sizes") or []) if products else [];
+print(sizes[0] if sizes else "")' <<< "$PRODUCTS_RESPONSE")
+
+SELECTED_COLOR=$(python -c 'import json,sys; 
+data=json.loads(sys.stdin.read() or "{}");
+products=data.get("products") or [];
+colors=(products[0].get("colors") or []) if products else [];
+print(colors[0] if colors else "")' <<< "$PRODUCTS_RESPONSE")
+
 # Test 5: Create a test product
 echo "5. Testing product creation..."
-CREATE_RESPONSE=$(curl -k -s -X POST \
-  -H "Content-Type: application/json" \
-  -H "X-CSRFToken: $CSRF_TOKEN" \
-  -H "Referer: $BASE_URL/" \
-  -c $COOKIE_JAR -b $COOKIE_JAR \
-  -d '{
-    "id": "TEST001",
-    "name": "Test Product",
-    "description": "A test product for API testing",
-    "price": 99.99,
-    "currency": "KES",
-    "category_id": 1,
-    "sizes": ["M", "L"],
-    "colors": ["Red", "Blue"],
-    "images": ["https://example.com/test.jpg"],
-    "in_stock": true
-  }' \
-  "$BASE_URL/api/admin/products/")
-echo "Create Product Response: $CREATE_RESPONSE"
+NEW_PRODUCT_ID=$(date +%s)
+if [ -n "$CATEGORY_ID" ]; then
+  CREATE_RESPONSE=$(curl -k -s -X POST \
+    -H "Content-Type: application/json" \
+    -H "X-CSRFToken: $CSRF_TOKEN" \
+    -H "Referer: $BASE_URL/" \
+    -c $COOKIE_JAR -b $COOKIE_JAR \
+    -d '{
+      "id": '"$NEW_PRODUCT_ID"',
+      "name": "Test Product",
+      "description": "A test product for API testing",
+      "price": 99.99,
+      "currency": "KES",
+      "category_id": '"$CATEGORY_ID"',
+      "sizes": ["M", "L"],
+      "colors": ["Red", "Blue"],
+      "images": ["https://example.com/test.jpg"],
+      "in_stock": true
+    }' \
+    "$BASE_URL/api/admin/products/")
+  echo "Create Product Response: $CREATE_RESPONSE"
+else
+  echo "Create Product Response: skipped (no categories found)"
+fi
 echo ""
 
 # Test 6: User endpoints (require auth)
@@ -94,19 +135,29 @@ echo ""
 
 # Test 7: Test cart operations
 echo "7. Testing cart operations..."
-ADD_TO_CART=$(curl -k -s -X POST \
-  -H "Content-Type: application/json" \
-  -H "X-CSRFToken: $CSRF_TOKEN" \
-  -H "Referer: $BASE_URL/" \
-  -c $COOKIE_JAR -b $COOKIE_JAR \
-  -d '{
-    "product_id": "cl-001",
-    "quantity": 2,
-    "selected_size": "M",
-    "selected_color": "Blue"
-  }' \
-  "$BASE_URL/api/cart/")
-echo "Add to Cart Response: $ADD_TO_CART"
+if [ -z "$PRODUCT_ID" ] && [ -n "$CATEGORY_ID" ]; then
+  PRODUCT_ID="$NEW_PRODUCT_ID"
+  SELECTED_SIZE="M"
+  SELECTED_COLOR="Red"
+fi
+
+if [ -n "$PRODUCT_ID" ]; then
+  ADD_TO_CART=$(curl -k -s -X POST \
+    -H "Content-Type: application/json" \
+    -H "X-CSRFToken: $CSRF_TOKEN" \
+    -H "Referer: $BASE_URL/" \
+    -c $COOKIE_JAR -b $COOKIE_JAR \
+    -d '{
+      "product_id": '"${PRODUCT_ID}"',
+      "quantity": 2,
+      "selected_size": "'"$SELECTED_SIZE"'",
+      "selected_color": "'"$SELECTED_COLOR"'"
+    }' \
+    "$BASE_URL/api/cart/add/")
+  echo "Add to Cart Response: $ADD_TO_CART"
+else
+  echo "Add to Cart Response: skipped (no product available)"
+fi
 echo ""
 
 # Test 8: Logout

@@ -20,7 +20,7 @@ NEXTJS_PID=$!
 echo "✅ Servers started:"
 echo "   • Django Backend: http://127.0.0.1:8000"
 echo "   • Next.js Frontend: http://localhost:3000"
-echo "   • Admin Panel: http://localhost:3000/admin/"
+echo "   • Admin Panel: http://127.0.0.1:8000/admin/"
 echo ""
 echo "Press Ctrl+C to stop both servers"
 

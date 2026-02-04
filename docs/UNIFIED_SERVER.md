@@ -1,100 +1,40 @@
-_How the Unified Server Works_
+# Unified Server Architecture
 
-The unified server architecture integrates Django Templates (admin) and Next.js frontend through a sophisticated routing and build system:
+Arnova can run in a **unified mode** where Django serves both the API and the
+prebuilt Next.js frontend from a single port. This is the default local workflow
+when running `python unified_server.py`.
 
-1. Build Process (unified_server.py)
+## Build & Startup Flow
 
-# 1. Builds Next.js frontend
+`unified_server.py` performs these steps:
 
-subprocess.run(["npm", "run", "build"])
+1. Build the Next.js frontend: `npm run build`
+2. Copy build output into Django static dirs: `copy_nextjs_build.py`
+3. Run migrations: `python manage.py migrate`
+4. Generate PWA assets: `python generate_pwa_assets.py`
+5. Start Django:
+   - HTTP on `127.0.0.1:8000`
+   - HTTPS on `127.0.0.1:8443` if `ssl/cert.pem` + `ssl/key.pem` exist
 
-# 2. Copies build files to Django static directories
+## URL Routing (Actual Priority)
 
-subprocess.run([sys.executable, "copy_nextjs_build.py"])
+Routes are defined in `urls.py`:
 
-# 3. Runs Django migrations
+1. **Custom Admin (Django templates)**: `/admin/*`
+2. **Django Admin Site**: `/django-admin/`
+3. **API**: `/api/*`
+4. **Next.js static assets**: `/_next/*`
+5. **Service worker / manifest**: `/service-worker.js`, `/manifest.json`
+6. **Public assets**: `/public/*` via direct file serving
+7. **Catch-all**: all remaining routes serve the Next.js app (`views.index`)
 
-subprocess.run([sys.executable, "manage.py", "migrate"])
+## Request Flow
 
-# 4. Starts Django server(s)
+- **Admin users** access `/admin/*` (custom dashboard) or `/django-admin/`.
+- **Buyers** use all other routes which are served by the Next.js build.
+- **API calls** are handled by Django under `/api/*`.
 
-python 2. URL Routing Priority (urls.py)
-urlpatterns = [ # 1. Django admin (highest priority)
-path("admin/", admin.site.urls),
+## SSL Notes
 
-    # 2. Custom admin dashboard (Django templates)
-    path("dashboard/", admin_views.admin_dashboard),
-    path("dashboard/products/", admin_views.admin_products),
-    # ... more admin routes
-
-    # 3. API endpoints
-    path("api/", ...),
-
-    # 4. Next.js static assets
-    re_path(r"^_next/static/(?P<path>.*)$", serve),
-
-    # 5. Catch-all for Next.js frontend (lowest priority)
-    re_path(r"^.*$", views.index),
-
-]
-
-python 3. Request Flow
-For Admin Users (/admin/ or /dashboard/):
-
-Django handles authentication via /admin/login/
-
-Custom admin views render Django templates with glass morphism design
-
-Templates use Django's template engine with context data
-
-Static files served from /static/admin/
-
-For Buyers (all other routes):
-
-Next.js build files served from /build/ directory
-
-Client-side routing handled by Next.js
-
-API calls to /api/ endpoints for data
-
-Authentication via API endpoints
-
-1. Static File Serving
-
-# Next.js assets
-
-re_path(r"^\_next/static/(?P<path>.\*)$", serve,
-{"document_root": "build/\_next/static"})
-
-# Public assets (manifest, service worker, etc.)
-
-path("manifest.json", serve,
-{"document_root": "public", "path": "manifest.json"})
-
-# Catch-all for Next.js pages
-
-re_path(r"^.\*$", views.index) # Serves build/index.html
-
-python 5. Frontend Integration (views.index)
-def index(request): # Try specific route HTML file
-html_file = os.path.join(build_dir, path, "index.html")
-
-    # Fallback to root index.html
-    root_html = os.path.join(build_dir, "index.html")
-
-    # Serve Next.js built HTML with caching
-    return HttpResponse(html_content, content_type="text/html")
-
-python
-Key Benefits:
-Single Server: One Django process serves both admin templates and Next.js frontend
-
-Shared Authentication: Django sessions work across both systems
-
-Unified API: Same API endpoints serve both admin dashboard and customer frontend
-
-Static Optimization: Next.js build optimization with Django caching
-
-SSL Support: Both HTTP/HTTPS with certificate management
-
-The system seamlessly switches between Django template rendering for admin functionality and Next.js static file serving for the customer-facing e-commerce experience.
+If SSL certificates exist in `ssl/`, the unified server starts both HTTP and
+HTTPS via `runserver_plus`. Run `python generate_ssl.py` to create local certs.

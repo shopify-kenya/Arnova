@@ -6,9 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "npm run lint",
     "lint": "eslint .",
     "django": "python manage.py runserver",
-    "full": "python run.py"
+    "full": "python unified_server.py"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.3.1",

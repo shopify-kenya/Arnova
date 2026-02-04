@@ -710,7 +710,7 @@ def api_admin_users(request):
                     "is_active": user.is_active,
                     "date_joined": user.date_joined.isoformat(),
                     "profile": {
-                        "avatar": profile.avatar,
+                        "avatar": str(profile.avatar) if profile.avatar else "",
                         "phone": profile.phone,
                         "address": profile.address,
                         "city": profile.city,

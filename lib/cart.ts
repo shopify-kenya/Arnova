@@ -80,8 +80,8 @@ export async function updateCartItemQuantity(
 
 /**
  * Clears all items from the cart on the server.
- * NOTE: This requires a backend endpoint, which we will assume is POST /api/cart/clear/
- * For now, it will delete items one by one.
+ * Currently implemented by deleting items one-by-one because there is no
+ * dedicated bulk-clear endpoint.
  * @returns {boolean} True if the operation was successful, false otherwise.
  */
 export async function clearCart(cart: CartItem[]): Promise<boolean> {

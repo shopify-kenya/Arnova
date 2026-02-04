@@ -15,7 +15,7 @@ Arnova uses a unified server architecture where Django serves both the Next.js f
 │  ├── / (homepage)                      │
 │  ├── /login, /register                 │
 │  ├── /products, /cart, /profile        │
-│  └── /admin-panel/*                    │
+│  └── / (all non-admin routes)          │
 ├─────────────────────────────────────────┤
 │  API Routes                            │
 │  ├── /api/auth/* (login, register)     │
@@ -23,8 +23,9 @@ Arnova uses a unified server architecture where Django serves both the Next.js f
 │  ├── /api/cart/*                       │
 │  └── /api/admin/*                      │
 ├─────────────────────────────────────────┤
-│  Django Admin                          │
-│  └── /admin/*                          │
+│  Django Admin + Custom Admin            │
+│  ├── /admin/* (custom admin dashboard) │
+│  └── /django-admin/ (Django admin site)│
 └─────────────────────────────────────────┘
 ```
 
@@ -33,7 +34,8 @@ Arnova uses a unified server architecture where Django serves both the Next.js f
 1. **Single Server**: Django serves everything from one port
 2. **Route Handling**:
    - API routes (`/api/*`) → Django API views
-   - Admin routes (`/admin/*`) → Django admin
+   - Admin routes (`/admin/*`) → Custom Django templates
+   - Django admin (`/django-admin/`) → Django admin site
    - All other routes → Next.js frontend
 3. **CSRF Protection**: Enabled for API security
 4. **Static Files**: Next.js build output served by Django
@@ -48,7 +50,7 @@ npm install
 pip install -r requirements.txt
 
 # Start unified server
-python quick-start.py
+python unified_server.py
 ```
 
 ### Manual Start
@@ -60,10 +62,10 @@ npm run build
 # Run migrations
 python manage.py migrate
 
-# Start Django server
+# Start Django server (HTTP only)
 python manage.py runserver
-# OR with HTTPS
-python run_https.py
+# For HTTP + HTTPS with build steps, use:
+python unified_server.py
 ```
 
 ## API Integration
@@ -114,7 +116,7 @@ Arnova/
 ├── templates/              # Django templates
 ├── settings.py             # Django settings
 ├── urls.py                 # URL routing
-├── quick-start.py          # Unified server starter
+├── unified_server.py       # Unified server starter
 └── manage.py               # Django management
 ```
 
@@ -143,7 +145,7 @@ Arnova/
 ### Port Conflicts
 
 - Default port is 8000, change in `manage.py runserver <port>`
-- For HTTPS, modify `run_https.py`
+- For HTTPS, use `python unified_server.py` after generating SSL certs
 
 ## Production Deployment
 

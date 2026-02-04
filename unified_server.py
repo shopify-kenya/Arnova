@@ -26,49 +26,68 @@ def run_unified_server():
 
     print("🚀 Starting Arnova Unified Server...")
 
+    if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
+        os.environ["DATABASE_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
+        os.environ.setdefault("DEBUG", "1")
+
+    build_success = True
+
     # Build Next.js frontend
-    print("📦 Building Next.js frontend...")
-    try:
-        subprocess.run(["npm", "run", "build"], check=True, cwd=base_dir)
-        print("✅ Next.js build completed")
-    except subprocess.CalledProcessError:
-        print("❌ Next.js build failed")
-        sys.exit(1)
+    if os.environ.get("ARNOVA_SKIP_BUILD") == "1":
+        build_success = False
+        print("⏭️  Skipping Next.js build (ARNOVA_SKIP_BUILD=1)")
+    else:
+        print("📦 Building Next.js frontend...")
+        try:
+            env = os.environ.copy()
+            # Disable Turbopack to avoid sandboxed port-binding errors during build
+            env["NEXT_DISABLE_TURBOPACK"] = "1"
+            env["NEXT_FORCE_DISABLE_TURBOPACK"] = "1"
+            env["NEXT_TURBOPACK"] = "0"
+            env["TURBOPACK"] = "0"
+            subprocess.run(["npm", "run", "build"], check=True, cwd=base_dir, env=env)
+            print("✅ Next.js build completed")
+        except subprocess.CalledProcessError:
+            build_success = False
+            print("⚠️  Next.js build failed; continuing with API-only mode")
 
     # Copy Next.js build files
-    print("📁 Copying build files...")
-    try:
-        subprocess.run(
-            [sys.executable, "copy_nextjs_build.py"], check=True, cwd=base_dir
-        )
-        print("✅ Build files copied")
-    except subprocess.CalledProcessError:
-        print("❌ Failed to copy build files")
-        sys.exit(1)
+    if build_success:
+        print("📁 Copying build files...")
+        try:
+            subprocess.run(
+                [sys.executable, "copy_nextjs_build.py"], check=True, cwd=base_dir
+            )
+            print("✅ Build files copied")
+        except subprocess.CalledProcessError:
+            print("⚠️  Failed to copy build files; continuing...")
 
     # Run Django migrations
-    print("🗄️  Running database migrations...")
-    try:
-        subprocess.run(
-            [sys.executable, "manage.py", "migrate"], check=True, cwd=base_dir
-        )
-        print("✅ Migrations completed")
-    except subprocess.CalledProcessError:
-        print("⚠️  Migrations failed, continuing...")
+    if os.environ.get("ARNOVA_SKIP_MIGRATIONS") != "1":
+        print("🗄️  Running database migrations...")
+        try:
+            subprocess.run(
+                [sys.executable, "manage.py", "migrate"], check=True, cwd=base_dir
+            )
+            print("✅ Migrations completed")
+        except subprocess.CalledProcessError:
+            print("⚠️  Migrations failed, continuing...")
 
     # Generate PWA assets
-    print("🎨 Generating PWA assets...")
-    try:
-        subprocess.run(
-            [sys.executable, "generate_pwa_assets.py"], check=True, cwd=base_dir
-        )
-    except subprocess.CalledProcessError:
-        print("⚠️  PWA asset generation failed, continuing...")
+    if os.environ.get("ARNOVA_SKIP_PWA") != "1":
+        print("🎨 Generating PWA assets...")
+        try:
+            subprocess.run(
+                [sys.executable, "generate_pwa_assets.py"], check=True, cwd=base_dir
+            )
+        except subprocess.CalledProcessError:
+            print("⚠️  PWA asset generation failed, continuing...")
 
     # Check for SSL certificates and start both HTTP and HTTPS servers
     has_ssl = check_ssl_certificates()
+    force_http_only = os.environ.get("ARNOVA_HTTP_ONLY") == "1"
 
-    if has_ssl:
+    if has_ssl and not force_http_only:
         print("🔒 SSL certificates found, starting both HTTP and HTTPS servers...")
         print("📍 Servers will be available at:")
         print("   • HTTP - Main App: http://127.0.0.1:8000")
@@ -124,11 +143,12 @@ def start_http_server(base_dir):
     try:
         env = os.environ.copy()
         env["DJANGO_SETTINGS_MODULE"] = "settings"
-        subprocess.run(
-            [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"],
-            cwd=base_dir,
-            env=env,
-        )
+        if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
+            env["DATABASE_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
+        args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
+        if os.environ.get("ARNOVA_NO_RELOAD") == "1":
+            args.append("--noreload")
+        subprocess.run(args, cwd=base_dir, env=env)
     except KeyboardInterrupt:
         print("\n🛑 Server stopped")
 
@@ -142,11 +162,12 @@ def start_dual_servers(base_dir):
         try:
             env = os.environ.copy()
             env["DJANGO_SETTINGS_MODULE"] = "settings"
-            subprocess.run(
-                [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"],
-                cwd=base_dir,
-                env=env,
-            )
+            if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
+                env["DATABASE_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
+            args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
+            if os.environ.get("ARNOVA_NO_RELOAD") == "1":
+                args.append("--noreload")
+            subprocess.run(args, cwd=base_dir, env=env)
         except KeyboardInterrupt:
             pass
 
