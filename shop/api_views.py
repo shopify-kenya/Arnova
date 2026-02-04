@@ -1146,8 +1146,8 @@ def api_product_review(request, product_id):
         )
     except Product.DoesNotExist:
         return JsonResponse({"error": "Product not found"}, status=404)
-    except (json.JSONDecodeError, ValueError, KeyError) as e:
-        return JsonResponse({"error": f"Invalid request: {str(e)}"}, status=400)
+    except (json.JSONDecodeError, ValueError, KeyError):
+        return JsonResponse({"error": "Invalid request data"}, status=400)
 
 
 @require_http_methods(["GET"])
