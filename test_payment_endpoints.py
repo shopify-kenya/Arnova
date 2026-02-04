@@ -9,7 +9,7 @@ from urllib3.exceptions import InsecureRequestWarning
 # Suppress SSL warnings for testing
 requests.urllib3.disable_warnings(InsecureRequestWarning)
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://127.0.0.1:8443"
 GRAPHQL_URL = f"{BASE_URL}/graphql/"
 ADMIN_CREDS = {"username": "ArnovaAdmin", "password": "Arnova@010126"}
 
@@ -21,7 +21,7 @@ def gql(session, query, variables=None, token=None):
     payload = {"query": query}
     if variables:
         payload["variables"] = variables
-    return session.post(GRAPHQL_URL, json=payload, headers=headers)
+    return session.post(GRAPHQL_URL, json=payload, headers=headers, verify=False)
 
 
 def test_payment_endpoints():
@@ -69,7 +69,16 @@ def test_payment_endpoints():
       }
     }
     """
-    payment_input = {"paymentMethod": "card", "amount": 100.00}
+    payment_input = {
+        "paymentMethod": "card",
+        "amount": 100.00,
+        "cardData": {
+            "cardNumber": "4111111111111111",
+            "cardExpiry": "12/30",
+            "cardCvc": "123",
+            "cardName": "Test User",
+        },
+    }
     response = gql(session, process_query, {"input": payment_input}, token)
     print(f"Status: {response.status_code}")
     print(f"Response: {response.text[:200]}...")
@@ -94,7 +103,7 @@ def test_payment_endpoints():
         }
     }
     webhook_response = session.post(
-        f"{BASE_URL}/webhooks/mpesa/", json=mpesa_data
+        f"{BASE_URL}/webhooks/mpesa/", json=mpesa_data, verify=False
     )
     print(f"Status: {webhook_response.status_code}")
     print(f"Response: {webhook_response.text[:200]}...")

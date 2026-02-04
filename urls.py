@@ -3,8 +3,6 @@ import os
 from django.conf import settings
 from django.urls import include, path, re_path
 from django.views.static import serve
-from django.views.decorators.csrf import csrf_exempt
-from strawberry.django.views import GraphQLView
 
 import views
 from shop import (
@@ -17,6 +15,7 @@ from shop.admin import admin_site
 from shop.error_handlers import handler400, handler403, handler404, handler500
 from shop.graphql.context import get_context
 from shop.graphql.schema import schema
+from shop.graphql.view import CSRFExemptGraphQLView
 
 # Admin URLs - separate namespace for security
 admin_patterns = [
@@ -69,8 +68,8 @@ urlpatterns = [
     # GraphQL API endpoint
     path(
         "graphql/",
-        csrf_exempt(
-            GraphQLView.as_view(schema=schema, graphiql=settings.DEBUG, get_context=get_context)
+        CSRFExemptGraphQLView.as_view(
+            schema=schema, graphiql=settings.DEBUG, get_context=get_context
         ),
         name="graphql",
     ),

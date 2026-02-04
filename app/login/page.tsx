@@ -55,7 +55,7 @@ export default function LoginPage() {
     setErrors({ email: "", password: "", general: "" })
 
     try {
-      const user = login(email, password, rememberMe)
+      const user = await login(email, password, rememberMe)
       if (user) {
         setUser(user)
         toast.success("Welcome back!")

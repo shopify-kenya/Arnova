@@ -91,6 +91,15 @@ class PaymentInput:
     amount: float
     phoneNumber: Optional[str] = None
     orderData: Optional[JSON] = None
+    cardData: Optional["CardDataInput"] = None
+
+
+@strawberry.input
+class CardDataInput:
+    cardNumber: str
+    cardExpiry: str
+    cardCvc: str
+    cardName: str
 
 
 @strawberry.input
@@ -697,10 +706,17 @@ class Mutation:
         }
         if input.orderData is not None:
             payload["order_data"] = input.orderData
+        if input.cardData is not None:
+            payload["card_data"] = {
+                "cardNumber": input.cardData.cardNumber,
+                "cardExpiry": input.cardData.cardExpiry,
+                "cardCvc": input.cardData.cardCvc,
+                "cardName": input.cardData.cardName,
+            }
         request = info.context.request
         request._body = json.dumps(payload).encode()
         result = payment_views.process_payment(request)
-        data = result.json()
+        data = json.loads(result.content.decode())
         return PaymentResult(
             success=data.get("success", False),
             message=data.get("message"),
@@ -717,7 +733,7 @@ class Mutation:
         request = info.context.request
         request._body = json.dumps({"card_number": card_number}).encode()
         result = payment_views.validate_card(request)
-        data = result.json()
+        data = json.loads(result.content.decode())
         return CardValidationResult(valid=data.get("valid", False), cardType=data.get("card_type"))
 
     @strawberry.mutation
@@ -738,9 +754,9 @@ class Mutation:
         return AdminCreateProductPayload(success=True, productId=product.id)
 
 
-schema_extensions: List[type] = []
+schema_extensions: List[object] = []
 if not settings.DEBUG:
-    schema_extensions.append(DisableIntrospection)
+    schema_extensions.append(DisableIntrospection())
 
 schema = strawberry.Schema(
     query=Query,

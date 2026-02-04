@@ -82,7 +82,7 @@ PY
 
 # Test 3: Login
 printf "\n3. Login (admin)...\n"
-LOGIN_RESPONSE=$(gql "mutation Login($username: String!, $password: String!) { login(username: $username, password: $password) { accessToken refreshToken user { id username role } } }" "{\"username\": \"ArnovaAdmin\", \"password\": \"Arnova@010126\"}")
+LOGIN_RESPONSE=$(gql "mutation Login(\$username: String!, \$password: String!) { login(username: \$username, password: \$password) { accessToken refreshToken user { id username role } } }" "{\"username\": \"ArnovaAdmin\", \"password\": \"Arnova@010126\"}")
 echo "$LOGIN_RESPONSE" | head -200
 ACCESS_TOKEN=$(python - <<PY
 import json
@@ -118,7 +118,7 @@ PY
 
 printf "\n5. Admin create product...\n"
 if [ -n "$CATEGORY_ID" ]; then
-  CREATE_PRODUCT=$(gql "mutation AdminCreateProduct($input: AdminCreateProductInput!) { adminCreateProduct(input: $input) { success productId } }" "{\"input\": {\"name\": \"Test Product\", \"description\": \"GraphQL test product\", \"price\": 99.99, \"categoryId\": $CATEGORY_ID, \"sizes\": [\"M\", \"L\"], \"colors\": [\"Red\", \"Blue\"], \"images\": [\"https://example.com/test.jpg\"], \"inStock\": true }}")
+  CREATE_PRODUCT=$(gql "mutation AdminCreateProduct(\$input: AdminCreateProductInput!) { adminCreateProduct(input: \$input) { success productId } }" "{\"input\": {\"name\": \"Test Product\", \"description\": \"GraphQL test product\", \"price\": 99.99, \"categoryId\": $CATEGORY_ID, \"sizes\": [\"M\", \"L\"], \"colors\": [\"Red\", \"Blue\"], \"images\": [\"https://example.com/test.jpg\"], \"inStock\": true }}")
   echo "$CREATE_PRODUCT" | head -200
 else
   echo "Create Product: skipped (no categories found)"
@@ -136,7 +136,7 @@ echo "$ORDERS" | head -200
 # Test 7: Cart add
 printf "\n7. Cart add...\n"
 if [ -n "$PRODUCT_ID" ]; then
-  ADD_TO_CART=$(gql "mutation CartAdd($input: CartAddInput!) { cartAdd(input: $input) { success } }" "{\"input\": {\"productId\": $PRODUCT_ID, \"quantity\": 2, \"selectedSize\": \"$SELECTED_SIZE\", \"selectedColor\": \"$SELECTED_COLOR\" }}")
+  ADD_TO_CART=$(gql "mutation CartAdd(\$input: CartAddInput!) { cartAdd(input: \$input) { success } }" "{\"input\": {\"productId\": $PRODUCT_ID, \"quantity\": 2, \"selectedSize\": \"$SELECTED_SIZE\", \"selectedColor\": \"$SELECTED_COLOR\" }}")
   echo "$ADD_TO_CART" | head -200
 else
   echo "Add to Cart: skipped (no product available)"

@@ -12,7 +12,7 @@ class GraphQLContext:
     user: object
 
 
-def get_context(request) -> GraphQLContext:
+def get_context(request, response=None) -> GraphQLContext:
     auth_header = request.headers.get("Authorization", "")
     token = ""
     if auth_header.startswith("Bearer "):
