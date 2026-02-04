@@ -4,8 +4,6 @@ Quick database connectivity check.
 Respects DATABASE_URL or NEON_DATABASE_URL from environment.
 """
 import os
-import sys
-
 import dj_database_url
 
 

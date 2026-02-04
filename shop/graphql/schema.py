@@ -35,6 +35,7 @@ from .auth import (
 )
 from .security import rate_limit, require_auth, require_staff
 from .types import (
+    JSON,
     AdminAnalytics,
     AdminCreateProductPayload,
     AdminOrderType,
@@ -46,17 +47,16 @@ from .types import (
     CartProductType,
     CategoryType,
     ExchangeRates,
-    JSON,
     MpesaStatus,
-    NotificationType,
     NotificationsPayload,
+    NotificationType,
     OrderItemType,
     OrderType,
     PaymentResult,
     ProductType,
     ProfileType,
-    ReviewType,
     ReviewsPayload,
+    ReviewType,
     SavedAddPayload,
     SavedItemType,
     SimplePayload,
@@ -195,7 +195,14 @@ class Query:
 
     @strawberry.field
     def categories(self, info: Info) -> List[CategoryType]:
-        return [CategoryType(id=c.id, name=c.name, slug=c.slug) for c in Category.objects.all()]
+        return [
+            CategoryType(
+                id=c.id,
+                name=c.name,
+                slug=c.slug,
+            )
+            for c in Category.objects.all()
+        ]
 
     @strawberry.field
     def product_reviews(self, info: Info, id: int) -> ReviewsPayload:
@@ -246,8 +253,14 @@ class Query:
     @strawberry.field
     def saved(self, info: Info) -> SavedPayload:
         require_auth(info.context.user)
-        items = SavedItem.objects.filter(user=info.context.user).select_related("product")
-        data = [SavedItemType(id=item.id, product=_product_to_type(item.product)) for item in items]
+        items = (
+            SavedItem.objects.filter(user=info.context.user)
+            .select_related("product")
+        )
+        data = [
+            SavedItemType(id=item.id, product=_product_to_type(item.product))
+            for item in items
+        ]
         return SavedPayload(items=data)
 
     @strawberry.field
@@ -303,7 +316,9 @@ class Query:
     @strawberry.field
     def notifications(self, info: Info) -> NotificationsPayload:
         require_auth(info.context.user)
-        notes = Notification.objects.filter(user=info.context.user).order_by("-created_at")[:50]
+        notes = Notification.objects.filter(user=info.context.user).order_by(
+            "-created_at"
+        )[:50]
         items = [
             NotificationType(
                 id=n.id,
@@ -316,7 +331,10 @@ class Query:
             )
             for n in notes
         ]
-        unread_count = Notification.objects.filter(user=info.context.user, is_read=False).count()
+        unread_count = Notification.objects.filter(
+            user=info.context.user,
+            is_read=False,
+        ).count()
         return NotificationsPayload(items=items, unreadCount=unread_count)
 
     @strawberry.field
@@ -328,7 +346,9 @@ class Query:
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                return ExchangeRates(base=data.get("base", base), rates=data.get("rates", {}))
+                return ExchangeRates(
+                    base=data.get("base", base), rates=data.get("rates", {})
+                )
         except Exception:
             pass
 
@@ -403,8 +423,8 @@ class Query:
         ]
 
         login_activity = []
-        from datetime import datetime, timedelta
         import random
+        from datetime import datetime, timedelta
 
         for i in range(7):
             date = datetime.now() - timedelta(days=i)
@@ -504,7 +524,9 @@ class Query:
     @strawberry.field
     def mpesa_status(self, info: Info, checkoutRequestId: str) -> MpesaStatus:
         require_auth(info.context.user)
-        response = payment_views.check_mpesa_status(info.context.request, checkoutRequestId)
+        response = payment_views.check_mpesa_status(
+            info.context.request, checkoutRequestId
+        )
         data = json.loads(response.content.decode())
         return MpesaStatus(
             status=data.get("status"),
@@ -538,7 +560,11 @@ class Mutation:
 
     @strawberry.mutation
     def refresh(self, info: Info, refresh_token: str) -> AuthPayload:
-        rate_limit(f"refresh:{info.context.request.META.get('REMOTE_ADDR')}", 10, 60)
+        rate_limit(
+            f"refresh:{info.context.request.META.get('REMOTE_ADDR')}",
+            10,
+            60,
+        )
         payload = decode_token(refresh_token)
         if not payload or payload.get("type") != "refresh":
             raise strawberry.exceptions.GraphQLError("Invalid refresh token")
@@ -560,15 +586,28 @@ class Mutation:
         )
 
     @strawberry.mutation
-    def register(self, info: Info, username: str, email: str, password: str) -> AuthPayload:
-        rate_limit(f"register:{info.context.request.META.get('REMOTE_ADDR')}", 3, 60)
+    def register(
+        self, info: Info, username: str, email: str, password: str
+    ) -> AuthPayload:
+        rate_limit(
+            f"register:{info.context.request.META.get('REMOTE_ADDR')}",
+            3,
+            60,
+        )
         form = RegistrationForm(
-            {"username": username, "email": email, "password": password, "password_confirm": password}
+            {
+                "username": username,
+                "email": email,
+                "password": password,
+                "password_confirm": password,
+            }
         )
         if not form.is_valid():
             raise strawberry.exceptions.GraphQLError("Invalid registration data")
         with transaction.atomic():
-            user = User.objects.create_user(username=username, email=email, password=password)
+            user = User.objects.create_user(
+                username=username, email=email, password=password
+            )
             UserProfile.objects.create(user=user)
             Cart.objects.create(user=user)
         return AuthPayload(
@@ -627,7 +666,9 @@ class Mutation:
     def saved_add(self, info: Info, product_id: int) -> SavedAddPayload:
         require_auth(info.context.user)
         product = Product.objects.get(id=product_id)
-        item, _ = SavedItem.objects.get_or_create(user=info.context.user, product=product)
+        item, _ = SavedItem.objects.get_or_create(
+            user=info.context.user, product=product
+        )
         return SavedAddPayload(success=True, itemId=item.id)
 
     @strawberry.mutation
@@ -655,7 +696,9 @@ class Mutation:
         )
         if not form.is_valid():
             raise strawberry.exceptions.GraphQLError("Invalid profile data")
-        info.context.user.first_name = input.firstName or info.context.user.first_name
+        info.context.user.first_name = (
+            input.firstName or info.context.user.first_name
+        )
         info.context.user.last_name = input.lastName or info.context.user.last_name
         info.context.user.email = input.email or info.context.user.email
         info.context.user.save()
@@ -668,11 +711,15 @@ class Mutation:
         return SimplePayload(success=True)
 
     @strawberry.mutation
-    def submit_review(self, info: Info, product_id: int, rating: int, comment: str) -> SimplePayload:
+    def submit_review(
+        self, info: Info, product_id: int, rating: int, comment: str
+    ) -> SimplePayload:
         require_auth(info.context.user)
         product = Product.objects.get(id=product_id)
         if rating < 1 or rating > 5:
-            raise strawberry.exceptions.GraphQLError("Rating must be between 1 and 5")
+            raise strawberry.exceptions.GraphQLError(
+                "Rating must be between 1 and 5"
+            )
         Review.objects.update_or_create(
             product=product,
             user=info.context.user,
@@ -681,11 +728,13 @@ class Mutation:
         return SimplePayload(success=True)
 
     @strawberry.mutation
-    def mark_notification_read(self, info: Info, notification_id: int) -> SimplePayload:
+    def mark_notification_read(
+        self, info: Info, notification_id: int
+    ) -> SimplePayload:
         require_auth(info.context.user)
-        Notification.objects.filter(
-            id=notification_id, user=info.context.user
-        ).update(is_read=True)
+        Notification.objects.filter(id=notification_id, user=info.context.user).update(
+            is_read=True
+        )
         return SimplePayload(success=True)
 
     @strawberry.mutation
@@ -734,10 +783,14 @@ class Mutation:
         request._body = json.dumps({"card_number": card_number}).encode()
         result = payment_views.validate_card(request)
         data = json.loads(result.content.decode())
-        return CardValidationResult(valid=data.get("valid", False), cardType=data.get("card_type"))
+        return CardValidationResult(
+            valid=data.get("valid", False), cardType=data.get("card_type")
+        )
 
     @strawberry.mutation
-    def admin_create_product(self, info: Info, input: AdminCreateProductInput) -> AdminCreateProductPayload:
+    def admin_create_product(
+        self, info: Info, input: AdminCreateProductInput
+    ) -> AdminCreateProductPayload:
         require_staff(info.context.user)
         category = Category.objects.get(id=input.categoryId)
         product = Product.objects.create(

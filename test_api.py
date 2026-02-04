@@ -4,7 +4,6 @@ GraphQL readiness test for API endpoints
 Run this before deploying to catch serialization issues
 """
 
-import json
 import sys
 
 import requests

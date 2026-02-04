@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import AnonymousUser, User
 
-
 JWT_ALGORITHM = getattr(settings, "JWT_ALGORITHM", "HS256")
 ACCESS_TTL_MINUTES = getattr(settings, "JWT_ACCESS_TTL_MINUTES", 15)
 REFRESH_TTL_DAYS = getattr(settings, "JWT_REFRESH_TTL_DAYS", 7)

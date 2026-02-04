@@ -241,7 +241,11 @@ CSRF_USE_SESSIONS = False
 CSRF_COOKIE_AGE = 86400
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
-    default="http://127.0.0.1:8000,https://127.0.0.1:8443,http://localhost:8000,https://localhost:8443,https://arnova-207y.onrender.com",
+    default=(
+        "http://127.0.0.1:8000,https://127.0.0.1:8443,"
+        "http://localhost:8000,https://localhost:8443,"
+        "https://arnova-207y.onrender.com"
+    ),
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 CSRF_FAILURE_VIEW = "django.views.csrf.csrf_failure"

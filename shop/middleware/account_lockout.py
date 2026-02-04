@@ -22,14 +22,16 @@ class AccountLockoutMiddleware:
         if is_login_attempt:
             identifier = self.get_identifier(request)
             lockout_key = f"lockout_{identifier}"
-            attempts_key = f"attempts_{identifier}"
 
             # Check if account is locked
             if cache.get(lockout_key):
                 logger.warning(f"Login attempt on locked account: {identifier}")
                 return JsonResponse(
                     {
-                        "error": "Account temporarily locked due to multiple failed login attempts. Try again in 15 minutes."
+                        "error": (
+                            "Account temporarily locked due to multiple failed login "
+                            "attempts. Try again in 15 minutes."
+                        )
                     },
                     status=429,
                 )
@@ -51,12 +53,13 @@ class AccountLockoutMiddleware:
             return False
         try:
             import json
-
             import re
 
             payload = json.loads(request.body or "{}")
             query = payload.get("query", "") or ""
-            return bool(re.search(r"\bmutation\b", query) and re.search(r"\blogin\s*\(", query))
+            return bool(
+                re.search(r"\bmutation\b", query) and re.search(r"\blogin\s*\(", query)
+            )
         except Exception:
             return False
 
@@ -96,7 +99,10 @@ class AccountLockoutMiddleware:
         cache.set(attempts_key, attempts, 3600)  # Store for 1 hour
 
         logger.warning(
-            f"Failed login attempt {attempts}/{self.max_attempts} for {identifier}"
+            "Failed login attempt %s/%s for %s",
+            attempts,
+            self.max_attempts,
+            identifier,
         )
 
         # Lock account if max attempts reached

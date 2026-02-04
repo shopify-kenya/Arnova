@@ -6,4 +6,3 @@ from strawberry.django.views import GraphQLView
 @method_decorator(csrf_exempt, name="dispatch")
 class CSRFExemptGraphQLView(GraphQLView):
     """GraphQL view with CSRF exemption for JWT-based API calls."""
-

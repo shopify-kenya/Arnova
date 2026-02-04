@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
-
 from django.contrib.auth.models import AnonymousUser
 
 from .auth import get_user_from_token

@@ -56,7 +56,7 @@ def fetch_product_image(product_name, save_path="public"):
         print(f"✅ Found image by {photographer}")
 
         # Download the image
-        print(f"⬇️  Downloading image...")
+        print("⬇️  Downloading image...")
         img_response = requests.get(image_url, timeout=30)
         img_response.raise_for_status()
 
@@ -165,6 +165,6 @@ if __name__ == "__main__":
     else:
         results = fetch_multiple_images(product_name, count)
         if results:
-            print(f"\n✅ Image URLs:")
+            print("\n✅ Image URLs:")
             for url in results:
                 print(f"   {url}")

@@ -7,9 +7,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 django.setup()
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User  # noqa: E402
 
-from shop.models import Cart, UserProfile
+from shop.models import Cart, UserProfile  # noqa: E402
 
 
 def test_permissions():

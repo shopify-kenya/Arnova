@@ -1,8 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.shortcuts import redirect
-from django.urls import reverse
-
 from .models import (
     Cart,
     CartItem,

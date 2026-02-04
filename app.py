@@ -7,4 +7,4 @@ imports that application and exposes it as a module-level variable named `app`,
 allowing gunicorn to find it.
 """
 
-from wsgi import application as app
+from wsgi import application as app  # noqa: F401
