@@ -60,6 +60,7 @@ JWT_SECRET=your-jwt-secret
 JWT_ACCESS_TTL_MINUTES=15
 JWT_REFRESH_TTL_DAYS=7
 # DATABASE_URL=postgresql://user:pass@host:5432/dbname
+# NEON_DATABASE_URL=postgresql://user:pass@ep-xxxx.neon.tech/dbname?sslmode=require
 ```
 
 ## 📦 Manual Setup

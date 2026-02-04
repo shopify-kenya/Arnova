@@ -41,6 +41,7 @@ DEBUG=true
 DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
 CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
 # DATABASE_URL=postgresql://user:pass@host:5432/dbname
+# NEON_DATABASE_URL=postgresql://user:pass@ep-xxxx.neon.tech/dbname?sslmode=require
 SESSION_COOKIE_SECURE=false
 CSRF_COOKIE_SECURE=false
 JWT_SECRET=your-jwt-secret

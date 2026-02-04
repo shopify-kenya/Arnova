@@ -96,16 +96,21 @@ WSGI_APPLICATION = "wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+primary_db_url = config(
+    "DATABASE_URL",
+    default=config("NEON_DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+)
+
 DATABASES = {
     "default": dj_database_url.config(
-        default=config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        default=primary_db_url,
         conn_max_age=600,
         conn_health_checks=True,
     )
 }
 
 # Validate DATABASE_URL format
-db_url = config("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+db_url = primary_db_url
 if db_url.startswith("http://") or db_url.startswith("https://"):
     # Invalid URL format - use SQLite as fallback
     import sys
