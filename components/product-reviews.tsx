@@ -68,7 +68,7 @@ export function ProductReviews({
       setRating(0)
       setComment("")
       onReviewAdded()
-    } catch (error) {
+    } catch {
       toast.error("Failed to submit review")
     } finally {
       setIsSubmitting(false)

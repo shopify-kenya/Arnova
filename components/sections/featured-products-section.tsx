@@ -78,7 +78,7 @@ export function FeaturedProductsSection() {
           whileInView="animate"
           viewport={{ once: true }}
         >
-          {featuredProducts.map((product, index) => (
+          {featuredProducts.map(product => (
             <motion.div key={product.id} variants={fadeInUp}>
               <Link href={`/product/${product.id}`} className="group block">
                 <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-sm border border-border/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl">

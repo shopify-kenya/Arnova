@@ -38,9 +38,9 @@ export async function getCartFromServer(): Promise<CartItem[]> {
       }
     `)
     return data.cart.items || []
-  } catch (error) {
+  } catch {
+    return []
   }
-  return []
 }
 
 /**
@@ -69,7 +69,7 @@ export async function addToCart(item: CartItem): Promise<boolean> {
       }
     )
     return data.cartAdd.success
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -93,7 +93,7 @@ export async function removeFromCart(itemId: number): Promise<boolean> {
       { itemId }
     )
     return data.cartRemove.success
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -120,7 +120,7 @@ export async function updateCartItemQuantity(
       { itemId, quantity }
     )
     return data.cartUpdate.success
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -140,7 +140,7 @@ export async function clearCart(cart: CartItem[]): Promise<boolean> {
     const results = await Promise.all(deletePromises)
     // Return true only if all deletions were successful
     return results.every(res => res)
-  } catch (error) {
+  } catch {
     return false
   }
 }

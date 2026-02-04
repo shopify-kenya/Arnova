@@ -28,7 +28,7 @@ import { countries } from "@/lib/countries"
 import { toast } from "sonner"
 import { PaymentMethods } from "@/components/payment-methods"
 import { MpesaAuthModal } from "@/components/mpesa-auth-modal"
-import { processPayment, checkMpesaPaymentStatus } from "@/lib/payment"
+import { processPayment } from "@/lib/payment"
 
 function CheckoutPageContent() {
   const router = useRouter()
@@ -99,7 +99,7 @@ function CheckoutPageContent() {
     toast.success("M-Pesa payment completed successfully!")
   }
 
-  const handleMpesaError = (_error: string) => {
+  const handleMpesaError = () => {
     setShowMpesaModal(false)
     toast.error("Payment failed. Please try again.")
   }
@@ -211,7 +211,7 @@ function CheckoutPageContent() {
       } else {
         throw new Error("Payment failed. Please try again.")
       }
-    } catch (error: unknown) {
+    } catch {
       setIsProcessing(false)
       toast.error("Payment failed. Please try again.")
     }

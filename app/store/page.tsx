@@ -10,7 +10,6 @@ import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ProductCard } from "@/components/product-card"
-import { useAuth } from "@/components/auth-provider"
 import { graphqlRequest } from "@/lib/graphql-client"
 
 interface Product {
@@ -25,7 +24,6 @@ interface Product {
 }
 
 export default function StorePage() {
-  const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -34,7 +32,7 @@ export default function StorePage() {
   const categories = ["all", "clothing", "accessories", "shoes", "bags"]
 
   // Fetch products with SWR for auto-refresh
-  const { data, error, isLoading } = useSWR(
+  const { data } = useSWR(
     "graphql:products",
     async () => {
       const data = await graphqlRequest<{

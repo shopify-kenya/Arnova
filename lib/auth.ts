@@ -57,7 +57,7 @@ export async function checkAuthStatus(): Promise<User | null> {
     }
     setCurrentUser(user)
     return user
-  } catch (error) {
+  } catch {
     return null
   }
 }
@@ -74,8 +74,9 @@ export function setCurrentUser(user: User | null) {
 export async function login(
   email: string,
   password: string,
-  rememberMe: boolean = false
+  _rememberMe: boolean = false
 ): Promise<User | null> {
+  void _rememberMe
   const result = await graphqlRequest<{
     login: {
       accessToken: string

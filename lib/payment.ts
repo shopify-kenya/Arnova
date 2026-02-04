@@ -72,7 +72,7 @@ export const processPayment = async (
       { input: paymentData }
     )
     return data.processPayment
-  } catch (error: unknown) {
+  } catch {
     const errorMessage = "Payment failed. Please try again."
     return {
       success: false,
@@ -106,7 +106,7 @@ export const validateCard = async (
       valid: data.validateCard.valid,
       card_type: data.validateCard.cardType,
     }
-  } catch (error: unknown) {
+  } catch {
     const errorMessage = "Unable to validate card. Please try again."
     return {
       valid: false,
@@ -207,7 +207,7 @@ export const checkMpesaPaymentStatus = async (
       result_desc: data.mpesaStatus.resultDesc,
       transaction_id: data.mpesaStatus.transactionId,
     }
-  } catch (error: unknown) {
+  } catch {
     return {
       status: "failed",
       result_code: "1",

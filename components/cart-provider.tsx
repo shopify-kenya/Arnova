@@ -51,7 +51,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const serverCart = await getCartFromServer()
       setCart(serverCart)
-    } catch (e) {
+    } catch {
       setError("Failed to load cart.")
       toast.error("Failed to load your cart from the server.")
     } finally {

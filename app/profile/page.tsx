@@ -100,7 +100,7 @@ export default function ProfilePage() {
         },
       }
       setProfile(mapped)
-    } catch (error) {
+    } catch {
       toast.error("Failed to load profile")
     } finally {
       setLoading(false)
@@ -139,7 +139,7 @@ export default function ProfilePage() {
       toast.success("Profile updated successfully")
       setEditing(false)
       fetchProfile()
-    } catch (error) {
+    } catch {
       toast.error("Failed to update profile")
     }
   }

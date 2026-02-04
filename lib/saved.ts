@@ -44,9 +44,9 @@ export async function getSavedProductsFromServer(): Promise<SavedItem[]> {
       }
     `)
     return data.saved.items || []
-  } catch (error) {
+  } catch {
+    return []
   }
-  return []
 }
 
 /**
@@ -69,9 +69,9 @@ export async function addToSaved(productId: string): Promise<number | null> {
       { productId: Number(productId) }
     )
     return data.savedAdd.itemId || null
-  } catch (error) {
+  } catch {
+    return null
   }
-  return null
 }
 
 /**
@@ -93,7 +93,7 @@ export async function removeFromSaved(itemId: number): Promise<boolean> {
       { itemId }
     )
     return data.savedRemove.success
-  } catch (error) {
+  } catch {
     return false
   }
 }

@@ -253,9 +253,8 @@ class Query:
     @strawberry.field
     def saved(self, info: Info) -> SavedPayload:
         require_auth(info.context.user)
-        items = (
-            SavedItem.objects.filter(user=info.context.user)
-            .select_related("product")
+        items = SavedItem.objects.filter(user=info.context.user).select_related(
+            "product"
         )
         data = [
             SavedItemType(id=item.id, product=_product_to_type(item.product))
@@ -696,9 +695,7 @@ class Mutation:
         )
         if not form.is_valid():
             raise strawberry.exceptions.GraphQLError("Invalid profile data")
-        info.context.user.first_name = (
-            input.firstName or info.context.user.first_name
-        )
+        info.context.user.first_name = input.firstName or info.context.user.first_name
         info.context.user.last_name = input.lastName or info.context.user.last_name
         info.context.user.email = input.email or info.context.user.email
         info.context.user.save()
@@ -717,9 +714,7 @@ class Mutation:
         require_auth(info.context.user)
         product = Product.objects.get(id=product_id)
         if rating < 1 or rating > 5:
-            raise strawberry.exceptions.GraphQLError(
-                "Rating must be between 1 and 5"
-            )
+            raise strawberry.exceptions.GraphQLError("Rating must be between 1 and 5")
         Review.objects.update_or_create(
             product=product,
             user=info.context.user,
@@ -728,9 +723,7 @@ class Mutation:
         return SimplePayload(success=True)
 
     @strawberry.mutation
-    def mark_notification_read(
-        self, info: Info, notification_id: int
-    ) -> SimplePayload:
+    def mark_notification_read(self, info: Info, notification_id: int) -> SimplePayload:
         require_auth(info.context.user)
         Notification.objects.filter(id=notification_id, user=info.context.user).update(
             is_read=True

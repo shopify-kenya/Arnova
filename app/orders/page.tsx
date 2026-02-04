@@ -97,7 +97,7 @@ function OrdersPageContent() {
           paymentMethod: "card",
         }))
         setOrders(mapped)
-      } catch (error) {
+      } catch {
         toast.error("An error occurred while fetching orders.")
       } finally {
         setIsLoading(false)

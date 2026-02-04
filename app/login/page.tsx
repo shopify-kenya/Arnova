@@ -4,7 +4,6 @@ import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Mail, Lock, ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react"
 import { Home } from "lucide-react"
 import { GlassCard } from "@/components/glass-card"
@@ -20,7 +19,6 @@ import { validateEmail } from "@/lib/validation"
 import { toast } from "sonner"
 
 export default function LoginPage() {
-  const router = useRouter()
   const { setUser } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

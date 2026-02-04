@@ -1,13 +1,11 @@
 "use client"
 
-import React, { useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { ShoppingCart, Heart, User, Search, Menu, X } from "lucide-react"
+import { ShoppingCart, Heart, User, Search, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useAuth } from "@/components/auth-provider"
 import { useCart } from "@/components/cart-provider"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { GlassCard } from "@/components/glass-card"
@@ -24,9 +22,7 @@ export function BuyerNavbar({
   onMenuToggle,
 }: BuyerNavbarProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const { user } = useAuth()
   const { itemCount } = useCart()
-  const pathname = usePathname()
 
   return (
     <motion.header

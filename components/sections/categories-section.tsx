@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ShoppingBag } from "lucide-react"
 
 const fadeInUp = {
   initial: { opacity: 0, y: 60 },

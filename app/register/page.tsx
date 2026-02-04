@@ -16,7 +16,6 @@ import {
   EyeOff,
   LoaderCircle,
 } from "lucide-react"
-import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"

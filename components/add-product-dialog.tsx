@@ -171,7 +171,7 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
       setImages([])
       setImageUrl("")
       onProductAdded?.()
-    } catch (error) {
+    } catch {
       toast.error("Network error. Please try again.")
     }
   }

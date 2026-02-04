@@ -21,13 +21,7 @@ const staggerContainer = {
   },
 }
 
-function TypewriterText({
-  texts,
-  delay = 0,
-}: {
-  texts: string[]
-  delay?: number
-}) {
+function TypewriterText({ texts }: { texts: string[] }) {
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
   const [displayText, setDisplayText] = useState("")
   const [currentCharIndex, setCurrentCharIndex] = useState(0)
@@ -98,7 +92,6 @@ export function HeroSection() {
                 "Next Level",
                 "Pure Fire",
               ]}
-              delay={500}
             />
           </motion.h1>
 

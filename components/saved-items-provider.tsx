@@ -51,7 +51,7 @@ export function SavedItemsProvider({
     try {
       const serverItems = await getSavedProductsFromServer()
       setSavedItems(serverItems)
-    } catch (e) {
+    } catch {
       setError("Failed to load saved items.")
       toast.error("Failed to load your saved items from the server.")
     } finally {
