@@ -63,6 +63,7 @@ All client-facing API operations are exposed via the single `/graphql/` endpoint
 Use `Authorization: Bearer <token>` for JWT-authenticated requests.
 
 For operations and examples, see `docs/API_DOCUMENTATION.md`.
+For Neon configuration, see `docs/NEON_POSTGRES.md`.
 
 ## Database
 

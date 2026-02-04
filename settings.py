@@ -100,6 +100,8 @@ primary_db_url = config(
     "DATABASE_URL",
     default=config("NEON_DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
 )
+if not primary_db_url:
+    primary_db_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
 
 DATABASES = {
     "default": dj_database_url.config(
@@ -125,6 +127,14 @@ if db_url.startswith("http://") or db_url.startswith("https://"):
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+elif "neon.tech" in db_url and "sslmode=require" not in db_url:
+    import sys
+
+    print(
+        "WARNING: NEON_DATABASE_URL missing sslmode=require. "
+        "Neon requires SSL; ensure your URL includes '?sslmode=require'.",
+        file=sys.stderr,
+    )
 
 # Add SSL certificate for Supabase (PostgreSQL only)
 if config("SSL_SUPABASE", default=None):
