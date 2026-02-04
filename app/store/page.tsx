@@ -32,7 +32,7 @@ export default function StorePage() {
   const categories = ["all", "clothing", "accessories", "shoes", "bags"]
 
   // Fetch products with SWR for auto-refresh
-  const { data } = useSWR(
+  const { data, isLoading } = useSWR(
     "graphql:products",
     async () => {
       const data = await graphqlRequest<{
@@ -190,9 +190,9 @@ export default function StorePage() {
                         | "shoes"
                         | "bags"
                         | "accessories",
-                      isNew: product.is_new || false,
-                      onSale: product.on_sale || false,
-                      salePrice: product.sale_price,
+                      isNew: product.isNew || false,
+                      onSale: product.onSale || false,
+                      salePrice: product.salePrice,
                       inStock: true,
                       rating: 4.5,
                       sizes: ["S", "M", "L", "XL"],

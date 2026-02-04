@@ -196,7 +196,7 @@ export default function RegisterPage() {
     })
 
     try {
-      const user = register({
+      const user = await register({
         email: formData.email,
         password: formData.password,
         firstName: formData.firstName,
@@ -204,9 +204,13 @@ export default function RegisterPage() {
         country: formData.country,
         phone: formData.phone,
       })
-      setUser(user)
-      toast.success("Account created successfully!")
-      router.push("/store")
+      if (user) {
+        setUser(user)
+        toast.success("Account created successfully!")
+        router.push("/store")
+      } else {
+        setErrors({ ...errors, general: "Registration failed. Try again." })
+      }
     } catch {
       setErrors({ ...errors, general: "An error occurred. Please try again." })
     } finally {
