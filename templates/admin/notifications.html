@@ -40,14 +40,30 @@
 
     async function loadNotifications() {
         try {
-            const response = await fetch('/api/notifications/', {
-                credentials: 'same-origin'
+            const response = await fetch('/graphql/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    query: `
+                        query Notifications {
+                            notifications {
+                                items {
+                                    id
+                                    title
+                                    message
+                                    type
+                                    isRead
+                                    link
+                                    createdAt
+                                }
+                            }
+                        }
+                    `
+                })
             });
-            if (!response.ok) {
-                throw new Error('Failed to load notifications');
-            }
-            const data = await response.json();
-            allNotifications = data.notifications;
+            const payload = await response.json();
+            allNotifications = payload?.data?.notifications?.items || [];
             renderNotifications();
         } catch (error) {
             console.error('Error loading notifications:', error);
@@ -79,18 +95,18 @@
         }
 
         container.innerHTML = allNotifications.map(n => `
-            <div class="glass-strong rounded-2xl p-6 acrylic-card hover:scale-[1.01] transition-transform cursor-pointer ${n.is_read ? 'opacity-60' : ''}"
+            <div class="glass-strong rounded-2xl p-6 acrylic-card hover:scale-[1.01] transition-transform cursor-pointer ${n.isRead ? 'opacity-60' : ''}"
                  onclick="markAsRead(${n.id}, '${n.link || ''}')">
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
                         <div class="flex items-center gap-3 mb-2">
                             ${getTypeIcon(n.type)}
                             <h3 class="text-lg font-bold text-foreground">${escapeHtml(n.title)}</h3>
-                            ${!n.is_read ? '<div class="w-2 h-2 bg-blue-500 rounded-full"></div>' : ''}
+                            ${!n.isRead ? '<div class="w-2 h-2 bg-blue-500 rounded-full"></div>' : ''}
                         </div>
                         <p class="text-muted-foreground mb-3">${escapeHtml(n.message)}</p>
                         <div class="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>${new Date(n.created_at).toLocaleString()}</span>
+                            <span>${new Date(n.createdAt).toLocaleString()}</span>
                             <span class="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">${n.type}</span>
                         </div>
                     </div>
@@ -117,11 +133,20 @@
 
     async function markAsRead(id, link) {
         try {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-            await fetch(`/api/notifications/${id}/read/`, {
+            await fetch('/graphql/', {
                 method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken || '' },
-                credentials: 'same-origin'
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    query: `
+                        mutation MarkNotificationRead($notificationId: Int!) {
+                            markNotificationRead(notificationId: $notificationId) {
+                                success
+                            }
+                        }
+                    `,
+                    variables: { notificationId: id }
+                })
             });
             if (link) {
                 window.location.href = link;
@@ -135,11 +160,19 @@
 
     async function markAllAsRead() {
         try {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-            await fetch('/api/notifications/mark-all-read/', {
+            await fetch('/graphql/', {
                 method: 'POST',
-                headers: { 'X-CSRFToken': csrfToken || '' },
-                credentials: 'same-origin'
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    query: `
+                        mutation MarkAllNotificationsRead {
+                            markAllNotificationsRead {
+                                success
+                            }
+                        }
+                    `
+                })
             });
             loadNotifications();
         } catch (error) {

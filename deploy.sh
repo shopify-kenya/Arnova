@@ -1,18 +1,17 @@
 #!/bin/bash
-# Production deployment script with CSRF validation
+# Production deployment script with GraphQL validation
 
 set -e
 
 echo "🚀 Starting production deployment..."
 
 # Environment validation
-if [ -z "$CSRF_TRUSTED_ORIGINS" ]; then
-    echo "❌ CSRF_TRUSTED_ORIGINS not set in production environment"
-    exit 1
-fi
-
 if [ -z "$SECRET_KEY" ]; then
     echo "❌ SECRET_KEY not set in production environment"
+    exit 1
+fi
+if [ -z "$JWT_SECRET" ]; then
+    echo "❌ JWT_SECRET not set in production environment"
     exit 1
 fi
 
@@ -28,28 +27,31 @@ python manage.py collectstatic --noinput
 echo "🗄️ Running database migrations..."
 python manage.py migrate
 
-# Test CSRF endpoints
-echo "🔒 Testing CSRF endpoints..."
+# Test health + GraphQL endpoint
+echo "🔒 Testing health and GraphQL endpoints..."
 python -c "
 import requests
 import sys
 
 try:
     # Test health check
-    response = requests.get('${DEPLOYMENT_URL:-http://localhost:8000}/api/health/')
+    response = requests.get('${DEPLOYMENT_URL:-http://localhost:8000}/health/')
     if response.status_code != 200:
         print('❌ Health check failed')
         sys.exit(1)
 
-    # Test CSRF token generation
-    response = requests.get('${DEPLOYMENT_URL:-http://localhost:8000}/api/csrf-token/')
-    if response.status_code != 200:
-        print('❌ CSRF token generation failed')
+    # Test GraphQL health query
+    response = requests.post(
+        '${DEPLOYMENT_URL:-http://localhost:8000}/graphql/',
+        json={\"query\": \"{ health }\"}
+    )
+    if response.status_code != 200 or response.json().get('errors'):
+        print('❌ GraphQL health query failed')
         sys.exit(1)
 
-    print('✅ CSRF endpoints working')
+    print('✅ Health and GraphQL endpoints working')
 except Exception as e:
-    print(f'❌ CSRF test failed: {e}')
+    print(f'❌ Endpoint test failed: {e}')
     sys.exit(1)
 "
 

@@ -1,8 +1,8 @@
 "use client"
 
-import { apiFetch } from "./api"
+import { graphqlRequest } from "./graphql-client"
+import { clearTokens, getAccessToken, setTokens } from "./token-store"
 
-// Mock authentication - Replace with actual backend API calls
 export interface User {
   id: string
   email: string
@@ -14,43 +14,8 @@ export interface User {
   createdAt: string
 }
 
-export const mockUsers: User[] = [
-  {
-    id: "admin-001",
-    email: "admin@arnova.com",
-    firstName: "Arnova",
-    lastName: "Admin",
-    country: "US",
-    phone: "+1234567890",
-    role: "admin",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "buyer-001",
-    email: "buyer@arnova.com",
-    firstName: "Arno",
-    lastName: "Buyer",
-    country: "US",
-    phone: "+1234567890",
-    role: "buyer",
-    createdAt: new Date().toISOString(),
-  },
-]
-
 export function getCurrentUser(): User | null {
   if (typeof window === "undefined") return null
-
-  // Check if user session has expired
-  const expiryStr = localStorage.getItem("arnova-user-expiry")
-  if (expiryStr) {
-    const expiryDate = new Date(expiryStr)
-    if (new Date() > expiryDate) {
-      // Session expired, clear user data
-      localStorage.removeItem("arnova-user")
-      localStorage.removeItem("arnova-user-expiry")
-      return null
-    }
-  }
 
   const userStr = localStorage.getItem("arnova-user")
   if (!userStr) return null
@@ -59,24 +24,39 @@ export function getCurrentUser(): User | null {
 
 export async function checkAuthStatus(): Promise<User | null> {
   try {
-    const response = await apiFetch("api/auth/status/")
-    const data = await response.json()
-
-    if (data.authenticated && data.user) {
-      const user: User = {
-        id: data.user.id.toString(),
-        email: data.user.email,
-        firstName: data.user.username,
-        lastName: "",
-        country: "US",
-        phone: "",
-        role: data.user.role,
-        createdAt: new Date().toISOString(),
+    const data = await graphqlRequest<{
+      me: {
+        id: number
+        username: string
+        email: string
+        role: string
+      } | null
+    }>(
+      `
+      query Me {
+        me {
+          id
+          username
+          email
+          role
+        }
       }
-      setCurrentUser(user)
-      return user
+      `
+    )
+
+    if (!data.me) return null
+    const user: User = {
+      id: data.me.id.toString(),
+      email: data.me.email,
+      firstName: data.me.username,
+      lastName: "",
+      country: "US",
+      phone: "",
+      role: data.me.role as "admin" | "buyer",
+      createdAt: new Date().toISOString(),
     }
-    return null
+    setCurrentUser(user)
+    return user
   } catch (error) {
     return null
   }
@@ -91,99 +71,104 @@ export function setCurrentUser(user: User | null) {
   }
 }
 
-export function login(
+export async function login(
   email: string,
   password: string,
   rememberMe: boolean = false
-): User | null {
-  // Use Django API for authentication
-  apiFetch("api/auth/login/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCsrfToken(),
-    },
-    body: JSON.stringify({ email, password }),
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        const user: User = {
-          id: data.user.id.toString(),
-          email: data.user.email,
-          firstName: data.user.username,
-          lastName: "",
-          country: "US",
-          phone: "",
-          role: data.user.role,
-          createdAt: new Date().toISOString(),
+): Promise<User | null> {
+  const result = await graphqlRequest<{
+    login: {
+      accessToken: string
+      refreshToken: string
+      user: { id: number; username: string; email: string; role: string }
+    }
+  }>(
+    `
+    mutation Login($username: String!, $password: String!) {
+      login(username: $username, password: $password) {
+        accessToken
+        refreshToken
+        user {
+          id
+          username
+          email
+          role
         }
-        setCurrentUser(user)
-        if (rememberMe && typeof window !== "undefined") {
-          const expirationDate = new Date()
-          expirationDate.setDate(expirationDate.getDate() + 30)
-          localStorage.setItem(
-            "arnova-user-expiry",
-            expirationDate.toISOString()
-          )
-        }
-        return user
       }
-      return null
-    })
-    .catch(() => null)
-
-  // Fallback to mock for now
-  const user = mockUsers.find(u => u.email === email)
-  if (user && (password === "Arnova@010126" || password === "Buyer@010126")) {
-    setCurrentUser(user)
-    if (rememberMe && typeof window !== "undefined") {
-      const expirationDate = new Date()
-      expirationDate.setDate(expirationDate.getDate() + 30)
-      localStorage.setItem("arnova-user-expiry", expirationDate.toISOString())
     }
-    return user
+    `,
+    { username: email, password }
+  )
+
+  if (!result.login) return null
+  setTokens(result.login.accessToken, result.login.refreshToken)
+  const user: User = {
+    id: result.login.user.id.toString(),
+    email: result.login.user.email,
+    firstName: result.login.user.username,
+    lastName: "",
+    country: "US",
+    phone: "",
+    role: result.login.user.role as "admin" | "buyer",
+    createdAt: new Date().toISOString(),
   }
-  return null
+  setCurrentUser(user)
+  return user
 }
 
-function getCsrfToken(): string {
-  const cookies = document.cookie.split(";")
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split("=")
-    if (name === "csrftoken") {
-      return value
-    }
-  }
-  return ""
-}
-
-export function register(data: {
+export async function register(data: {
   email: string
   password: string
   firstName: string
   lastName: string
   country: string
   phone: string
-}): User {
-  // Mock registration - Replace with actual API call
-  const newUser: User = {
-    id: `user-${Date.now()}`,
-    email: data.email,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    country: data.country,
-    phone: data.phone,
-    role: "buyer",
+}): Promise<User | null> {
+  const result = await graphqlRequest<{
+    register: {
+      accessToken: string
+      refreshToken: string
+      user: { id: number; username: string; email: string; role: string }
+    }
+  }>(
+    `
+    mutation Register($username: String!, $email: String!, $password: String!) {
+      register(username: $username, email: $email, password: $password) {
+        accessToken
+        refreshToken
+        user {
+          id
+          username
+          email
+          role
+        }
+      }
+    }
+    `,
+    { username: data.email, email: data.email, password: data.password }
+  )
+
+  if (!result.register) return null
+  setTokens(result.register.accessToken, result.register.refreshToken)
+  const user: User = {
+    id: result.register.user.id.toString(),
+    email: result.register.user.email,
+    firstName: result.register.user.username,
+    lastName: "",
+    country: data.country || "US",
+    phone: data.phone || "",
+    role: result.register.user.role as "admin" | "buyer",
     createdAt: new Date().toISOString(),
   }
-  setCurrentUser(newUser)
-  return newUser
+  setCurrentUser(user)
+  return user
 }
 
 export function logout() {
   setCurrentUser(null)
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("arnova-user-expiry")
-  }
+  clearTokens()
+}
+
+export function hasToken(): boolean {
+  return !!getAccessToken()
 }

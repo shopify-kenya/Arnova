@@ -3,20 +3,20 @@ import os
 from django.conf import settings
 from django.urls import include, path, re_path
 from django.views.static import serve
+from django.views.decorators.csrf import csrf_exempt
+from strawberry.django.views import GraphQLView
 
 import views
 from shop import (
     admin_auth_views,
     admin_views,
-    api_docs_view,
-    api_views,
-    notification_views,
     payment_views,
     static_views,
 )
 from shop.admin import admin_site
-from shop.admin_api_views import AdminOrdersView, AdminProductsView, AdminUsersView
 from shop.error_handlers import handler400, handler403, handler404, handler500
+from shop.graphql.context import get_context
+from shop.graphql.schema import schema
 
 # Admin URLs - separate namespace for security
 admin_patterns = [
@@ -58,95 +58,6 @@ admin_patterns = [
     path("settings/", admin_views.admin_settings, name="admin_settings"),
 ]
 
-# API URLs - separate namespace for buyers
-api_patterns = [
-    path("docs/", api_docs_view.api_docs, name="api_docs"),
-    path("health/", api_views.api_health_check, name="api_health_check"),
-    path("auth/status/", api_views.api_auth_status, name="api_auth_status"),
-    path("csrf-token/", api_views.api_csrf_token, name="api_csrf_token"),
-    path("auth/login/", api_views.api_login, name="api_login"),
-    path("auth/register/", api_views.api_register, name="api_register"),
-    path("auth/logout/", api_views.api_logout, name="api_logout"),
-    path("products/", api_views.api_products, name="api_products"),
-    path(
-        "products/<str:product_id>/",
-        api_views.api_product_detail,
-        name="api_product_detail",
-    ),
-    path(
-        "products/<str:product_id>/reviews/",
-        api_views.api_product_reviews,
-        name="api_product_reviews",
-    ),
-    path(
-        "products/<str:product_id>/review/",
-        api_views.api_product_review,
-        name="api_product_review",
-    ),
-    path("categories/", api_views.api_categories, name="api_categories"),
-    path("cart/", api_views.api_cart, name="api_cart"),
-    path("cart/add/", api_views.api_cart_add, name="api_cart_add"),
-    path("cart/<int:item_id>/", api_views.api_cart_item, name="api_cart_item"),
-    path("saved/", api_views.api_saved, name="api_saved"),
-    path("saved/add/", api_views.api_saved_add, name="api_saved_add"),
-    path("saved/<int:item_id>/", api_views.api_saved_item, name="api_saved_item"),
-    path("profile/", api_views.api_profile, name="api_profile"),
-    path("orders/", api_views.api_orders, name="api_orders"),
-    path("payment/process/", payment_views.process_payment, name="api_process_payment"),
-    path(
-        "payment/validate-card/", payment_views.validate_card, name="api_validate_card"
-    ),
-    path(
-        "payment/mpesa/callback/",
-        payment_views.mpesa_callback,
-        name="api_mpesa_callback",
-    ),
-    path(
-        "payment/mpesa/status/<str:checkout_request_id>/",
-        payment_views.check_mpesa_status,
-        name="api_mpesa_status",
-    ),
-    path(
-        "placeholder/<int:width>/<int:height>",
-        api_views.api_placeholder_image,
-        name="api_placeholder_image",
-    ),
-    path("exchange-rates/", api_views.api_exchange_rates, name="api_exchange_rates"),
-    # Notifications
-    path(
-        "notifications/", notification_views.api_notifications, name="api_notifications"
-    ),
-    path(
-        "notifications/<int:notification_id>/read/",
-        notification_views.api_notification_mark_read,
-        name="api_notification_mark_read",
-    ),
-    path(
-        "notifications/mark-all-read/",
-        notification_views.api_notifications_mark_all_read,
-        name="api_notifications_mark_all_read",
-    ),
-]
-
-# Admin API URLs - staff only
-admin_api_patterns = [
-    path("orders/", AdminOrdersView.as_view(), name="api_admin_orders_drf"),
-    path("products/", AdminProductsView.as_view(), name="api_admin_products_drf"),
-    path("users/", AdminUsersView.as_view(), name="api_admin_users_drf"),
-    path(
-        "products/<str:product_id>/",
-        api_views.api_admin_product_detail,
-        name="api_admin_product_detail",
-    ),
-    path(
-        "users/<int:user_id>/",
-        api_views.api_admin_user_detail,
-        name="api_admin_user_detail",
-    ),
-    path("analytics/", api_views.api_admin_analytics, name="api_admin_analytics"),
-    path("settings/", api_views.api_admin_settings, name="api_admin_settings"),
-]
-
 urlpatterns = [
     # Admin login/logout
     path("admin/login/", admin_auth_views.admin_login, name="admin_login"),
@@ -155,10 +66,18 @@ urlpatterns = [
     path("admin/", include(admin_patterns)),
     # Django admin site
     path("django-admin/", admin_site.urls),
-    # Buyer API endpoints
-    path("api/", include(api_patterns)),
-    # Admin API endpoints - staff only
-    path("api/admin/", include(admin_api_patterns)),
+    # GraphQL API endpoint
+    path(
+        "graphql/",
+        csrf_exempt(
+            GraphQLView.as_view(schema=schema, graphiql=settings.DEBUG, get_context=get_context)
+        ),
+        name="graphql",
+    ),
+    # Health check
+    path("health/", views.health, name="health"),
+    # Webhooks
+    path("webhooks/mpesa/", payment_views.mpesa_callback, name="mpesa_callback"),
     # Serve Next.js static assets
     re_path(
         r"^_next/(?P<path>.*)$",
@@ -183,14 +102,6 @@ urlpatterns = [
         {
             "document_root": os.path.join(settings.BASE_DIR, "public"),
             "path": "sitemap.xml",
-        },
-    ),
-    path(
-        "csrf-example/",
-        serve,
-        {
-            "document_root": os.path.join(settings.BASE_DIR, "public"),
-            "path": "csrf-example.html",
         },
     ),
     re_path(

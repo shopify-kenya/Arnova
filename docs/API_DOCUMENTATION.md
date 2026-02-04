@@ -1,255 +1,301 @@
-# Arnova API Documentation
+# Arnova GraphQL API Documentation
 
-**Base URL:** `/api/` (same origin in unified mode)  
-**Auth:** Session cookies + CSRF (`X-CSRFToken` header)
+**Endpoint:** `/graphql/` (same origin in unified mode)  
+**Auth:** JWT (`Authorization: Bearer <token>`) for frontend clients. Admin templates can use session auth.
 
-This document is a practical overview of request/response shapes for the current
-implementation. For a canonical endpoint list, see `docs/API_ENDPOINTS.md`.
+This document provides the canonical GraphQL entry point and common operations.
 
 ## Authentication
 
-### Get CSRF Token
-
-`GET /api/csrf-token/`
-
-Response:
-```json
-{ "csrfToken": "<token>", "success": true }
-```
-
 ### Login
 
-`POST /api/auth/login/`
-
-Request:
-```json
-{ "username": "jane", "password": "secret" }
-```
-
-Response (success):
-```json
-{
-  "success": true,
-  "redirect": "/",
-  "user": {
-    "id": 1,
-    "username": "jane",
-    "email": "jane@example.com",
-    "is_staff": false,
-    "role": "buyer"
+```graphql
+mutation Login($username: String!, $password: String!) {
+  login(username: $username, password: $password) {
+    accessToken
+    refreshToken
+    user {
+      id
+      username
+      email
+      role
+    }
   }
 }
 ```
 
-Notes:
-- `username` may be an email address.
-- Rate limited to 5 requests/min.
+### Refresh Token
+
+```graphql
+mutation Refresh($refreshToken: String!) {
+  refresh(refreshToken: $refreshToken) {
+    accessToken
+    refreshToken
+  }
+}
+```
 
 ### Register
 
-`POST /api/auth/register/`
-
-Request:
-```json
-{
-  "username": "jane",
-  "email": "jane@example.com",
-  "password": "secret",
-  "password_confirm": "secret"
+```graphql
+mutation Register($username: String!, $email: String!, $password: String!) {
+  register(username: $username, email: $email, password: $password) {
+    accessToken
+    refreshToken
+    user {
+      id
+      username
+      email
+      role
+    }
+  }
 }
 ```
-
-Response (success):
-```json
-{ "success": true, "message": "User created successfully" }
-```
-
-Notes:
-- Rate limited to 3 requests/min.
 
 ### Logout
 
-`POST /api/auth/logout/`
-
-Response:
-```json
-{ "success": true }
+```graphql
+mutation { logout { success } }
 ```
 
-## Products
+## Products & Categories
 
-### List Products
-
-`GET /api/products/`
-
-Response:
-```json
-{
-  "products": [
-    {
-      "id": 1,
-      "name": "Premium Cotton T-Shirt",
-      "description": "Comfortable and stylish",
-      "price": 29.99,
-      "sale_price": 19.99,
-      "currency": "USD",
-      "base_currency": "KES",
-      "category": "Clothing",
-      "sizes": ["S", "M"],
-      "colors": ["Blue"],
-      "images": ["/placeholder.svg"],
-      "in_stock": true,
-      "is_new": true,
-      "on_sale": true,
-      "rating": 4.5,
-      "reviews": 12
-    }
-  ]
+```graphql
+query Products($currency: String!) {
+  products(currency: $currency) {
+    id
+    name
+    description
+    price
+    salePrice
+    currency
+    baseCurrency
+    category
+    sizes
+    colors
+    images
+    inStock
+    isNew
+    onSale
+    rating
+    reviews
+  }
 }
 ```
 
-Notes:
-- Rate limited to 100 requests/hour.
-
-### Product Detail
-
-`GET /api/products/<id>/`
-
-Response:
-```json
-{
-  "id": 1,
-  "name": "Premium Cotton T-Shirt",
-  "description": "Comfortable and stylish",
-  "price": 29.99,
-  "salePrice": 19.99,
-  "category": "Clothing",
-  "sizes": ["S", "M"],
-  "colors": ["Blue"],
-  "images": ["/placeholder.svg"],
-  "inStock": true,
-  "isNew": true,
-  "onSale": true,
-  "rating": 4.5,
-  "reviews": 12
+```graphql
+query Product($id: Int!, $currency: String!) {
+  product(id: $id, currency: $currency) {
+    id
+    name
+    description
+    price
+    salePrice
+    currency
+    baseCurrency
+    category
+    sizes
+    colors
+    images
+    inStock
+    isNew
+    onSale
+    rating
+    reviews
+  }
 }
 ```
 
-### Product Reviews
+```graphql
+query Categories { categories { id name slug } }
+```
 
-`GET /api/products/<id>/reviews/`
+## Reviews
 
-Response:
-```json
-{
-  "reviews": [
-    {
-      "id": 10,
-      "user": "jane",
-      "rating": 5,
-      "comment": "Great fit!",
-      "created_at": "2026-02-04T12:00:00Z"
-    }
-  ],
-  "average_rating": 4.5,
-  "review_count": 12
+```graphql
+query ProductReviews($id: Int!) {
+  productReviews(id: $id) {
+    reviews { id user rating comment createdAt }
+    averageRating
+    reviewCount
+  }
 }
 ```
 
-`POST /api/products/<id>/review/` (auth required)
-
-Request:
-```json
-{ "rating": 5, "comment": "Great fit!" }
+```graphql
+mutation SubmitReview($productId: Int!, $rating: Int!, $comment: String!) {
+  submitReview(productId: $productId, rating: $rating, comment: $comment) {
+    success
+  }
+}
 ```
 
 ## Cart
 
-### Get Cart
-
-`GET /api/cart/`
-
-Response (authenticated):
-```json
-{
-  "items": [
-    {
-      "id": 5,
-      "product": { "id": 1, "name": "T-Shirt", "price": 29.99, "images": [] },
-      "quantity": 2,
-      "selected_size": "M",
-      "selected_color": "Blue"
+```graphql
+query Cart {
+  cart {
+    items {
+      id
+      quantity
+      selectedSize
+      selectedColor
+      product { id name price images }
     }
-  ],
-  "authenticated": true
+  }
 }
 ```
 
-Response (unauthenticated):
-```json
-{ "items": [], "authenticated": false }
-```
-
-### Add to Cart
-
-`POST /api/cart/add/` (auth required)
-
-Request:
-```json
-{
-  "product_id": 1,
-  "quantity": 2,
-  "selected_size": "M",
-  "selected_color": "Blue"
+```graphql
+mutation CartAdd($input: CartAddInput!) {
+  cartAdd(input: $input) { success }
 }
 ```
 
-Response:
-```json
-{ "success": true, "item_id": 5 }
+```graphql
+mutation CartUpdate($itemId: Int!, $quantity: Int!) {
+  cartUpdate(itemId: $itemId, quantity: $quantity) { success }
+}
 ```
 
-### Update/Delete Cart Item
-
-`PUT /api/cart/<item_id>/`  
-`DELETE /api/cart/<item_id>/`
+```graphql
+mutation CartRemove($itemId: Int!) {
+  cartRemove(itemId: $itemId) { success }
+}
+```
 
 ## Saved Items
 
-`GET /api/saved/` returns empty when unauthenticated.  
-`POST /api/saved/add/` (auth required)  
-`DELETE /api/saved/<id>/` (auth required)
+```graphql
+query Saved { saved { items { id product { id name price } } } }
+```
+
+```graphql
+mutation SavedAdd($productId: Int!) {
+  savedAdd(productId: $productId) { success itemId }
+}
+```
+
+```graphql
+mutation SavedRemove($itemId: Int!) {
+  savedRemove(itemId: $itemId) { success }
+}
+```
 
 ## Profile & Orders
 
-`GET /api/profile/` (auth required)  
-`PUT /api/profile/` (auth required)  
-`GET /api/orders/` (auth required)
+```graphql
+query Profile {
+  profile {
+    user { id username email firstName lastName }
+    profile { avatar phone address city country postalCode }
+  }
+}
+```
+
+```graphql
+mutation UpdateProfile($input: ProfileUpdateInput!) {
+  updateProfile(input: $input) { success }
+}
+```
+
+```graphql
+query Orders {
+  orders {
+    id
+    orderId
+    totalAmount
+    status
+    createdAt
+    items { productName quantity price }
+  }
+}
+```
 
 ## Payments
 
-`POST /api/payment/process/`  
-`POST /api/payment/validate-card/`  
-`POST /api/payment/mpesa/callback/`  
-`GET /api/payment/mpesa/status/<checkout_id>/`
+```graphql
+mutation ProcessPayment($input: PaymentInput!) {
+  processPayment(input: $input) {
+    success
+    message
+    error
+    transactionId
+    redirectUrl
+    checkoutRequestId
+    merchantRequestId
+  }
+}
+```
 
-Notes:
-- Payment processing is rate limited to 10 requests/hour.
+```graphql
+mutation ValidateCard($cardNumber: String!) {
+  validateCard(cardNumber: $cardNumber) { valid cardType }
+}
+```
+
+```graphql
+query MpesaStatus($checkoutRequestId: String!) {
+  mpesaStatus(checkoutRequestId: $checkoutRequestId) {
+    status
+    resultCode
+    resultDesc
+    transactionId
+  }
+}
+```
 
 ## Notifications
 
-`GET /api/notifications/`  
-`POST /api/notifications/<id>/read/`  
-`POST /api/notifications/mark-all-read/`
+```graphql
+query Notifications {
+  notifications {
+    unreadCount
+    items { id title message type isRead link createdAt }
+  }
+}
+```
 
-## Admin API
+```graphql
+mutation MarkNotificationRead($notificationId: Int!) {
+  markNotificationRead(notificationId: $notificationId) { success }
+}
+```
 
-All admin API endpoints require staff authentication:
+```graphql
+mutation MarkAllNotificationsRead {
+  markAllNotificationsRead { success }
+}
+```
 
-- `GET /api/admin/orders/`
-- `GET /api/admin/products/`
-- `GET /api/admin/users/`
-- `GET/PUT/DELETE /api/admin/products/<id>/`
-- `GET/PUT/DELETE /api/admin/users/<id>/`
-- `GET /api/admin/analytics/`
-- `GET /api/admin/settings/`
+## Admin (Staff Only)
+
+```graphql
+query AdminAnalytics {
+  adminAnalytics { totalOrders totalRevenue totalUsers totalProducts }
+}
+```
+
+```graphql
+query AdminProducts {
+  adminProducts { id name price inStock isNew onSale }
+}
+```
+
+```graphql
+query AdminUsers {
+  adminUsers { id username email isStaff isActive }
+}
+```
+
+```graphql
+query AdminOrders {
+  adminOrders { id orderId totalAmount status createdAt }
+}
+```
+
+```graphql
+mutation AdminCreateProduct($input: AdminCreateProductInput!) {
+  adminCreateProduct(input: $input) { success productId }
+}
+```

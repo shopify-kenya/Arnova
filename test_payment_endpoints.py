@@ -1,81 +1,81 @@
 #!/usr/bin/env python3
 """
-Payment Endpoints Test Script
-Tests all payment-related API endpoints for functionality
+Payment GraphQL Test Script
+Tests payment-related GraphQL operations
 """
-import json
-from datetime import datetime
-
 import requests
+from urllib3.exceptions import InsecureRequestWarning
+
+# Suppress SSL warnings for testing
+requests.urllib3.disable_warnings(InsecureRequestWarning)
 
 BASE_URL = "http://127.0.0.1:8000"
+GRAPHQL_URL = f"{BASE_URL}/graphql/"
+ADMIN_CREDS = {"username": "ArnovaAdmin", "password": "Arnova@010126"}
 
 
-def test_endpoint(method, endpoint, data=None, headers=None):
-    """Test an API endpoint and return response"""
-    url = f"{BASE_URL}{endpoint}"
-    try:
-        if method == "GET":
-            response = requests.get(url, headers=headers)
-        elif method == "POST":
-            response = requests.post(url, json=data, headers=headers)
-
-        print(f"\n{method} {endpoint}")
-        print(f"Status: {response.status_code}")
-        print(f"Response: {response.text[:200]}...")
-        return response
-    except Exception as e:
-        print(f"Error testing {endpoint}: {e}")
-        return None
-
-
-def get_csrf_token():
-    """Get CSRF token for authenticated requests"""
-    response = test_endpoint("GET", "/api/csrf-token/")
-    if response and response.status_code == 200:
-        return response.json().get("csrfToken")
-    return None
+def gql(session, query, variables=None, token=None):
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    payload = {"query": query}
+    if variables:
+        payload["variables"] = variables
+    return session.post(GRAPHQL_URL, json=payload, headers=headers)
 
 
 def test_payment_endpoints():
-    """Test all payment endpoints"""
-    print("🧪 Testing Payment Endpoints")
+    print("🧪 Testing Payment GraphQL Operations")
     print("=" * 50)
 
-    # Get CSRF token
-    csrf_token = get_csrf_token()
-    headers = (
-        {"Content-Type": "application/json", "X-CSRFToken": csrf_token}
-        if csrf_token
-        else {"Content-Type": "application/json"}
-    )
+    session = requests.Session()
+
+    login_query = """
+    mutation Login($username: String!, $password: String!) {
+      login(username: $username, password: $password) {
+        accessToken
+      }
+    }
+    """
+    login_response = gql(session, login_query, ADMIN_CREDS)
+    token = login_response.json().get("data", {}).get("login", {}).get("accessToken")
+    if not token:
+        print("❌ Failed to login as admin")
+        return
 
     # Test card validation
     print("\n1. Testing Card Validation")
-    card_data = {
-        "card_number": "4111111111111111",
-        "expiry_month": "12",
-        "expiry_year": "2025",
-        "cvv": "123",
+    validate_query = """
+    mutation ValidateCard($cardNumber: String!) {
+      validateCard(cardNumber: $cardNumber) {
+        valid
+        cardType
+      }
     }
-    test_endpoint("POST", "/api/payment/validate-card/", card_data, headers)
+    """
+    response = gql(session, validate_query, {"cardNumber": "4111111111111111"}, token)
+    print(f"Status: {response.status_code}")
+    print(f"Response: {response.text[:200]}...")
 
     # Test payment processing
     print("\n2. Testing Payment Processing")
-    payment_data = {
-        "amount": 100.00,
-        "currency": "USD",
-        "payment_method": "card",
-        "card_number": "4111111111111111",
-        "expiry_month": "12",
-        "expiry_year": "2025",
-        "cvv": "123",
-        "cardholder_name": "Test User",
+    process_query = """
+    mutation ProcessPayment($input: PaymentInput!) {
+      processPayment(input: $input) {
+        success
+        message
+        error
+        transactionId
+      }
     }
-    test_endpoint("POST", "/api/payment/process/", payment_data, headers)
+    """
+    payment_input = {"paymentMethod": "card", "amount": 100.00}
+    response = gql(session, process_query, {"input": payment_input}, token)
+    print(f"Status: {response.status_code}")
+    print(f"Response: {response.text[:200]}...")
 
-    # Test M-Pesa callback (simulate)
-    print("\n3. Testing M-Pesa Callback")
+    # Test M-Pesa callback (simulate webhook)
+    print("\n3. Testing M-Pesa Callback Webhook")
     mpesa_data = {
         "Body": {
             "stkCallback": {
@@ -93,13 +93,31 @@ def test_payment_endpoints():
             }
         }
     }
-    test_endpoint("POST", "/api/payment/mpesa/callback/", mpesa_data, headers)
+    webhook_response = session.post(
+        f"{BASE_URL}/webhooks/mpesa/", json=mpesa_data
+    )
+    print(f"Status: {webhook_response.status_code}")
+    print(f"Response: {webhook_response.text[:200]}...")
 
     # Test M-Pesa status check
     print("\n4. Testing M-Pesa Status Check")
-    test_endpoint("GET", "/api/payment/mpesa/status/ws_CO_test123/")
+    status_query = """
+    query MpesaStatus($checkoutRequestId: String!) {
+      mpesaStatus(checkoutRequestId: $checkoutRequestId) {
+        status
+        resultCode
+        resultDesc
+        transactionId
+      }
+    }
+    """
+    status_response = gql(
+        session, status_query, {"checkoutRequestId": "ws_CO_test123"}, token
+    )
+    print(f"Status: {status_response.status_code}")
+    print(f"Response: {status_response.text[:200]}...")
 
-    print("\n✅ Payment endpoint testing completed!")
+    print("\n✅ Payment GraphQL testing completed!")
 
 
 if __name__ == "__main__":

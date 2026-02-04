@@ -42,11 +42,64 @@ export default function ProfilePage() {
 
   const fetchProfile = async () => {
     try {
-      const res = await fetch("/api/profile/")
-      if (res.ok) {
-        const data = await res.json()
-        setProfile(data)
+      const { graphqlRequest } = await import("@/lib/graphql-client")
+      const data = await graphqlRequest<{
+        profile: {
+          user: {
+            id: number
+            username: string
+            email: string
+            firstName: string
+            lastName: string
+          }
+          profile: {
+            avatar: string
+            phone: string
+            address: string
+            city: string
+            country: string
+            postalCode: string
+          }
+        }
+      }>(`
+        query Profile {
+          profile {
+            user {
+              id
+              username
+              email
+              firstName
+              lastName
+            }
+            profile {
+              avatar
+              phone
+              address
+              city
+              country
+              postalCode
+            }
+          }
+        }
+      `)
+      const mapped: ProfileData = {
+        user: {
+          id: data.profile.user.id,
+          username: data.profile.user.username,
+          email: data.profile.user.email,
+          first_name: data.profile.user.firstName || "",
+          last_name: data.profile.user.lastName || "",
+        },
+        profile: {
+          avatar: data.profile.profile.avatar || "",
+          phone: data.profile.profile.phone || "",
+          address: data.profile.profile.address || "",
+          city: data.profile.profile.city || "",
+          country: data.profile.profile.country || "",
+          postal_code: data.profile.profile.postalCode || "",
+        },
       }
+      setProfile(mapped)
     } catch (error) {
       toast.error("Failed to load profile")
     } finally {
@@ -59,28 +112,33 @@ export default function ProfilePage() {
     const formData = new FormData(e.currentTarget)
 
     try {
-      const res = await fetch("/api/profile/", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          first_name: formData.get("first_name"),
-          last_name: formData.get("last_name"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          address: formData.get("address"),
-          city: formData.get("city"),
-          country: formData.get("country"),
-          postal_code: formData.get("postal_code"),
-        }),
-      })
-
-      if (res.ok) {
-        toast.success("Profile updated successfully")
-        setEditing(false)
-        fetchProfile()
-      } else {
-        toast.error("Failed to update profile")
-      }
+      const { graphqlRequest } = await import("@/lib/graphql-client")
+      await graphqlRequest<{
+        updateProfile: { success: boolean }
+      }>(
+        `
+        mutation UpdateProfile($input: ProfileUpdateInput!) {
+          updateProfile(input: $input) {
+            success
+          }
+        }
+        `,
+        {
+          input: {
+            firstName: formData.get("first_name"),
+            lastName: formData.get("last_name"),
+            email: formData.get("email"),
+            phone: formData.get("phone"),
+            address: formData.get("address"),
+            city: formData.get("city"),
+            country: formData.get("country"),
+            postalCode: formData.get("postal_code"),
+          },
+        }
+      )
+      toast.success("Profile updated successfully")
+      setEditing(false)
+      fetchProfile()
     } catch (error) {
       toast.error("Failed to update profile")
     }

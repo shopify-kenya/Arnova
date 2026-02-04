@@ -77,18 +77,44 @@
 <script>
 async function loadProfile() {
     try {
-        const res = await fetch('/api/profile/', { credentials: 'same-origin' });
-        if (res.ok) {
-            const data = await res.json();
+        const res = await fetch('/graphql/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                query: `
+                    query Profile {
+                        profile {
+                            user {
+                                username
+                                firstName
+                                lastName
+                                email
+                            }
+                            profile {
+                                phone
+                                address
+                                city
+                                country
+                                postalCode
+                            }
+                        }
+                    }
+                `
+            })
+        });
+        const payload = await res.json();
+        const data = payload?.data?.profile;
+        if (data) {
             document.getElementById('username').value = data.user.username;
-            document.getElementById('first_name').value = data.user.first_name || '';
-            document.getElementById('last_name').value = data.user.last_name || '';
+            document.getElementById('first_name').value = data.user.firstName || '';
+            document.getElementById('last_name').value = data.user.lastName || '';
             document.getElementById('email').value = data.user.email || '';
             document.getElementById('phone').value = data.profile.phone || '';
             document.getElementById('address').value = data.profile.address || '';
             document.getElementById('city').value = data.profile.city || '';
             document.getElementById('country').value = data.profile.country || '';
-            document.getElementById('postal_code').value = data.profile.postal_code || '';
+            document.getElementById('postal_code').value = data.profile.postalCode || '';
         }
     } catch (error) {
         console.error('Failed to load profile:', error);
@@ -98,29 +124,36 @@ async function loadProfile() {
 document.getElementById('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
     try {
-        const res = await fetch('/api/profile/', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
+        const res = await fetch('/graphql/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'same-origin',
             body: JSON.stringify({
-                first_name: formData.get('first_name'),
-                last_name: formData.get('last_name'),
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                address: formData.get('address'),
-                city: formData.get('city'),
-                country: formData.get('country'),
-                postal_code: formData.get('postal_code'),
+                query: `
+                    mutation UpdateProfile($input: ProfileUpdateInput!) {
+                        updateProfile(input: $input) {
+                            success
+                        }
+                    }
+                `,
+                variables: {
+                    input: {
+                        firstName: formData.get('first_name'),
+                        lastName: formData.get('last_name'),
+                        email: formData.get('email'),
+                        phone: formData.get('phone'),
+                        address: formData.get('address'),
+                        city: formData.get('city'),
+                        country: formData.get('country'),
+                        postalCode: formData.get('postal_code'),
+                    }
+                }
             })
         });
-
-        if (res.ok) {
+        const payload = await res.json();
+        if (payload?.data?.updateProfile?.success) {
             alert('Profile updated successfully!');
             loadProfile();
         } else {

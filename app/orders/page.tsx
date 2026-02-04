@@ -50,15 +50,53 @@ function OrdersPageContent() {
 
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/orders/", {
-          credentials: "include",
-        })
-        if (response.ok) {
-          const data = await response.json()
-          setOrders(data.orders)
-        } else {
-          toast.error("Failed to fetch orders.")
-        }
+        const { graphqlRequest } = await import("@/lib/graphql-client")
+        const data = await graphqlRequest<{
+          orders: {
+            id: number
+            orderId: string
+            totalAmount: number
+            status: string
+            createdAt: string
+            items: { productName: string; quantity: number; price: number }[]
+          }[]
+        }>(`
+          query Orders {
+            orders {
+              id
+              orderId
+              totalAmount
+              status
+              createdAt
+              items {
+                productName
+                quantity
+                price
+              }
+            }
+          }
+        `)
+
+        const mapped = (data.orders || []).map(order => ({
+          id: order.id.toString(),
+          date: order.createdAt,
+          status: order.status as Order["status"],
+          total: order.totalAmount,
+          items: order.items.map(item => ({
+            name: item.productName,
+            quantity: item.quantity,
+            price: item.price,
+            image: "/placeholder.svg",
+          })),
+          shippingAddress: {
+            name: user?.firstName || "Customer",
+            address: "N/A",
+            city: "N/A",
+            country: "N/A",
+          },
+          paymentMethod: "card",
+        }))
+        setOrders(mapped)
       } catch (error) {
         toast.error("An error occurred while fetching orders.")
       } finally {

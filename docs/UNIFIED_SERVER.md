@@ -22,7 +22,7 @@ Routes are defined in `urls.py`:
 
 1. **Custom Admin (Django templates)**: `/admin/*`
 2. **Django Admin Site**: `/django-admin/`
-3. **API**: `/api/*`
+3. **GraphQL**: `/graphql/`
 4. **Next.js static assets**: `/_next/*`
 5. **Service worker / manifest**: `/service-worker.js`, `/manifest.json`
 6. **Public assets**: `/public/*` via direct file serving
@@ -32,7 +32,7 @@ Routes are defined in `urls.py`:
 
 - **Admin users** access `/admin/*` (custom dashboard) or `/django-admin/`.
 - **Buyers** use all other routes which are served by the Next.js build.
-- **API calls** are handled by Django under `/api/*`.
+- **API calls** are handled by Django under `/graphql/`.
 
 ## SSL Notes
 

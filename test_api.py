@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Production readiness test for API endpoints
+GraphQL readiness test for API endpoints
 Run this before deploying to catch serialization issues
 """
 
@@ -14,70 +14,66 @@ from urllib3.exceptions import InsecureRequestWarning
 requests.urllib3.disable_warnings(InsecureRequestWarning)
 
 BASE_URL = "https://127.0.0.1:8443"
+GRAPHQL_URL = f"{BASE_URL}/graphql/"
 ADMIN_CREDS = {"username": "ArnovaAdmin", "password": "Arnova@010126"}
 
 
-def test_endpoint(session, endpoint, method="GET", data=None):
-    """Test an API endpoint for JSON serialization issues"""
-    try:
-        url = f"{BASE_URL}{endpoint}"
-        response = session.request(method, url, json=data, verify=False)
-
-        # Try to parse JSON
-        response.json()
-        print(f"✅ {method} {endpoint} - Status: {response.status_code}")
-        return True
-    except json.JSONDecodeError:
-        print(f"❌ {method} {endpoint} - JSON decode error")
-        return False
-    except Exception as e:
-        print(f"❌ {method} {endpoint} - Error: {str(e)}")
-        return False
+def gql(session, query, variables=None, token=None):
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    payload = {"query": query}
+    if variables:
+        payload["variables"] = variables
+    response = session.post(GRAPHQL_URL, json=payload, headers=headers, verify=False)
+    return response
 
 
 def main():
     session = requests.Session()
 
-    # Get CSRF token
-    csrf_response = session.get(f"{BASE_URL}/api/csrf-token/", verify=False)
-    csrf_token = csrf_response.json()["csrfToken"]
-
     # Login as admin
-    session.headers.update(
-        {
-            "X-CSRFToken": csrf_token,
-            "Referer": f"{BASE_URL}/",
-            "Content-Type": "application/json",
-        }
-    )
-
-    login_response = session.post(
-        f"{BASE_URL}/api/auth/login/", json=ADMIN_CREDS, verify=False
-    )
-    if login_response.status_code != 200:
+    login_query = """
+    mutation Login($username: String!, $password: String!) {
+      login(username: $username, password: $password) {
+        accessToken
+      }
+    }
+    """
+    login_response = gql(session, login_query, ADMIN_CREDS)
+    login_payload = login_response.json()
+    token = login_payload.get("data", {}).get("login", {}).get("accessToken")
+    if not token:
         print("❌ Failed to login as admin")
         sys.exit(1)
 
-    # Test critical endpoints
-    endpoints = [
-        "/api/products/",
-        "/api/categories/",
-        "/api/admin/analytics/",
-        "/api/admin/orders/",
-        "/api/admin/products/",
-        "/api/admin/users/",
-    ]
+    # Test critical GraphQL queries
+    queries = {
+        "products": "query { products { id name price } }",
+        "categories": "query { categories { id name slug } }",
+        "adminAnalytics": "query { adminAnalytics { totalOrders totalRevenue } }",
+        "adminOrders": "query { adminOrders { id orderId totalAmount } }",
+        "adminProducts": "query { adminProducts { id name price } }",
+        "adminUsers": "query { adminUsers { id username email } }",
+    }
 
     failed = 0
-    for endpoint in endpoints:
-        if not test_endpoint(session, endpoint):
+    for name, query in queries.items():
+        response = gql(session, query, token=token)
+        try:
+            payload = response.json()
+            if payload.get("errors"):
+                raise ValueError(payload["errors"][0].get("message"))
+            print(f"✅ {name} - Status: {response.status_code}")
+        except Exception as e:
+            print(f"❌ {name} - Error: {str(e)}")
             failed += 1
 
     if failed == 0:
-        print(f"\n🎉 All {len(endpoints)} endpoints passed!")
+        print(f"\n🎉 All {len(queries)} queries passed!")
         sys.exit(0)
     else:
-        print(f"\n💥 {failed}/{len(endpoints)} endpoints failed!")
+        print(f"\n💥 {failed}/{len(queries)} queries failed!")
         sys.exit(1)
 
 

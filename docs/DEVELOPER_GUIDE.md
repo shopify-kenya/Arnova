@@ -43,6 +43,9 @@ CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
 # DATABASE_URL=postgresql://user:pass@host:5432/dbname
 SESSION_COOKIE_SECURE=false
 CSRF_COOKIE_SECURE=false
+JWT_SECRET=your-jwt-secret
+JWT_ACCESS_TTL_MINUTES=15
+JWT_REFRESH_TTL_DAYS=7
 ```
 
 ### Scripts
@@ -53,40 +56,12 @@ CSRF_COOKIE_SECURE=false
 - `python generate_pwa_assets.py` - Setup PWA assets
 - `python update_translations.py` - Find untranslated strings
 
-## API Endpoints
+## GraphQL API
 
-### Authentication
+All client-facing API operations are exposed via the single `/graphql/` endpoint.
+Use `Authorization: Bearer <token>` for JWT-authenticated requests.
 
-- `POST /api/auth/login/` - User login
-- `POST /api/auth/register/` - User registration
-- `POST /api/auth/logout/` - User logout
-
-### Products
-
-- `GET /api/products/` - List products
-- `GET /api/products/{id}/` - Product details
-- `GET /api/categories/` - Product categories
-
-### User
-
-- `GET /api/cart/` - Cart items (returns empty when unauthenticated)
-- `POST /api/cart/add/` - Add item to cart
-- `PUT/DELETE /api/cart/<id>/` - Update/remove cart item
-- `GET /api/saved/` - Saved items (returns empty when unauthenticated)
-- `POST /api/saved/add/` - Add to saved
-- `DELETE /api/saved/<id>/` - Remove from saved
-- `GET/PUT /api/profile/` - User profile
-- `GET /api/orders/` - Order history
-- `GET /api/notifications/` - Notifications
-- `POST /api/notifications/<id>/read/` - Mark notification as read
-- `POST /api/notifications/mark-all-read/` - Mark all notifications as read
-
-### Admin
-
-- `GET /api/admin/orders/` - Manage orders
-- `GET/POST /api/admin/products/` - Manage products
-- `GET /api/admin/users/` - Manage users
-- `GET /api/admin/analytics/` - Analytics data
+For operations and examples, see `docs/API_DOCUMENTATION.md`.
 
 ## Database
 

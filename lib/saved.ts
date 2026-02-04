@@ -1,6 +1,6 @@
 "use client"
 
-import { apiClient } from "./api-client"
+import { graphqlRequest } from "./graphql-client"
 import type { Product } from "./products"
 
 // The SavedItem interface now includes the server-side ID
@@ -14,11 +14,36 @@ export interface SavedItem {
  */
 export async function getSavedProductsFromServer(): Promise<SavedItem[]> {
   try {
-    const response = await apiClient.get("/api/saved/")
-    if (response.ok) {
-      const data = await response.json()
-      return data.items || []
-    }
+    const data = await graphqlRequest<{
+      saved: { items: SavedItem[] }
+    }>(`
+      query SavedItems {
+        saved {
+          items {
+            id
+            product {
+              id
+              name
+              description
+              price
+              salePrice
+              currency
+              baseCurrency
+              category
+              sizes
+              colors
+              images
+              inStock
+              isNew
+              onSale
+              rating
+              reviews
+            }
+          }
+        }
+      }
+    `)
+    return data.saved.items || []
   } catch (error) {
     console.error("Failed to fetch saved items:", error)
   }
@@ -31,13 +56,20 @@ export async function getSavedProductsFromServer(): Promise<SavedItem[]> {
  */
 export async function addToSaved(productId: string): Promise<number | null> {
   try {
-    const response = await apiClient.post("/api/saved/add/", {
-      product_id: parseInt(productId),
-    })
-    if (response.ok) {
-      const data = await response.json()
-      return data.item_id
-    }
+    const data = await graphqlRequest<{
+      savedAdd: { success: boolean; itemId: number | null }
+    }>(
+      `
+      mutation SavedAdd($productId: Int!) {
+        savedAdd(productId: $productId) {
+          success
+          itemId
+        }
+      }
+      `,
+      { productId: Number(productId) }
+    )
+    return data.savedAdd.itemId || null
   } catch (error) {
     console.error("Failed to add to saved items:", error)
   }
@@ -50,8 +82,19 @@ export async function addToSaved(productId: string): Promise<number | null> {
  */
 export async function removeFromSaved(itemId: number): Promise<boolean> {
   try {
-    const response = await apiClient.delete(`/api/saved/${itemId}/`)
-    return response.ok
+    const data = await graphqlRequest<{
+      savedRemove: { success: boolean }
+    }>(
+      `
+      mutation SavedRemove($itemId: Int!) {
+        savedRemove(itemId: $itemId) {
+          success
+        }
+      }
+      `,
+      { itemId }
+    )
+    return data.savedRemove.success
   } catch (error) {
     console.error("Failed to remove from saved items:", error)
     return false

@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { GlassCard } from "@/components/glass-card"
 import { toast } from "sonner"
-import { apiFetch } from "@/lib/api"
+import { graphqlRequest } from "@/lib/graphql-client"
 
 interface Review {
   id: number
   user: string
   rating: number
   comment: string
-  created_at: string
+  createdAt: string
 }
 
 interface ProductReviewsProps {
@@ -51,20 +51,23 @@ export function ProductReviews({
 
     setIsSubmitting(true)
     try {
-      const response = await apiFetch(`api/products/${productId}/review/`, {
-        method: "POST",
-        body: JSON.stringify({ rating, comment }),
-      })
-
-      if (response.ok) {
-        toast.success("Review submitted successfully!")
-        setRating(0)
-        setComment("")
-        onReviewAdded()
-      } else {
-        const error = await response.json()
-        toast.error(error.error || "Failed to submit review")
-      }
+      await graphqlRequest<{
+        submitReview: { success: boolean; message?: string }
+      }>(
+        `
+        mutation SubmitReview($productId: Int!, $rating: Int!, $comment: String!) {
+          submitReview(productId: $productId, rating: $rating, comment: $comment) {
+            success
+            message
+          }
+        }
+        `,
+        { productId: Number(productId), rating, comment }
+      )
+      toast.success("Review submitted successfully!")
+      setRating(0)
+      setComment("")
+      onReviewAdded()
     } catch (error) {
       toast.error("Failed to submit review")
     } finally {
@@ -169,7 +172,7 @@ export function ProductReviews({
                   </div>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {new Date(review.created_at).toLocaleDateString()}
+                  {new Date(review.createdAt).toLocaleDateString()}
                 </span>
               </div>
               {review.comment && (

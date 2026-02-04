@@ -1,85 +1,68 @@
 #!/bin/bash
-# Payment Endpoints Test Script using curl
-# Run this when the server is running on localhost:8000
+# GraphQL payment testing script
 
-BASE_URL="http://127.0.0.1:8000"
+BASE_URL="${BASE_URL:-https://127.0.0.1:8443}"
+GRAPHQL_URL="$BASE_URL/graphql/"
+ACCESS_TOKEN=""
 
-echo "🧪 Testing Payment Endpoints with curl"
-echo "======================================"
+gql() {
+  local query="$1"
+  local variables="$2"
 
-# Get CSRF token first
-echo -e "\n1. Getting CSRF Token..."
-CSRF_RESPONSE=$(curl -s -X GET "$BASE_URL/api/csrf-token/")
-echo "CSRF Response: $CSRF_RESPONSE"
+  local payload
+  if [ -n "$variables" ]; then
+    payload=$(python - <<PY
+import json
+query = """$query"""
+variables = json.loads('''$variables''')
+print(json.dumps({"query": query, "variables": variables}))
+PY
+)
+  else
+    payload=$(python - <<PY
+import json
+query = """$query"""
+print(json.dumps({"query": query}))
+PY
+)
+  fi
 
-# Extract CSRF token (basic extraction)
-CSRF_TOKEN=$(echo $CSRF_RESPONSE | grep -o '"csrfToken":"[^"]*"' | cut -d'"' -f4)
-echo "CSRF Token: $CSRF_TOKEN"
+  if [ -n "$ACCESS_TOKEN" ]; then
+    curl -k -s -H "Content-Type: application/json" -H "Authorization: Bearer $ACCESS_TOKEN" \
+      -d "$payload" "$GRAPHQL_URL"
+  else
+    curl -k -s -H "Content-Type: application/json" -d "$payload" "$GRAPHQL_URL"
+  fi
+}
 
-# Test card validation
-echo -e "\n2. Testing Card Validation..."
-curl -X POST "$BASE_URL/api/payment/validate-card/" \
-  -H "Content-Type: application/json" \
-  -H "X-CSRFToken: $CSRF_TOKEN" \
-  -d '{
-    "card_number": "4111111111111111",
-    "expiry_month": "12",
-    "expiry_year": "2025",
-    "cvv": "123"
-  }' \
-  -w "\nStatus Code: %{http_code}\n"
+echo "🧪 GraphQL payment tests"
 
-# Test payment processing
-echo -e "\n3. Testing Payment Processing..."
-curl -X POST "$BASE_URL/api/payment/process/" \
-  -H "Content-Type: application/json" \
-  -H "X-CSRFToken: $CSRF_TOKEN" \
-  -d '{
-    "amount": 100.00,
-    "currency": "USD",
-    "payment_method": "card",
-    "card_number": "4111111111111111",
-    "expiry_month": "12",
-    "expiry_year": "2025",
-    "cvv": "123",
-    "cardholder_name": "Test User"
-  }' \
-  -w "\nStatus Code: %{http_code}\n"
+# Login
+LOGIN=$(gql "mutation Login($username: String!, $password: String!) { login(username: $username, password: $password) { accessToken } }" "{\"username\": \"ArnovaAdmin\", \"password\": \"Arnova@010126\"}")
+ACCESS_TOKEN=$(python - <<PY
+import json
+resp = json.loads('''$LOGIN''')
+print(resp.get('data', {}).get('login', {}).get('accessToken', ""))
+PY
+)
 
-# Test M-Pesa callback
-echo -e "\n4. Testing M-Pesa Callback..."
-curl -X POST "$BASE_URL/api/payment/mpesa/callback/" \
-  -H "Content-Type: application/json" \
-  -H "X-CSRFToken: $CSRF_TOKEN" \
-  -d '{
-    "Body": {
-      "stkCallback": {
-        "MerchantRequestID": "test-123",
-        "CheckoutRequestID": "ws_CO_test123",
-        "ResultCode": 0,
-        "ResultDesc": "The service request is processed successfully.",
-        "CallbackMetadata": {
-          "Item": [
-            {"Name": "Amount", "Value": 100},
-            {"Name": "MpesaReceiptNumber", "Value": "TEST123"},
-            {"Name": "PhoneNumber", "Value": "254700000000"}
-          ]
-        }
-      }
-    }
-  }' \
-  -w "\nStatus Code: %{http_code}\n"
+if [ -z "$ACCESS_TOKEN" ]; then
+  echo "Login failed."
+  exit 1
+fi
 
-# Test M-Pesa status check
-echo -e "\n5. Testing M-Pesa Status Check..."
-curl -X GET "$BASE_URL/api/payment/mpesa/status/ws_CO_test123/" \
-  -H "Content-Type: application/json" \
-  -w "\nStatus Code: %{http_code}\n"
+# Validate card
+echo "\n1. Validate Card"
+VALIDATE=$(gql "mutation ValidateCard($cardNumber: String!) { validateCard(cardNumber: $cardNumber) { valid cardType } }" "{\"cardNumber\": \"4111111111111111\"}")
+echo "$VALIDATE" | head -200
 
-# Test health check
-echo -e "\n6. Testing API Health Check..."
-curl -X GET "$BASE_URL/api/health/" \
-  -w "\nStatus Code: %{http_code}\n"
+# Process payment (card)
+echo "\n2. Process Payment (card)"
+PAYMENT=$(gql "mutation ProcessPayment($input: PaymentInput!) { processPayment(input: $input) { success message error transactionId } }" "{\"input\": {\"paymentMethod\": \"card\", \"amount\": 100.0 }}")
+echo "$PAYMENT" | head -200
 
-echo -e "\n✅ Payment endpoint testing completed!"
-echo "Note: Start the server with 'python unified_server.py' to see actual responses"
+# Process payment (mpesa) - expects phone number
+echo "\n3. Process Payment (mpesa)"
+PAYMENT_MPESA=$(gql "mutation ProcessPayment($input: PaymentInput!) { processPayment(input: $input) { success message error checkoutRequestId merchantRequestId } }" "{\"input\": {\"paymentMethod\": \"mpesa\", \"amount\": 100.0, \"phoneNumber\": \"0712345678\" }}")
+echo "$PAYMENT_MPESA" | head -200
+

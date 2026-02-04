@@ -97,8 +97,8 @@ def run_unified_server():
             "https://127.0.0.1:8443/admin/"
         )
         print(
-            "   • API Endpoints: http://127.0.0.1:8000/api/ or "
-            "https://127.0.0.1:8443/api/"
+            "   • GraphQL API: http://127.0.0.1:8000/graphql/ or "
+            "https://127.0.0.1:8443/graphql/"
         )
         print("\n🔧 Press Ctrl+C to stop the servers")
 
@@ -137,7 +137,7 @@ def start_http_server(base_dir):
     print("📍 Server will be available at:")
     print("   • Main App: http://127.0.0.1:8000")
     print("   • Admin Panel: http://127.0.0.1:8000/admin/")
-    print("   • API Endpoints: http://127.0.0.1:8000/api/")
+    print("   • GraphQL API: http://127.0.0.1:8000/graphql/")
     print("\n🔧 Press Ctrl+C to stop the server")
 
     try:

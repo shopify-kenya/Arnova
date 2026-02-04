@@ -2,7 +2,7 @@ import mimetypes
 import os
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
 from django.views.decorators.cache import cache_control
 from django.views.decorators.gzip import gzip_page
 
@@ -61,3 +61,8 @@ def index(request):
     from django.shortcuts import render
 
     return render(request, "home.html")
+
+
+def health(request):
+    """Simple health check for deploy probes."""
+    return JsonResponse({"status": "ok"})

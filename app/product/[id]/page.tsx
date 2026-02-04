@@ -15,7 +15,7 @@ import { useSavedItems } from "@/components/saved-items-provider"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import type { Product } from "@/lib/products"
-import { apiFetch } from "@/lib/api"
+import { graphqlRequest } from "@/lib/graphql-client"
 import { ProductReviews } from "@/components/product-reviews"
 
 export default function ProductPage() {
@@ -32,19 +32,62 @@ export default function ProductPage() {
   const router = useRouter()
 
   const fetchReviews = () => {
-    apiFetch(`api/products/${params.id}/reviews/`)
-      .then(res => res.json())
-      .then(data => setReviews(data.reviews || []))
+    graphqlRequest<{
+      productReviews: {
+        reviews: any[]
+      }
+    }>(
+      `
+      query ProductReviews($id: Int!) {
+        productReviews(id: $id) {
+          reviews {
+            id
+            user
+            rating
+            comment
+            createdAt
+          }
+        }
+      }
+      `,
+      { id: Number(params.id) }
+    )
+      .then(data => setReviews(data.productReviews.reviews || []))
       .catch(() => {})
   }
 
   useEffect(() => {
-    apiFetch(`api/products/${params.id}/`)
-      .then(res => res.json())
+    graphqlRequest<{
+      product: Product
+    }>(
+      `
+      query Product($id: Int!) {
+        product(id: $id) {
+          id
+          name
+          description
+          price
+          salePrice
+          currency
+          baseCurrency
+          category
+          sizes
+          colors
+          images
+          inStock
+          isNew
+          onSale
+          rating
+          reviews
+        }
+      }
+      `,
+      { id: Number(params.id) }
+    )
       .then(data => {
-        setProduct(data)
-        setSelectedSize(data.sizes[0] || "")
-        setSelectedColor(data.colors[0] || "")
+        setProduct(data.product)
+        setSelectedSize(data.product.sizes[0] || "")
+        setSelectedColor(data.product.colors[0] || "")
       })
       .catch(() => toast.error("Failed to load product"))
 

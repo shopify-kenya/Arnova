@@ -25,7 +25,6 @@ class IPAccessControlMiddleware:
         if (
             request.path.startswith("/admin/")
             or request.path.startswith("/django-admin/")
-            or request.path.startswith("/api/admin/")
         ):
             client_ip = self.get_client_ip(request)
 

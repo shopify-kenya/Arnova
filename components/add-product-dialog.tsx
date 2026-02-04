@@ -132,47 +132,45 @@ export function AddProductDialog({ onProductAdded }: AddProductDialogProps) {
     }
 
     try {
-      const response = await fetch("/api/admin/products/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken":
-            document.cookie
-              .split("; ")
-              .find(row => row.startsWith("csrftoken="))
-              ?.split("=")[1] || "",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          description: formData.description,
-          price: parseFloat(formData.price),
-          category_id: parseInt(formData.category),
-          sizes: formData.sizes,
-          colors: formData.colors,
-          images: images,
-          in_stock: parseInt(formData.stock) > 0,
-        }),
+      const { graphqlRequest } = await import("@/lib/graphql-client")
+      await graphqlRequest<{
+        adminCreateProduct: { success: boolean; productId?: number }
+      }>(
+        `
+        mutation AdminCreateProduct($input: AdminCreateProductInput!) {
+          adminCreateProduct(input: $input) {
+            success
+            productId
+          }
+        }
+        `,
+        {
+          input: {
+            name: formData.name,
+            description: formData.description,
+            price: parseFloat(formData.price),
+            categoryId: parseInt(formData.category),
+            sizes: formData.sizes,
+            colors: formData.colors,
+            images,
+            inStock: parseInt(formData.stock) > 0,
+          },
+        }
+      )
+      toast.success("Product added successfully!")
+      setOpen(false)
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        sizes: [],
+        colors: [],
+        stock: "",
       })
-
-      if (response.ok) {
-        toast.success("Product added successfully!")
-        setOpen(false)
-        setFormData({
-          name: "",
-          description: "",
-          price: "",
-          category: "",
-          sizes: [],
-          colors: [],
-          stock: "",
-        })
-        setImages([])
-        setImageUrl("")
-        onProductAdded?.()
-      } else {
-        const error = await response.json()
-        toast.error(error.error || "Failed to add product")
-      }
+      setImages([])
+      setImageUrl("")
+      onProductAdded?.()
     } catch (error) {
       toast.error("Network error. Please try again.")
     }

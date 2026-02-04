@@ -273,17 +273,25 @@
             if (!badge) return;
 
             try {
-                const response = await fetch('/api/notifications/', {
-                    credentials: 'same-origin'
+                const response = await fetch('/graphql/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        query: `
+                            query NotificationsBadge {
+                                notifications {
+                                    unreadCount
+                                }
+                            }
+                        `
+                    })
                 });
-                if (!response.ok) {
-                    console.error('Failed to load notifications:', response.status);
-                    return;
-                }
-                const data = await response.json();
+                const payload = await response.json();
+                const unreadCount = payload?.data?.notifications?.unreadCount || 0;
 
-                if (data.unread_count > 0) {
-                    badge.textContent = data.unread_count;
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
                     badge.classList.remove('hidden');
                 } else {
                     badge.classList.add('hidden');
@@ -295,13 +303,20 @@
 
         async function markAsRead(id, link) {
             try {
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-                await fetch(`/api/notifications/${id}/read/`, {
+                await fetch('/graphql/', {
                     method: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrfToken || '',
-                    },
-                    credentials: 'same-origin'
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        query: `
+                            mutation MarkNotificationRead($notificationId: Int!) {
+                                markNotificationRead(notificationId: $notificationId) {
+                                    success
+                                }
+                            }
+                        `,
+                        variables: { notificationId: id }
+                    })
                 });
                 if (link) window.location.href = link;
                 else loadNotifications();

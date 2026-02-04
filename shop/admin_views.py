@@ -109,7 +109,7 @@ def admin_product_create(request):
                 print(f"Failed to fetch images: {e}")
 
             if not images:
-                images = ["/api/placeholder/300/400"]
+                images = ["/placeholder.svg"]
 
         product = Product.objects.create(
             name=data.get("name"),

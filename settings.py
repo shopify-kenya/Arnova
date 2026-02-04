@@ -29,6 +29,12 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
+# JWT settings for GraphQL auth
+JWT_SECRET = config("JWT_SECRET", default=SECRET_KEY)
+JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
+JWT_ACCESS_TTL_MINUTES = config("JWT_ACCESS_TTL_MINUTES", default=15, cast=int)
+JWT_REFRESH_TTL_DAYS = config("JWT_REFRESH_TTL_DAYS", default=7, cast=int)
+
 ALLOWED_HOSTS = config(
     "DJANGO_ALLOWED_HOSTS",
     default="127.0.0.1,localhost,testserver,arnova-207y.onrender.com",
@@ -63,7 +69,6 @@ MIDDLEWARE = [
     "shop.middleware.admin_security.AdminSecurityMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "shop.middleware.auth.AuthMiddleware",
     "shop.middleware.security_headers.SecurityHeadersMiddleware",
 ]
 

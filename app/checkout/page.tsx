@@ -155,36 +155,36 @@ function CheckoutPageContent() {
 
       // Process payment
       const paymentData = {
-        payment_method: paymentMethod,
+        paymentMethod,
         amount: grandTotal,
-        card_data: paymentMethod === "card" ? cardData : undefined,
-        phone_number: paymentMethod === "mpesa" ? phoneNumber : undefined,
-        order_data: {
+        cardData: paymentMethod === "card" ? cardData : undefined,
+        phoneNumber: paymentMethod === "mpesa" ? phoneNumber : undefined,
+        orderData: {
           items: cart.map(item => ({
-            product_id: item.product.id,
+            productId: item.product.id,
             quantity: item.quantity,
             size: item.selectedSize,
             color: item.selectedColor,
             price: item.product.price,
           })),
-          shipping_address: formData,
-          billing_address: formData,
+          shippingAddress: formData,
+          billingAddress: formData,
         },
       }
 
       const result = await processPayment(paymentData)
 
       if (result.success) {
-        if (result.redirect_url && paymentMethod === "paypal") {
+        if (result.redirectUrl && paymentMethod === "paypal") {
           toast.info("Redirecting to PayPal...")
-          window.open(result.redirect_url, "_blank")
+          window.open(result.redirectUrl, "_blank")
           // Simulate successful return from PayPal
           await new Promise(resolve => setTimeout(resolve, 3000))
         }
 
         if (paymentMethod === "mpesa") {
-          if (result.checkout_request_id) {
-            setMpesaCheckoutId(result.checkout_request_id)
+          if (result.checkoutRequestId) {
+            setMpesaCheckoutId(result.checkoutRequestId)
             setShowMpesaModal(true)
             setIsProcessing(false)
             return // Don't continue processing here

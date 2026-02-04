@@ -11,17 +11,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ProductCard } from "@/components/product-card"
 import { useAuth } from "@/components/auth-provider"
-import { apiFetch } from "@/lib/api"
+import { graphqlRequest } from "@/lib/graphql-client"
 
 interface Product {
   id: string
   name: string
   price: number
-  sale_price?: number
+  salePrice?: number
   images: string[]
   category: string
-  is_new?: boolean
-  on_sale?: boolean
+  isNew?: boolean
+  onSale?: boolean
 }
 
 export default function StorePage() {
@@ -35,11 +35,24 @@ export default function StorePage() {
 
   // Fetch products with SWR for auto-refresh
   const { data, error, isLoading } = useSWR(
-    "api/products/",
-    async url => {
-      const response = await apiFetch(url)
-      if (!response.ok) throw new Error("Failed to fetch")
-      const data = await response.json()
+    "graphql:products",
+    async () => {
+      const data = await graphqlRequest<{
+        products: Product[]
+      }>(`
+        query Products {
+          products {
+            id
+            name
+            price
+            salePrice
+            images
+            category
+            isNew
+            onSale
+          }
+        }
+      `)
       return data.products || []
     },
     {

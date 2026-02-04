@@ -1,4 +1,4 @@
-import { apiClient } from "./api-client"
+import { graphqlRequest } from "./graphql-client"
 
 export interface CardData {
   cardNumber: string
@@ -8,7 +8,7 @@ export interface CardData {
 }
 
 export interface OrderItem {
-  product_id: string
+  productId: string
   quantity: number
   size: string
   color: string
@@ -28,47 +28,50 @@ export interface Address {
 }
 
 export interface PaymentData {
-  payment_method: "card" | "paypal" | "mpesa"
+  paymentMethod: "card" | "paypal" | "mpesa"
   amount: number
-  card_data?: CardData
-  phone_number?: string
-  order_data: {
+  cardData?: CardData
+  phoneNumber?: string
+  orderData: {
     items: OrderItem[]
-    shipping_address: Address
-    billing_address?: Address
+    shippingAddress: Address
+    billingAddress?: Address
   }
 }
 
 export interface PaymentResult {
   success: boolean
-  transaction_id?: string
+  transactionId?: string
   message?: string
   error?: string
-  redirect_url?: string
-  checkout_request_id?: string
-  merchant_request_id?: string
+  redirectUrl?: string
+  checkoutRequestId?: string
+  merchantRequestId?: string
 }
 
 export const processPayment = async (
   paymentData: PaymentData
 ): Promise<PaymentResult> => {
   try {
-    if (paymentData.payment_method === "mpesa") {
-      const response = await apiClient.post("/api/payment/mpesa/", {
-        phone_number: paymentData.phone_number!,
-        amount: paymentData.amount,
-        order_data: paymentData.order_data,
-      })
-      const data = await response.json()
-      return data || { success: false, error: "No response data" }
-    } else {
-      const response = await apiClient.post(
-        "/api/payment/process/",
-        paymentData
-      )
-      const data = await response.json()
-      return data || { success: false, error: "No response data" }
-    }
+    const data = await graphqlRequest<{
+      processPayment: PaymentResult
+    }>(
+      `
+      mutation ProcessPayment($input: PaymentInput!) {
+        processPayment(input: $input) {
+          success
+          message
+          error
+          transactionId
+          redirectUrl
+          checkoutRequestId
+          merchantRequestId
+        }
+      }
+      `,
+      { input: paymentData }
+    )
+    return data.processPayment
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Payment processing failed"
@@ -87,17 +90,23 @@ export const validateCard = async (
   error?: string
 }> => {
   try {
-    const response = await apiClient.post("/api/payment/validate-card/", {
-      card_number: cardNumber,
-    })
-    const data = await response.json()
-    return (
-      data || {
-        valid: false,
-        card_type: "unknown",
-        error: "No response data",
+    const data = await graphqlRequest<{
+      validateCard: { valid: boolean; cardType: string }
+    }>(
+      `
+      mutation ValidateCard($cardNumber: String!) {
+        validateCard(cardNumber: $cardNumber) {
+          valid
+          cardType
+        }
       }
+      `,
+      { cardNumber }
     )
+    return {
+      valid: data.validateCard.valid,
+      card_type: data.validateCard.cardType,
+    }
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : "Card validation failed"
@@ -174,17 +183,32 @@ export const checkMpesaPaymentStatus = async (
   transaction_id?: string
 }> => {
   try {
-    const response = await apiClient.get(
-      `/api/payment/mpesa/status/${checkoutRequestId}/`
-    )
-    const data = await response.json()
-    return (
-      data || {
-        status: "failed",
-        result_code: "1",
-        result_desc: "No response data",
+    const data = await graphqlRequest<{
+      mpesaStatus: {
+        status: string
+        resultCode: string
+        resultDesc: string
+        transactionId?: string
       }
+    }>(
+      `
+      query MpesaStatus($checkoutRequestId: String!) {
+        mpesaStatus(checkoutRequestId: $checkoutRequestId) {
+          status
+          resultCode
+          resultDesc
+          transactionId
+        }
+      }
+      `,
+      { checkoutRequestId }
     )
+    return {
+      status: data.mpesaStatus.status,
+      result_code: data.mpesaStatus.resultCode,
+      result_desc: data.mpesaStatus.resultDesc,
+      transaction_id: data.mpesaStatus.transactionId,
+    }
   } catch (error: unknown) {
     return {
       status: "failed",

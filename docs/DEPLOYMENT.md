@@ -56,6 +56,9 @@ SECRET_KEY=your-secret-key-here
 DEBUG=true
 DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
 CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+JWT_SECRET=your-jwt-secret
+JWT_ACCESS_TTL_MINUTES=15
+JWT_REFRESH_TTL_DAYS=7
 # DATABASE_URL=postgresql://user:pass@host:5432/dbname
 ```
 
@@ -105,7 +108,7 @@ Services:
 
 - **Unified App**: <http://127.0.0.1:8000>
 - **Admin Panel**: <http://127.0.0.1:8000/admin/>
-- **API**: <http://127.0.0.1:8000/api/>
+- **GraphQL API**: <http://127.0.0.1:8000/graphql/>
 - **Split Frontend (dev)**: <http://localhost:3000>
 
 ## 📱 PWA Features
@@ -120,7 +123,7 @@ The app includes a PWA manifest for mobile installation:
 ## 🔒 Security
 
 - Environment-based configuration
-- CSRF protection enabled
+- JWT authentication enabled for GraphQL
 - Secure headers configured
 - Production-ready settings
 

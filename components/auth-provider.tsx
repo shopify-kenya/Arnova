@@ -7,6 +7,8 @@ import {
   getCurrentUser,
   setCurrentUser as saveUser,
   logout as performLogout,
+  checkAuthStatus,
+  hasToken,
 } from "@/lib/auth"
 
 interface AuthContextType {
@@ -29,14 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const currentUser = getCurrentUser()
     if (currentUser) {
       setUserState(currentUser)
-    } else {
-      // If no local user, check Django session
-      import("@/lib/auth").then(({ checkAuthStatus }) => {
-        checkAuthStatus().then(sessionUser => {
-          if (sessionUser) {
-            setUserState(sessionUser)
-          }
-        })
+      return
+    }
+    if (hasToken()) {
+      checkAuthStatus().then(sessionUser => {
+        if (sessionUser) {
+          setUserState(sessionUser)
+        }
       })
     }
   }, [])

@@ -1,6 +1,6 @@
 "use client"
 
-import { apiClient } from "./api-client"
+import { graphqlRequest } from "./graphql-client"
 import type { Product } from "./products"
 
 // The CartItem interface now includes the server-side ID
@@ -17,11 +17,27 @@ export interface CartItem {
  */
 export async function getCartFromServer(): Promise<CartItem[]> {
   try {
-    const response = await apiClient.get("/api/cart/")
-    if (response.ok) {
-      const data = await response.json()
-      return data.items || []
-    }
+    const data = await graphqlRequest<{
+      cart: { items: CartItem[] }
+    }>(`
+      query Cart {
+        cart {
+          items {
+            id
+            quantity
+            selectedSize
+            selectedColor
+            product {
+              id
+              name
+              price
+              images
+            }
+          }
+        }
+      }
+    `)
+    return data.cart.items || []
   } catch (error) {
     console.error("Failed to fetch cart:", error)
   }
@@ -34,13 +50,26 @@ export async function getCartFromServer(): Promise<CartItem[]> {
  */
 export async function addToCart(item: CartItem): Promise<boolean> {
   try {
-    const response = await apiClient.post("/api/cart/add/", {
-      product_id: parseInt(item.product.id),
-      quantity: item.quantity,
-      selected_size: item.selectedSize,
-      selected_color: item.selectedColor,
-    })
-    return response.ok
+    const data = await graphqlRequest<{
+      cartAdd: { success: boolean }
+    }>(
+      `
+      mutation AddToCart($input: CartAddInput!) {
+        cartAdd(input: $input) {
+          success
+        }
+      }
+      `,
+      {
+        input: {
+          productId: Number(item.product.id),
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          selectedColor: item.selectedColor,
+        },
+      }
+    )
+    return data.cartAdd.success
   } catch (error) {
     console.error("Failed to add to cart:", error)
     return false
@@ -53,8 +82,19 @@ export async function addToCart(item: CartItem): Promise<boolean> {
  */
 export async function removeFromCart(itemId: number): Promise<boolean> {
   try {
-    const response = await apiClient.delete(`/api/cart/${itemId}/`)
-    return response.ok
+    const data = await graphqlRequest<{
+      cartRemove: { success: boolean }
+    }>(
+      `
+      mutation RemoveFromCart($itemId: Int!) {
+        cartRemove(itemId: $itemId) {
+          success
+        }
+      }
+      `,
+      { itemId }
+    )
+    return data.cartRemove.success
   } catch (error) {
     console.error("Failed to remove from cart:", error)
     return false
@@ -70,8 +110,19 @@ export async function updateCartItemQuantity(
   quantity: number
 ): Promise<boolean> {
   try {
-    const response = await apiClient.put(`/api/cart/${itemId}/`, { quantity })
-    return response.ok
+    const data = await graphqlRequest<{
+      cartUpdate: { success: boolean }
+    }>(
+      `
+      mutation UpdateCart($itemId: Int!, $quantity: Int!) {
+        cartUpdate(itemId: $itemId, quantity: $quantity) {
+          success
+        }
+      }
+      `,
+      { itemId, quantity }
+    )
+    return data.cartUpdate.success
   } catch (error) {
     console.error("Failed to update cart item quantity:", error)
     return false

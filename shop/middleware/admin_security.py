@@ -1,4 +1,3 @@
-from django.http import JsonResponse
 from django.shortcuts import redirect
 
 
@@ -20,15 +19,9 @@ class AdminSecurityMiddleware:
             return response
 
         # Check if accessing admin endpoints
-        if request.path.startswith("/admin/") or request.path.startswith("/api/admin/"):
+        if request.path.startswith("/admin/"):
             # Require staff authentication for admin endpoints
             if not (request.user.is_authenticated and request.user.is_staff):
-                # Return JSON for API requests
-                if request.path.startswith("/api/"):
-                    return JsonResponse(
-                        {"error": "Access denied. Staff privileges required."},
-                        status=403,
-                    )
                 # Redirect to admin login for web requests
                 return redirect(f"/admin/login/?next={request.path}")
 

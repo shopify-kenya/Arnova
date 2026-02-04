@@ -28,11 +28,12 @@
 - HTTPS/SSL enforced (`SECURE_SSL_REDIRECT=True`)
 - HSTS enabled with 1-year max-age
 - Secure session cookies (`SESSION_COOKIE_SECURE=True`)
-- Secure CSRF cookies (`CSRF_COOKIE_SECURE=True`)
+- Secure CSRF cookies (`CSRF_COOKIE_SECURE=True`) for admin templates
 - CORS restricted to Vercel and Render domains
 - Admin panel IP whitelisting
 - Account lockout after failed login attempts
-- Rate limiting on API endpoints
+- Rate limiting on GraphQL operations
+- JWT authentication for GraphQL clients
 
 #### Database
 
@@ -68,6 +69,9 @@ CSRF_TRUSTED_ORIGINS=https://arnova-207y.onrender.com,https://*.vercel.app
 - `CSRF_TRUSTED_ORIGINS` - Comma-separated trusted origins
 - `SESSION_COOKIE_SECURE=True`
 - `CSRF_COOKIE_SECURE=True`
+- `JWT_SECRET` - Secret used to sign JWTs
+- `JWT_ACCESS_TTL_MINUTES` - Access token lifetime
+- `JWT_REFRESH_TTL_DAYS` - Refresh token lifetime
 
 ### Required Frontend Variables (Vercel)
 

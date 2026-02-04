@@ -5,7 +5,7 @@ A modern e-commerce platform built with Next.js and Django, featuring a glass mo
 ## Features
 
 - Modern React/Next.js frontend with glass morphism design
-- Django REST API backend
+- Django GraphQL backend (single endpoint)
 - Multi-language support (English, Swahili)
 - Progressive Web App (PWA) capabilities
 - SSL/HTTPS support for development
@@ -32,23 +32,22 @@ python unified_server.py
 **Unified Server Architecture:**
 
 - Single server endpoint serves both frontend and backend
-- Django handles API routes (`/api/*`) and admin (`/admin/`)
+- Django handles GraphQL (`/graphql/`) and admin (`/admin/`)
 - Next.js frontend integrated seamlessly
-- CSRF protection enabled for secure API communication
+- JWT-based auth for GraphQL, plus session auth for admin
 
 **Access Points:**
 
 - Main App: <http://127.0.0.1:8000>
 - HTTPS: <https://127.0.0.1:8443> (if SSL enabled)
 - Admin Panel: <http://127.0.0.1:8000/admin/>
-- API Endpoints: <http://127.0.0.1:8000/api/>\*
-- CSRF Demo: <http://127.0.0.1:8000/csrf-example/>
+- GraphQL API: <http://127.0.0.1:8000/graphql/>
 
 ## Documentation
 
 - [Developer Guide](docs/DEVELOPER_GUIDE.md) - Technical documentation for developers
 - [User Guide](docs/USER_GUIDE.md) - Comprehensive guide for end users
-- [API Documentation](docs/API_DOCUMENTATION.md) - REST API reference
+- [API Documentation](docs/API_DOCUMENTATION.md) - GraphQL API reference
 - [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment instructions
 
 ## Technology Stack
@@ -64,7 +63,7 @@ python unified_server.py
 **Backend:**
 
 - Django 5.2
-- Django REST Framework
+- Strawberry GraphQL
 - SQLite (development)
 - PostgreSQL (production)
 

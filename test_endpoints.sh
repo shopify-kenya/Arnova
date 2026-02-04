@@ -1,183 +1,156 @@
 #!/bin/bash
-# Comprehensive API endpoint testing script
+# GraphQL endpoint testing script
 
 BASE_URL="${BASE_URL:-https://127.0.0.1:8443}"
-COOKIE_JAR="test_cookies.txt"
+GRAPHQL_URL="$BASE_URL/graphql/"
+ACCESS_TOKEN=""
 
-echo "🧪 Testing all Arnova API endpoints..."
+json_escape() {
+  python - <<'PY'
+import json,sys
+print(json.dumps(sys.stdin.read()))
+PY
+}
+
+gql() {
+  local query="$1"
+  local variables="$2"
+
+  local payload
+  if [ -n "$variables" ]; then
+    payload=$(python - <<PY
+import json
+query = """$query"""
+variables = json.loads('''$variables''')
+print(json.dumps({"query": query, "variables": variables}))
+PY
+)
+  else
+    payload=$(python - <<PY
+import json
+query = """$query"""
+print(json.dumps({"query": query}))
+PY
+)
+  fi
+
+  if [ -n "$ACCESS_TOKEN" ]; then
+    curl -k -s -H "Content-Type: application/json" -H "Authorization: Bearer $ACCESS_TOKEN" \
+      -d "$payload" "$GRAPHQL_URL"
+  else
+    curl -k -s -H "Content-Type: application/json" -d "$payload" "$GRAPHQL_URL"
+  fi
+}
+
+echo "🧪 Testing Arnova GraphQL endpoint..."
 echo "=================================="
 
-# Clean up previous cookies
-rm -f $COOKIE_JAR
+# Test 1: Health
+printf "1. Health check...\n"
+HEALTH=$(gql "query { health }")
+echo "$HEALTH" | head -200
 
-# Test 1: Get CSRF Token
-echo "1. Testing CSRF Token endpoint..."
-CSRF_RESPONSE=$(curl -k -s -c $COOKIE_JAR "$BASE_URL/api/csrf-token/")
-echo "Response: $CSRF_RESPONSE"
-CSRF_TOKEN=$(python -c 'import json,sys; 
-import sys
+echo "\n2. Public queries (products, categories)..."
+PRODUCTS_RESPONSE=$(gql "query Products { products { id name price sizes colors } }")
+echo "$PRODUCTS_RESPONSE" | head -200
+CATEGORIES_RESPONSE=$(gql "query Categories { categories { id name slug } }")
+echo "$CATEGORIES_RESPONSE" | head -200
+
+# Extract product id/size/color
+PRODUCT_ID=$(python - <<PY
 import json
-data = json.loads(sys.stdin.read() or "{}")
-print(data.get("csrfToken",""))' <<< "$CSRF_RESPONSE")
-echo "CSRF Token: $CSRF_TOKEN"
-echo ""
+import sys
+resp = json.loads('''$PRODUCTS_RESPONSE''')
+items = resp.get('data', {}).get('products', [])
+print(items[0].get('id') if items else "")
+PY
+)
+SELECTED_SIZE=$(python - <<PY
+import json
+resp = json.loads('''$PRODUCTS_RESPONSE''')
+items = resp.get('data', {}).get('products', [])
+print((items[0].get('sizes') or [""])[0] if items else "")
+PY
+)
+SELECTED_COLOR=$(python - <<PY
+import json
+resp = json.loads('''$PRODUCTS_RESPONSE''')
+items = resp.get('data', {}).get('products', [])
+print((items[0].get('colors') or [""])[0] if items else "")
+PY
+)
 
-# Test 2: Public endpoints (no auth required)
-echo "2. Testing public endpoints..."
-echo "   - Products:"
-PRODUCTS_RESPONSE=$(curl -k -s -b $COOKIE_JAR "$BASE_URL/api/products/")
-echo "$PRODUCTS_RESPONSE" | head -100
-echo ""
-echo "   - Categories:"
-categories_response=$(curl -k -s -b $COOKIE_JAR "$BASE_URL/api/categories/")
-echo "$categories_response"
-echo ""
-echo "   - Health check:"
-curl -k -s -b $COOKIE_JAR "$BASE_URL/api/health/"
-echo ""
+# Test 3: Login
+printf "\n3. Login (admin)...\n"
+LOGIN_RESPONSE=$(gql "mutation Login($username: String!, $password: String!) { login(username: $username, password: $password) { accessToken refreshToken user { id username role } } }" "{\"username\": \"ArnovaAdmin\", \"password\": \"Arnova@010126\"}")
+echo "$LOGIN_RESPONSE" | head -200
+ACCESS_TOKEN=$(python - <<PY
+import json
+resp = json.loads('''$LOGIN_RESPONSE''')
+print(resp.get('data', {}).get('login', {}).get('accessToken', ""))
+PY
+)
 
-# Test 3: Login as admin
-echo "3. Testing admin login..."
-LOGIN_RESPONSE=$(curl -k -s -X POST \
-  -H "Content-Type: application/json" \
-  -H "X-CSRFToken: $CSRF_TOKEN" \
-  -H "Referer: $BASE_URL/" \
-  -c $COOKIE_JAR -b $COOKIE_JAR \
-  -d '{"username":"ArnovaAdmin","password":"Arnova@010126"}' \
-  "$BASE_URL/api/auth/login/")
-echo "Login Response: $LOGIN_RESPONSE"
-echo ""
+if [ -z "$ACCESS_TOKEN" ]; then
+  echo "Failed to login. Aborting protected tests."
+  exit 1
+fi
 
-# Refresh CSRF token after login (token can rotate on auth)
-CSRF_RESPONSE=$(curl -k -s -b $COOKIE_JAR -c $COOKIE_JAR "$BASE_URL/api/csrf-token/")
-CSRF_TOKEN=$(python -c 'import json,sys; 
-data=json.loads(sys.stdin.read() or "{}");
-print(data.get("csrfToken",""))' <<< "$CSRF_RESPONSE")
+# Test 4: Admin queries
+printf "\n4. Admin queries...\n"
+ADMIN_ANALYTICS=$(gql "query { adminAnalytics { totalOrders totalRevenue totalUsers totalProducts } }")
+echo "$ADMIN_ANALYTICS" | head -200
+ADMIN_PRODUCTS=$(gql "query { adminProducts { id name price } }")
+echo "$ADMIN_PRODUCTS" | head -200
+ADMIN_USERS=$(gql "query { adminUsers { id username email isStaff } }")
+echo "$ADMIN_USERS" | head -200
+ADMIN_ORDERS=$(gql "query { adminOrders { id orderId totalAmount status } }")
+echo "$ADMIN_ORDERS" | head -200
 
-# Test 4: Admin endpoints (require auth + admin)
-echo "4. Testing admin endpoints..."
-echo "   - Admin Analytics:"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/admin/analytics/" | head -200
-echo ""
-echo "   - Admin Products:"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/admin/products/" | head -200
-echo ""
-echo "   - Admin Users:"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/admin/users/" | head -200
-echo ""
-echo "   - Admin Orders:"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/admin/orders/"
-echo ""
+# Test 5: Create product (if categories available)
+CATEGORY_ID=$(python - <<PY
+import json
+resp = json.loads('''$CATEGORIES_RESPONSE''')
+items = resp.get('data', {}).get('categories', [])
+print(items[0].get('id') if items else "")
+PY
+)
 
-# Extract a category id for product creation
-CATEGORY_ID=$(python -c 'import json,sys; 
-data=json.loads(sys.stdin.read() or "{}"); 
-categories=data.get("categories") or [];
-print(categories[0].get("id","") if categories else "")' <<< "$categories_response")
-
-# Extract a product id/size/color for cart tests
-PRODUCT_ID=$(python -c 'import json,sys; 
-data=json.loads(sys.stdin.read() or "{}"); 
-products=data.get("products") or [];
-print(products[0].get("id","") if products else "")' <<< "$PRODUCTS_RESPONSE")
-
-SELECTED_SIZE=$(python -c 'import json,sys; 
-data=json.loads(sys.stdin.read() or "{}");
-products=data.get("products") or [];
-sizes=(products[0].get("sizes") or []) if products else [];
-print(sizes[0] if sizes else "")' <<< "$PRODUCTS_RESPONSE")
-
-SELECTED_COLOR=$(python -c 'import json,sys; 
-data=json.loads(sys.stdin.read() or "{}");
-products=data.get("products") or [];
-colors=(products[0].get("colors") or []) if products else [];
-print(colors[0] if colors else "")' <<< "$PRODUCTS_RESPONSE")
-
-# Test 5: Create a test product
-echo "5. Testing product creation..."
-NEW_PRODUCT_ID=$(date +%s)
+printf "\n5. Admin create product...\n"
 if [ -n "$CATEGORY_ID" ]; then
-  CREATE_RESPONSE=$(curl -k -s -X POST \
-    -H "Content-Type: application/json" \
-    -H "X-CSRFToken: $CSRF_TOKEN" \
-    -H "Referer: $BASE_URL/" \
-    -c $COOKIE_JAR -b $COOKIE_JAR \
-    -d '{
-      "id": '"$NEW_PRODUCT_ID"',
-      "name": "Test Product",
-      "description": "A test product for API testing",
-      "price": 99.99,
-      "currency": "KES",
-      "category_id": '"$CATEGORY_ID"',
-      "sizes": ["M", "L"],
-      "colors": ["Red", "Blue"],
-      "images": ["https://example.com/test.jpg"],
-      "in_stock": true
-    }' \
-    "$BASE_URL/api/admin/products/")
-  echo "Create Product Response: $CREATE_RESPONSE"
+  CREATE_PRODUCT=$(gql "mutation AdminCreateProduct($input: AdminCreateProductInput!) { adminCreateProduct(input: $input) { success productId } }" "{\"input\": {\"name\": \"Test Product\", \"description\": \"GraphQL test product\", \"price\": 99.99, \"categoryId\": $CATEGORY_ID, \"sizes\": [\"M\", \"L\"], \"colors\": [\"Red\", \"Blue\"], \"images\": [\"https://example.com/test.jpg\"], \"inStock\": true }}")
+  echo "$CREATE_PRODUCT" | head -200
 else
-  echo "Create Product Response: skipped (no categories found)"
-fi
-echo ""
-
-# Test 6: User endpoints (require auth)
-echo "6. Testing user endpoints..."
-echo "   - User Profile:"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/profile/"
-echo ""
-echo "   - User Cart:"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/cart/"
-echo ""
-echo "   - User Orders:"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/orders/"
-echo ""
-
-# Test 7: Test cart operations
-echo "7. Testing cart operations..."
-if [ -z "$PRODUCT_ID" ] && [ -n "$CATEGORY_ID" ]; then
-  PRODUCT_ID="$NEW_PRODUCT_ID"
-  SELECTED_SIZE="M"
-  SELECTED_COLOR="Red"
+  echo "Create Product: skipped (no categories found)"
 fi
 
+# Test 6: User queries
+printf "\n6. User queries (profile, cart, orders)...\n"
+PROFILE=$(gql "query { profile { user { username email } profile { phone address city country postalCode } } }")
+echo "$PROFILE" | head -200
+CART=$(gql "query { cart { items { id quantity selectedSize selectedColor product { id name price } } } }")
+echo "$CART" | head -200
+ORDERS=$(gql "query { orders { id orderId totalAmount status createdAt } }")
+echo "$ORDERS" | head -200
+
+# Test 7: Cart add
+printf "\n7. Cart add...\n"
 if [ -n "$PRODUCT_ID" ]; then
-  ADD_TO_CART=$(curl -k -s -X POST \
-    -H "Content-Type: application/json" \
-    -H "X-CSRFToken: $CSRF_TOKEN" \
-    -H "Referer: $BASE_URL/" \
-    -c $COOKIE_JAR -b $COOKIE_JAR \
-    -d '{
-      "product_id": '"${PRODUCT_ID}"',
-      "quantity": 2,
-      "selected_size": "'"$SELECTED_SIZE"'",
-      "selected_color": "'"$SELECTED_COLOR"'"
-    }' \
-    "$BASE_URL/api/cart/add/")
-  echo "Add to Cart Response: $ADD_TO_CART"
+  ADD_TO_CART=$(gql "mutation CartAdd($input: CartAddInput!) { cartAdd(input: $input) { success } }" "{\"input\": {\"productId\": $PRODUCT_ID, \"quantity\": 2, \"selectedSize\": \"$SELECTED_SIZE\", \"selectedColor\": \"$SELECTED_COLOR\" }}")
+  echo "$ADD_TO_CART" | head -200
 else
-  echo "Add to Cart Response: skipped (no product available)"
+  echo "Add to Cart: skipped (no product available)"
 fi
-echo ""
 
 # Test 8: Logout
-echo "8. Testing logout..."
-LOGOUT_RESPONSE=$(curl -k -s -X POST \
-  -H "X-CSRFToken: $CSRF_TOKEN" \
-  -H "Referer: $BASE_URL/" \
-  -c $COOKIE_JAR -b $COOKIE_JAR \
-  "$BASE_URL/api/auth/logout/")
-echo "Logout Response: $LOGOUT_RESPONSE"
-echo ""
+printf "\n8. Logout...\n"
+LOGOUT=$(gql "mutation { logout { success } }")
+echo "$LOGOUT" | head -200
 
-# Test 9: Test endpoints after logout (should fail)
-echo "9. Testing protected endpoints after logout..."
-echo "   - Admin Analytics (should fail):"
-curl -k -s -H "X-CSRFToken: $CSRF_TOKEN" -b $COOKIE_JAR "$BASE_URL/api/admin/analytics/"
-echo ""
+# Test 9: Protected query after logout (should fail)
+printf "\n9. Protected query after logout (should fail)...\n"
+ACCESS_TOKEN=""
+ADMIN_FAIL=$(gql "query { adminAnalytics { totalOrders } }")
+echo "$ADMIN_FAIL" | head -200
 
-# Clean up
-rm -f $COOKIE_JAR
-
-echo "🎉 API endpoint testing completed!"
-echo "Check the responses above for any errors or issues."
+echo "\n🎉 GraphQL endpoint testing completed!"

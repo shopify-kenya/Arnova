@@ -13,6 +13,6 @@ services:
         value: production
       - key: PYTHONUNBUFFERED
         value: "1"
-    healthCheckPath: /api/health
+    healthCheckPath: /health/
     startCommand: ". /opt/render/project/src/.venv/bin/activate && gunicorn wsgi:application"
     preDeployCommand: "pip install -r requirements.txt && python manage.py migrate"
