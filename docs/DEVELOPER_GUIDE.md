@@ -56,6 +56,7 @@ JWT_REFRESH_TTL_DAYS=7
 - `python generate_ssl.py` - Generate SSL certificates
 - `python generate_pwa_assets.py` - Setup PWA assets
 - `python update_translations.py` - Find untranslated strings
+- `python scripts/check_db_connection.py` - Verify DB connectivity
 
 ## GraphQL API
 

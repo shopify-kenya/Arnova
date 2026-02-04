@@ -63,6 +63,12 @@ JWT_REFRESH_TTL_DAYS=7
 # NEON_DATABASE_URL=postgresql://user:pass@ep-xxxx.neon.tech/dbname?sslmode=require
 ```
 
+### Neon vs Render Postgres
+
+- `DATABASE_URL` takes precedence when set (e.g., Render Postgres).
+- `NEON_DATABASE_URL` is used when `DATABASE_URL` is not set.
+- For Neon, ensure the connection string includes `?sslmode=require`.
+
 ## 📦 Manual Setup
 
 ### Backend Setup
