@@ -99,9 +99,9 @@ function CheckoutPageContent() {
     toast.success("M-Pesa payment completed successfully!")
   }
 
-  const handleMpesaError = (error: string) => {
+  const handleMpesaError = (_error: string) => {
     setShowMpesaModal(false)
-    toast.error(error)
+    toast.error("Payment failed. Please try again.")
   }
 
   const handleMpesaCancel = () => {
@@ -189,7 +189,7 @@ function CheckoutPageContent() {
             setIsProcessing(false)
             return // Don't continue processing here
           } else {
-            throw new Error("No checkout request ID received")
+            throw new Error("Payment failed. Please try again.")
           }
         }
 
@@ -209,15 +209,11 @@ function CheckoutPageContent() {
             `Payment successful via ${paymentMethodNames[paymentMethod]}!`
         )
       } else {
-        throw new Error(result.error || "Payment failed")
+        throw new Error("Payment failed. Please try again.")
       }
     } catch (error: unknown) {
       setIsProcessing(false)
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Payment failed. Please try again."
-      toast.error(errorMessage)
+      toast.error("Payment failed. Please try again.")
     }
   }
 

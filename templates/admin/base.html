@@ -297,7 +297,7 @@
                     badge.classList.add('hidden');
                 }
             } catch (error) {
-                console.error('Failed to load notifications:', error);
+                // Avoid leaking internal error details to the client.
             }
         }
 
@@ -321,7 +321,7 @@
                 if (link) window.location.href = link;
                 else loadNotifications();
             } catch (error) {
-                console.error('Failed to mark as read:', error);
+                // Avoid leaking internal error details to the client.
             }
         }
 

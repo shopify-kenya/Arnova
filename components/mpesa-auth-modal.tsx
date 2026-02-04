@@ -201,11 +201,6 @@ export function MpesaAuthModal({
                 )}
               </div>
 
-              {status === "pending" && checkoutRequestId && (
-                <p className="text-xs text-muted-foreground mt-4">
-                  Request ID: {checkoutRequestId}
-                </p>
-              )}
             </GlassCard>
           </motion.div>
         </motion.div>

@@ -39,7 +39,6 @@ export async function getCartFromServer(): Promise<CartItem[]> {
     `)
     return data.cart.items || []
   } catch (error) {
-    console.error("Failed to fetch cart:", error)
   }
   return []
 }
@@ -71,7 +70,6 @@ export async function addToCart(item: CartItem): Promise<boolean> {
     )
     return data.cartAdd.success
   } catch (error) {
-    console.error("Failed to add to cart:", error)
     return false
   }
 }
@@ -96,7 +94,6 @@ export async function removeFromCart(itemId: number): Promise<boolean> {
     )
     return data.cartRemove.success
   } catch (error) {
-    console.error("Failed to remove from cart:", error)
     return false
   }
 }
@@ -124,7 +121,6 @@ export async function updateCartItemQuantity(
     )
     return data.cartUpdate.success
   } catch (error) {
-    console.error("Failed to update cart item quantity:", error)
     return false
   }
 }
@@ -145,7 +141,6 @@ export async function clearCart(cart: CartItem[]): Promise<boolean> {
     // Return true only if all deletions were successful
     return results.every(res => res)
   } catch (error) {
-    console.error("Failed to clear cart:", error)
     return false
   }
 }

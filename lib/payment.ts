@@ -73,8 +73,7 @@ export const processPayment = async (
     )
     return data.processPayment
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Payment processing failed"
+    const errorMessage = "Payment failed. Please try again."
     return {
       success: false,
       error: errorMessage,
@@ -108,8 +107,7 @@ export const validateCard = async (
       card_type: data.validateCard.cardType,
     }
   } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Card validation failed"
+    const errorMessage = "Unable to validate card. Please try again."
     return {
       valid: false,
       card_type: "unknown",
@@ -213,8 +211,7 @@ export const checkMpesaPaymentStatus = async (
     return {
       status: "failed",
       result_code: "1",
-      result_desc:
-        error instanceof Error ? error.message : "Status check failed",
+      result_desc: "Payment status unavailable. Please try again.",
     }
   }
 }

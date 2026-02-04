@@ -45,7 +45,6 @@ export async function getSavedProductsFromServer(): Promise<SavedItem[]> {
     `)
     return data.saved.items || []
   } catch (error) {
-    console.error("Failed to fetch saved items:", error)
   }
   return []
 }
@@ -71,7 +70,6 @@ export async function addToSaved(productId: string): Promise<number | null> {
     )
     return data.savedAdd.itemId || null
   } catch (error) {
-    console.error("Failed to add to saved items:", error)
   }
   return null
 }
@@ -96,7 +94,6 @@ export async function removeFromSaved(itemId: number): Promise<boolean> {
     )
     return data.savedRemove.success
   } catch (error) {
-    console.error("Failed to remove from saved items:", error)
     return false
   }
 }

@@ -192,11 +192,11 @@ document.getElementById('productForm').addEventListener('submit', function(e) {
         if (data.success) {
             window.location.href = "{% url 'admin_products' %}";
         } else {
-            alert('Error: ' + (data.error || 'Unknown error'));
+            alert('Unable to save product. Please try again.');
         }
     })
     .catch(error => {
-        alert('Error: ' + error.message);
+        alert('Unable to save product. Please try again.');
     });
 });
 </script>

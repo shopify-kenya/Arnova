@@ -66,7 +66,6 @@
             allNotifications = payload?.data?.notifications?.items || [];
             renderNotifications();
         } catch (error) {
-            console.error('Error loading notifications:', error);
             document.getElementById('notifications-container').innerHTML = `
                 <div class="text-center py-8">
                     <p class="text-red-600">Failed to load notifications</p>
@@ -154,7 +153,6 @@
                 loadNotifications();
             }
         } catch (error) {
-            console.error('Error marking as read:', error);
         }
     }
 
@@ -176,7 +174,6 @@
             });
             loadNotifications();
         } catch (error) {
-            console.error('Error marking all as read:', error);
         }
     }
 

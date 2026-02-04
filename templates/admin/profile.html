@@ -117,7 +117,7 @@ async function loadProfile() {
             document.getElementById('postal_code').value = data.profile.postalCode || '';
         }
     } catch (error) {
-        console.error('Failed to load profile:', error);
+        alert('Unable to load profile. Please refresh and try again.');
     }
 }
 
@@ -160,7 +160,7 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
             alert('Failed to update profile');
         }
     } catch (error) {
-        alert('Failed to update profile');
+        alert('Unable to update profile. Please try again.');
     }
 });
 
