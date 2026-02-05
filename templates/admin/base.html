@@ -230,7 +230,7 @@
                     </svg>
                     <span class="font-medium">Back to Store</span>
                 </a>
-                <form method="post" action="{% url 'api_logout' %}" class="inline w-full">
+                <form method="post" action="{% url 'admin_logout' %}" class="inline w-full">
                     {% csrf_token %}
                     <button type="submit" class="flex items-center h-11 px-4 rounded-lg hover:bg-destructive/10 text-red-600 transition-colors w-full text-left">
                         <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
