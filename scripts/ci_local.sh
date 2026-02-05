@@ -45,12 +45,25 @@ else
   .venv/bin/isort --check-only . --skip=migrations --skip=venv --skip=.venv --skip=node_modules
 fi
 
+USE_POSTGRES=${USE_POSTGRES:-0}
+
+if [[ "$USE_POSTGRES" == "1" ]]; then
+  if [[ -z "${DATABASE_URL:-}" ]]; then
+    echo "ERROR: DATABASE_URL must be set when USE_POSTGRES=1" >&2
+    exit 1
+  fi
+  DB_ENV=(DATABASE_URL="$DATABASE_URL")
+else
+  DB_ENV=(DATABASE_URL="sqlite:///$ROOT_DIR/db.sqlite3")
+fi
+
 echo "==> Django migrations"
-DATABASE_URL="sqlite:///$ROOT_DIR/db.sqlite3" SECRET_KEY="test-secret-key" DEBUG=False \
+SECRET_KEY="test-secret-key" DEBUG=False "${DB_ENV[@]}" \
   .venv/bin/python manage.py migrate
 
 echo "==> Django tests"
-.venv/bin/python manage.py test
+SECRET_KEY="test-secret-key" DEBUG=False "${DB_ENV[@]}" \
+  .venv/bin/python manage.py test
 
 echo "==> Next.js lint"
 npm run lint
