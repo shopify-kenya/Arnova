@@ -7,7 +7,6 @@ import { AuthProvider } from "@/components/auth-provider"
 import { CartProvider } from "@/components/cart-provider"
 import { SavedItemsProvider } from "@/components/saved-items-provider"
 import { PWAInstaller } from "@/components/pwa-installer"
-import { ClientRouter } from "@/components/client-router"
 import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
@@ -117,7 +116,6 @@ export default function RootLayout({
               <AuthProvider>
                 <SavedItemsProvider>
                   <CartProvider>
-                    <ClientRouter />
                     {children}
                     <Toaster />
                     <PWAInstaller />

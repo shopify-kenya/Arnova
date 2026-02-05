@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap");
 @config "../tailwind.config.cjs";
 @import "tailwindcss";
 
@@ -32,8 +31,8 @@
   }
 
   body {
-    font-family: "Manrope", "Inter", "Segoe UI", system-ui, -apple-system,
-      "Helvetica Neue", Arial, sans-serif;
+    font-family: "Linear Grotesk", "Inter", "Segoe UI", system-ui,
+      -apple-system, "Helvetica Neue", Arial, sans-serif;
   }
 
   .dark {
@@ -66,8 +65,58 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: "Manrope", sans-serif;
+    font-family: "Linear Grotesk", sans-serif;
   }
+}
+
+@font-face {
+  font-family: "Linear Grotesk";
+  src: url("/fonts/linear-grotesk/LinearGrotesk-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linear Grotesk";
+  src: url("/fonts/linear-grotesk/LinearGrotesk-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linear Grotesk";
+  src: url("/fonts/linear-grotesk/LinearGrotesk-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linear Grotesk";
+  src: url("/fonts/linear-grotesk/LinearGrotesk-Semibold.woff2")
+    format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linear Grotesk";
+  src: url("/fonts/linear-grotesk/LinearGrotesk-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Linear Grotesk";
+  src: url("/fonts/linear-grotesk/LinearGrotesk-Extrabold.woff2")
+    format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
 }
 
 .glass {
