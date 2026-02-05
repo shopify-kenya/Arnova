@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 import dj_database_url
@@ -28,6 +29,7 @@ SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
+IS_TESTING = "test" in sys.argv
 
 # GraphQL UI (GraphiQL) toggle for local development
 GRAPHQL_GRAPHIQL = config("GRAPHQL_GRAPHIQL", default=DEBUG, cast=bool)
@@ -106,13 +108,21 @@ primary_db_url = config(
 if not primary_db_url:
     primary_db_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=primary_db_url,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
+if "test" in sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+else:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=primary_db_url,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 
 # Validate DATABASE_URL format
 db_url = primary_db_url
@@ -214,7 +224,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_DOMAIN = None  # Allow cross-subdomain
 
 # HTTPS Security Headers
-if not DEBUG:
+if not DEBUG and not IS_TESTING:
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_HSTS_SECONDS = 31536000
