@@ -40,8 +40,8 @@ echo "==> Python format check"
 if command -v rg >/dev/null 2>&1; then
   PY_FILES="$(git ls-files "*.py" | rg -v "/migrations/")"
   if [[ -n "$PY_FILES" ]]; then
-    echo "$PY_FILES" | xargs -n 50 .venv/bin/black --check
-    echo "$PY_FILES" | xargs -n 50 .venv/bin/isort --check-only
+    echo "$PY_FILES" | xargs -n 10 .venv/bin/black --check
+    echo "$PY_FILES" | xargs -n 10 .venv/bin/isort --check-only
   else
     echo "No tracked Python files to format-check."
   fi
