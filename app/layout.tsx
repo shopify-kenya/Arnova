@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { Manrope } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LanguageProvider } from "@/components/language-provider"
@@ -50,12 +49,6 @@ export const viewport = {
     { media: "(prefers-color-scheme: dark)", color: "#1a1f12" },
   ],
 }
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["200", "300", "400", "500", "600", "700", "800"],
-})
 
 export default function RootLayout({
   children,
@@ -112,7 +105,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={manrope.className} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

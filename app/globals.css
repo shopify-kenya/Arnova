@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap");
 @config "../tailwind.config.cjs";
 @import "tailwindcss";
 
@@ -28,6 +29,11 @@
     --arnova-cream: 60 100% 94%;
     --arnova-gold: 36 64% 57%;
     --arnova-bronze: 36 65% 44%;
+  }
+
+  body {
+    font-family: "Manrope", "Inter", "Segoe UI", system-ui, -apple-system,
+      "Helvetica Neue", Arial, sans-serif;
   }
 
   .dark {
