@@ -27,6 +27,10 @@ RUN npm ci --include=dev --legacy-peer-deps
 # Copy application code
 COPY .. .
 
+# Entrypoint for runtime migrations
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Build Next.js frontend
 RUN npm run build
 
@@ -51,4 +55,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["gunicorn", "wsgi:application"]
