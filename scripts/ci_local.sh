@@ -38,15 +38,15 @@ echo "==> Python lint"
 echo "==> Python format check"
 # Avoid long runtimes by checking tracked python files, excluding migrations
 if command -v rg >/dev/null 2>&1; then
-  PY_FILES="$(git ls-files \"*.py\" | rg -v \"/migrations/\")"
-  if [[ -n \"$PY_FILES\" ]]; then
-    echo \"$PY_FILES\" | xargs -n 50 .venv/bin/black --check
-    echo \"$PY_FILES\" | xargs -n 50 .venv/bin/isort --check-only
+  PY_FILES="$(git ls-files "*.py" | rg -v "/migrations/")"
+  if [[ -n "$PY_FILES" ]]; then
+    echo "$PY_FILES" | xargs -n 50 .venv/bin/black --check
+    echo "$PY_FILES" | xargs -n 50 .venv/bin/isort --check-only
   else
-    echo \"No tracked Python files to format-check.\"
+    echo "No tracked Python files to format-check."
   fi
 else
-  .venv/bin/black --check . --exclude \"/(migrations|venv|.venv|node_modules)/\"
+  .venv/bin/black --check . --exclude "/(migrations|venv|.venv|node_modules)/"
   .venv/bin/isort --check-only . --skip=migrations --skip=venv --skip=.venv --skip=node_modules
 fi
 
