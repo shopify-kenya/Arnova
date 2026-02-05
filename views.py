@@ -41,10 +41,18 @@ def index(request):
 
     # Try to serve the specific HTML file for this route
     if path:
-        # Handle nested routes (e.g., admin/users, product/cl-001)
-        html_file = os.path.join(next_dir, path, "index.html")
+        # Next.js app output uses "<route>.html" at the app root
+        html_file = os.path.join(next_dir, f"{path}.html")
         if os.path.exists(html_file):
             with open(html_file, "r", encoding="utf-8") as f:
+                response = HttpResponse(f.read(), content_type="text/html")
+                response["Cache-Control"] = "public, max-age=3600"
+                return response
+
+        # Fallback for index-style outputs (if present)
+        nested_index = os.path.join(next_dir, path, "index.html")
+        if os.path.exists(nested_index):
+            with open(nested_index, "r", encoding="utf-8") as f:
                 response = HttpResponse(f.read(), content_type="text/html")
                 response["Cache-Control"] = "public, max-age=3600"
                 return response
