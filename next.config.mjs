@@ -9,6 +9,18 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: "/_next/static/:path*",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
+      {
+        source: "/fonts/:path*",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
+    ]
+  },
   async rewrites() {
     return [
       {

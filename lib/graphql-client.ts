@@ -3,7 +3,12 @@
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./token-store"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
-const GRAPHQL_URL = API_URL ? `${API_URL}/graphql/` : "/graphql/"
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+const GRAPHQL_URL =
+  isLocalhost || !API_URL ? "/graphql/" : `${API_URL}/graphql/`
 
 type GraphQLResponse<T> = {
   data?: T
