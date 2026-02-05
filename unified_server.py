@@ -40,11 +40,6 @@ def run_unified_server():
         print("📦 Building Next.js frontend...")
         try:
             env = os.environ.copy()
-            # Disable Turbopack to avoid sandboxed port-binding errors during build
-            env["NEXT_DISABLE_TURBOPACK"] = "1"
-            env["NEXT_FORCE_DISABLE_TURBOPACK"] = "1"
-            env["NEXT_TURBOPACK"] = "0"
-            env["TURBOPACK"] = "0"
             subprocess.run(["npm", "run", "build"], check=True, cwd=base_dir, env=env)
             print("✅ Next.js build completed")
         except subprocess.CalledProcessError:
