@@ -2,8 +2,8 @@
 
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./token-store"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-const GRAPHQL_URL = `${API_URL}/graphql/`
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+const GRAPHQL_URL = API_URL ? `${API_URL}/graphql/` : "/graphql/"
 
 type GraphQLResponse<T> = {
   data?: T
