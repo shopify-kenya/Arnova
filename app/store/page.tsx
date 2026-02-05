@@ -10,18 +10,12 @@ import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ProductCard } from "@/components/product-card"
-import { graphqlRequest } from "@/lib/graphql-client"
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  salePrice?: number
-  images: string[]
-  category: string
-  isNew?: boolean
-  onSale?: boolean
-}
+import {
+  ProductGridEmpty,
+  ProductGridSkeleton,
+} from "@/components/product-grid-state"
+import type { Product } from "@/lib/products"
+import { fetchProducts } from "@/lib/products"
 
 export default function StorePage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -34,25 +28,7 @@ export default function StorePage() {
   // Fetch products with SWR for auto-refresh
   const { data, isLoading } = useSWR(
     "graphql:products",
-    async () => {
-      const data = await graphqlRequest<{
-        products: Product[]
-      }>(`
-        query Products {
-          products {
-            id
-            name
-            price
-            salePrice
-            images
-            category
-            isNew
-            onSale
-          }
-        }
-      `)
-      return data.products || []
-    },
+    fetchProducts,
     {
       refreshInterval: 30000,
       revalidateOnFocus: true,
@@ -151,15 +127,12 @@ export default function StorePage() {
 
           {/* Products Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-muted rounded-lg h-80 mb-4"></div>
-                  <div className="bg-muted rounded h-4 mb-2"></div>
-                  <div className="bg-muted rounded h-4 w-2/3"></div>
-                </div>
-              ))}
-            </div>
+            <ProductGridSkeleton count={viewMode === "grid" ? 8 : 4} />
+          ) : filteredProducts.length === 0 ? (
+            <ProductGridEmpty
+              title="No products found"
+              description="Try updating your search or filters."
+            />
           ) : (
             <motion.div
               className={`grid gap-6 ${
@@ -178,41 +151,10 @@ export default function StorePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <ProductCard
-                    key={product.id}
-                    product={{
-                      id: product.id,
-                      name: product.name,
-                      price: product.price,
-                      images: product.images,
-                      category: product.category as
-                        | "clothing"
-                        | "shoes"
-                        | "bags"
-                        | "accessories",
-                      isNew: product.isNew || false,
-                      onSale: product.onSale || false,
-                      salePrice: product.salePrice,
-                      inStock: true,
-                      rating: 4.5,
-                      sizes: ["S", "M", "L", "XL"],
-                      colors: ["Black", "White", "Gray"],
-                      description: product.name,
-                      reviews: 0,
-                    }}
-                    index={index}
-                  />
+                  <ProductCard product={product} index={index} />
                 </motion.div>
               ))}
             </motion.div>
-          )}
-
-          {filteredProducts.length === 0 && !isLoading && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                No products found matching your criteria.
-              </p>
-            </div>
           )}
         </motion.div>
       </div>

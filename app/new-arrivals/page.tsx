@@ -11,6 +11,10 @@ import { ProductFilters, type FilterState } from "@/components/product-filters"
 import { CurrencyProvider } from "@/components/currency-provider"
 import { fetchProducts, filterNewArrivals } from "@/lib/products"
 import {
+  ProductGridEmpty,
+  ProductGridSkeleton,
+} from "@/components/product-grid-state"
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -30,7 +34,7 @@ export default function NewArrivalsPage() {
     isNew: false,
   })
 
-  const { data: allProducts = [] } = useSWR(
+  const { data: allProducts = [], isLoading } = useSWR(
     "graphql:products",
     fetchProducts
   )
@@ -121,21 +125,22 @@ export default function NewArrivalsPage() {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product, index) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      index={index}
-                    />
-                  ))}
-                </div>
-
-                {products.length === 0 && (
-                  <div className="text-center py-12">
-                    <p className="text-muted-foreground">
-                      No products found matching your filters.
-                    </p>
+                {isLoading ? (
+                  <ProductGridSkeleton />
+                ) : products.length === 0 ? (
+                  <ProductGridEmpty
+                    title="No new arrivals yet"
+                    description="We couldn't find any new arrivals matching your filters."
+                  />
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product, index) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        index={index}
+                      />
+                    ))}
                   </div>
                 )}
               </div>
