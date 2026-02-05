@@ -29,6 +29,9 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
+# GraphQL UI (GraphiQL) toggle for local development
+GRAPHQL_GRAPHIQL = config("GRAPHQL_GRAPHIQL", default=DEBUG, cast=bool)
+
 # JWT settings for GraphQL auth
 JWT_SECRET = config("JWT_SECRET", default=SECRET_KEY)
 JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
