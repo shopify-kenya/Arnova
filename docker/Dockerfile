@@ -44,12 +44,7 @@ RUN mkdir -p staticfiles ssl && \
 
 USER appuser
 
-# Make and run migrations
-RUN python manage.py makemigrations && \
-    python manage.py migrate
-
-# Collect static files
-RUN python manage.py collectstatic --noinput || true
+# Migrations and collectstatic should run at deploy/runtime, not build time.
 
 EXPOSE 8000
 
