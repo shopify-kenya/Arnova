@@ -26,7 +26,10 @@ def serve_nextjs_static(request, path):
 
     with open(file_path, "rb") as f:
         response = HttpResponse(f.read(), content_type=content_type)
-        response["Cache-Control"] = "public, max-age=31536000, immutable"
+        if settings.DEBUG:
+            response["Cache-Control"] = "no-store"
+        else:
+            response["Cache-Control"] = "public, max-age=31536000, immutable"
         return response
 
 
