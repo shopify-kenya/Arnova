@@ -1,11 +1,13 @@
 # Space Grotesk Font
 
-The "Space Grotesk" font used in this project should be placed in the `public/fonts/space-grotesk` directory.
+The Space Grotesk font files are bundled under `public/fonts/space-grotesk`.
+We currently load the TTF files in `public/fonts/space-grotesk/static` from
+`app/globals.css`.
 
-The following files are expected to be present in the `public/fonts/space-grotesk` directory:
+Expected files:
 
--   `SpaceGrotesk-Light.woff2`
--   `SpaceGrotesk-Regular.woff2`
--   `SpaceGrotesk-Medium.woff2`
--   `SpaceGrotesk-Semibold.woff2`
--   `SpaceGrotesk-Bold.woff2`
+- `static/SpaceGrotesk-Light.ttf`
+- `static/SpaceGrotesk-Regular.ttf`
+- `static/SpaceGrotesk-Medium.ttf`
+- `static/SpaceGrotesk-SemiBold.ttf`
+- `static/SpaceGrotesk-Bold.ttf`

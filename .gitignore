@@ -66,6 +66,7 @@ payment.md
 start_server.py
 test_api_endpoints.py
 migrate_local_postgres.sh
+download_fonts.py
 
 # Documentation (local only)
 docs/
