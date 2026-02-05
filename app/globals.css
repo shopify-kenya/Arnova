@@ -31,7 +31,7 @@
   }
 
   body {
-    font-family: "Linear Grotesk", "Inter", "Segoe UI", system-ui,
+    font-family: "Space Grotesk", "Inter", "Segoe UI", system-ui,
       -apple-system, "Helvetica Neue", Arial, sans-serif;
   }
 
@@ -65,37 +65,37 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: "Linear Grotesk", sans-serif;
+    font-family: "Space Grotesk", sans-serif;
   }
 }
 
 @font-face {
-  font-family: "Linear Grotesk";
-  src: url("/fonts/linear-grotesk/LinearGrotesk-Light.woff2") format("woff2");
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk/SpaceGrotesk-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Linear Grotesk";
-  src: url("/fonts/linear-grotesk/LinearGrotesk-Regular.woff2") format("woff2");
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk/SpaceGrotesk-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Linear Grotesk";
-  src: url("/fonts/linear-grotesk/LinearGrotesk-Medium.woff2") format("woff2");
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk/SpaceGrotesk-Medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Linear Grotesk";
-  src: url("/fonts/linear-grotesk/LinearGrotesk-Semibold.woff2")
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk/SpaceGrotesk-Semibold.woff2")
     format("woff2");
   font-weight: 600;
   font-style: normal;
@@ -103,18 +103,9 @@
 }
 
 @font-face {
-  font-family: "Linear Grotesk";
-  src: url("/fonts/linear-grotesk/LinearGrotesk-Bold.woff2") format("woff2");
+  font-family: "Space Grotesk";
+  src: url("/fonts/space-grotesk/SpaceGrotesk-Bold.woff2") format("woff2");
   font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Linear Grotesk";
-  src: url("/fonts/linear-grotesk/LinearGrotesk-Extrabold.woff2")
-    format("woff2");
-  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
