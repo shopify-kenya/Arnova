@@ -42,7 +42,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t arnova-ecommerce:${{ github.sha }} .
+        docker build -f docker/Dockerfile -t arnova-ecommerce:${{ github.sha }} .
         docker tag arnova-ecommerce:${{ github.sha }} arnova-ecommerce:latest
 
     # Add your deployment steps here

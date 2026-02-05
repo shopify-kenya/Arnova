@@ -115,4 +115,4 @@ jobs:
 
     - name: Build application image
       run: |
-        docker build -t arnova-ecommerce .
+        docker build -f docker/Dockerfile -t arnova-ecommerce .
