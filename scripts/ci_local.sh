@@ -63,11 +63,11 @@ else
 fi
 
 echo "==> Django migrations"
-SECRET_KEY="test-secret-key" DEBUG=False "${DB_ENV[@]}" \
+env "${DB_ENV[@]}" SECRET_KEY="test-secret-key" DEBUG=False \
   .venv/bin/python manage.py migrate
 
 echo "==> Django tests"
-SECRET_KEY="test-secret-key" DEBUG=False "${DB_ENV[@]}" \
+env "${DB_ENV[@]}" SECRET_KEY="test-secret-key" DEBUG=False \
   .venv/bin/python manage.py test
 
 echo "==> Next.js lint"
