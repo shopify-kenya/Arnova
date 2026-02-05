@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import useSWR from "swr"
 import { motion } from "framer-motion"
 import { BuyerNavbar } from "@/components/buyer-navbar"
 import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
@@ -8,7 +9,7 @@ import { Footer } from "@/components/footer"
 import { ProductCard } from "@/components/product-card"
 import { ProductFilters, type FilterState } from "@/components/product-filters"
 import { CurrencyProvider } from "@/components/currency-provider"
-import { getProductsByCategory } from "@/lib/products"
+import { fetchProducts, filterProductsByCategory } from "@/lib/products"
 import {
   Select,
   SelectContent,
@@ -29,7 +30,12 @@ export default function ClothingPage() {
     isNew: false,
   })
 
-  let products = getProductsByCategory("clothing")
+  const { data: allProducts = [] } = useSWR(
+    "graphql:products",
+    fetchProducts
+  )
+
+  let products = filterProductsByCategory(allProducts, "clothing")
 
   // Apply filters
   products = products.filter(product => {
