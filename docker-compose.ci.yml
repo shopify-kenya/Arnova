@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  ci-postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: arnova_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d arnova_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
