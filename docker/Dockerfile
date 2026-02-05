@@ -4,7 +4,6 @@ FROM python:3.13-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV DJANGO_SETTINGS_MODULE=settings
-ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 WORKDIR /app
@@ -22,14 +21,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy package files first for better caching
 COPY ../package*.json ./
 
-# Install Node.js dependencies
-RUN npm ci --legacy-peer-deps
+# Install Node.js dependencies (include dev deps for build tooling)
+RUN npm ci --include=dev --legacy-peer-deps
 
 # Copy application code
 COPY .. .
 
 # Build Next.js frontend
 RUN npm run build
+
+# Set runtime environment after build
+ENV NODE_ENV=production
 
 # Install Python dependencies
 RUN python -m pip install --upgrade pip && \
