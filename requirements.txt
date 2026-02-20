@@ -30,7 +30,7 @@ nodeenv==1.10.0
 numpy==2.4.1
 packaging==25.0
 pathspec==1.0.3
-pillow==12.1.0
+pillow==12.1.1
 platformdirs==4.5.1
 pre_commit==4.5.1
 psycopg2-binary==2.9.11
@@ -49,4 +49,4 @@ typing_extensions==4.15.0
 urllib3==2.6.3
 virtualenv==20.36.1
 webencodings==0.5.1
-Werkzeug==3.1.5
+Werkzeug==3.1.6
