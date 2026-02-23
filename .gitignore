@@ -57,6 +57,7 @@ ssl/
 
 # Temporary/Test files
 PR.md
+PR.txt
 payment.md
 *.txt
 !requirements.txt

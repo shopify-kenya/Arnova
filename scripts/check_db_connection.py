@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Quick database connectivity check.
-Respects DATABASE_URL or NEON_DATABASE_URL from environment.
+Respects POSTGRES_URL from environment.
 """
 import os
 
@@ -9,9 +9,9 @@ import dj_database_url
 
 
 def main() -> int:
-    db_url = os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL")
+    db_url = os.getenv("POSTGRES_URL")
     if not db_url:
-        print("No DATABASE_URL or NEON_DATABASE_URL set; using SQLite fallback.")
+        print("No POSTGRES_URL set; using SQLite fallback.")
         return 0
 
     config = dj_database_url.parse(db_url, conn_max_age=0)

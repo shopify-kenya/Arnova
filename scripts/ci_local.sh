@@ -53,13 +53,13 @@ fi
 USE_POSTGRES=${USE_POSTGRES:-0}
 
 if [[ "$USE_POSTGRES" == "1" ]]; then
-  if [[ -z "${DATABASE_URL:-}" ]]; then
-    echo "ERROR: DATABASE_URL must be set when USE_POSTGRES=1" >&2
+  if [[ -z "${POSTGRES_URL:-}" ]]; then
+    echo "ERROR: POSTGRES_URL must be set when USE_POSTGRES=1" >&2
     exit 1
   fi
-  DB_ENV=(DATABASE_URL="$DATABASE_URL")
+  DB_ENV=(POSTGRES_URL="$POSTGRES_URL")
 else
-  DB_ENV=(DATABASE_URL="sqlite:///$ROOT_DIR/db.sqlite3")
+  DB_ENV=(POSTGRES_URL="sqlite:///$ROOT_DIR/db.sqlite3")
 fi
 
 echo "==> Django migrations"
