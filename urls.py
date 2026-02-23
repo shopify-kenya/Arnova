@@ -69,7 +69,7 @@ urlpatterns = [
     path(
         "graphql/",
         CSRFExemptGraphQLView.as_view(
-            schema=schema, graphiql=settings.GRAPHQL_GRAPHIQL, get_context=get_context
+            schema=schema, graphql_ide="graphiql" if settings.GRAPHQL_GRAPHIQL else None, get_context=get_context
         ),
         name="graphql",
     ),
