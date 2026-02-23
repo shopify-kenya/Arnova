@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from shop.models import Category
+from shop.models import Cart, Category, UserProfile
 
 
 class Command(BaseCommand):
@@ -25,4 +25,18 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(f"\n📊 Total categories: {Category.objects.count()}")
+        )
+
+        # Create profiles and carts for all users
+        from django.contrib.auth.models import User
+
+        for user in User.objects.all():
+            UserProfile.objects.get_or_create(user=user)
+            Cart.objects.get_or_create(user=user)
+
+        self.stdout.write(
+            self.style.SUCCESS(f"📊 Total user profiles: {UserProfile.objects.count()}")
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"📊 Total carts: {Cart.objects.count()}")
         )
