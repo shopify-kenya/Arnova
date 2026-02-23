@@ -3,6 +3,7 @@
 Quick database connectivity check.
 Respects POSTGRES_URL from environment.
 """
+
 import os
 
 import dj_database_url

@@ -2,6 +2,7 @@
 """
 Generate self-signed SSL certificate for HTTPS development
 """
+
 import os
 import subprocess
 import sys

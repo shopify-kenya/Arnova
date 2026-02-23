@@ -2,6 +2,7 @@
 """
 Fetch free product images from Unsplash API
 """
+
 import sys
 from pathlib import Path
 

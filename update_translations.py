@@ -2,6 +2,7 @@
 """
 Update all components to use the translation system
 """
+
 import re
 from pathlib import Path
 

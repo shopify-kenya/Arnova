@@ -232,27 +232,30 @@ document.getElementById('addProductForm').addEventListener('submit', function(e)
         if (data.success) {
             location.reload();
         } else {
-            alert('Unable to save product. Please try again.');
+            window.toast.error('Unable to save product. Please try again.');
         }
     })
     .catch(error => {
-        alert('Unable to save product. Please try again.');
+        window.toast.error('Unable to save product. Please try again.');
     });
 });
 
 function showDeleteDialog(productId, productName) {
-    if (confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/admin/products/${productId}/delete/`;
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = 'csrfmiddlewaretoken';
-        csrfInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        form.appendChild(csrfInput);
-        document.body.appendChild(form);
-        form.submit();
-    }
+    window.confirmDialog.show(
+        `Are you sure you want to delete "${productName}"? This action cannot be undone.`,
+        () => {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/products/${productId}/delete/`;
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            form.appendChild(csrfInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    );
 }
 </script>
 

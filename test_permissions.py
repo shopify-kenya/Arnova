@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Test user permissions and roles"""
+
 import os
 
 import django
