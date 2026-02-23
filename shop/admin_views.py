@@ -102,9 +102,22 @@ def admin_product_create(request):
         images = data.get("images", [])
         if not images or len(images) == 0:
             try:
-                from fetch_product_images import fetch_multiple_images
+                import requests
+                from decouple import config
 
-                images = fetch_multiple_images(data.get("name"), count=3)
+                access_key = config("UNSPLASH_ACCESS_KEY", default="")
+                if access_key:
+                    search_url = "https://api.unsplash.com/search/photos"
+                    params = {
+                        "query": data.get("name"),
+                        "per_page": 3,
+                        "orientation": "portrait",
+                        "client_id": access_key,
+                    }
+                    response = requests.get(search_url, params=params, timeout=10)
+                    if response.status_code == 200:
+                        results = response.json().get("results", [])
+                        images = [img["urls"]["regular"] for img in results[:3]]
             except Exception as e:
                 print(f"Failed to fetch images: {e}")
 
