@@ -27,7 +27,7 @@ def run_unified_server():
     print("🚀 Starting Arnova Unified Server...")
 
     if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
-        os.environ["DATABASE_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
+        os.environ["POSTGRES_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
         os.environ.setdefault("DEBUG", "1")
 
     build_success = True
@@ -139,7 +139,7 @@ def start_http_server(base_dir):
         env = os.environ.copy()
         env["DJANGO_SETTINGS_MODULE"] = "settings"
         if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
-            env["DATABASE_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
+            env["POSTGRES_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
         args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
         if os.environ.get("ARNOVA_NO_RELOAD") == "1":
             args.append("--noreload")
@@ -158,7 +158,7 @@ def start_dual_servers(base_dir):
             env = os.environ.copy()
             env["DJANGO_SETTINGS_MODULE"] = "settings"
             if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
-                env["DATABASE_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
+                env["POSTGRES_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
             args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
             if os.environ.get("ARNOVA_NO_RELOAD") == "1":
                 args.append("--noreload")

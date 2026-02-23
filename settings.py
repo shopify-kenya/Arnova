@@ -104,8 +104,8 @@ WSGI_APPLICATION = "wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 primary_db_url = config(
-    "DATABASE_URL",
-    default=config("NEON_DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+    "POSTGRES_URL",
+    default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
 )
 if not primary_db_url:
     primary_db_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
@@ -126,14 +126,14 @@ else:
         )
     }
 
-# Validate DATABASE_URL format
+# Validate POSTGRES_URL format
 db_url = primary_db_url
 if db_url.startswith("http://") or db_url.startswith("https://"):
     # Invalid URL format - use SQLite as fallback
     import sys
 
     print(
-        "WARNING: DATABASE_URL has invalid format (http/https). Using SQLite.",
+        "WARNING: POSTGRES_URL has invalid format (http/https). Using SQLite.",
         file=sys.stderr,
     )
     DATABASES = {
@@ -146,7 +146,7 @@ elif "neon.tech" in db_url and "sslmode=require" not in db_url:
     import sys
 
     print(
-        "WARNING: NEON_DATABASE_URL missing sslmode=require. "
+        "WARNING: POSTGRES_URL missing sslmode=require. "
         "Neon requires SSL; ensure your URL includes '?sslmode=require'.",
         file=sys.stderr,
     )
