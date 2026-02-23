@@ -1,0 +1,47 @@
+# Configuration for automatic PR labeling based on file paths
+
+backend:
+  - '*.py'
+  - 'settings.py'
+  - 'urls.py'
+  - 'wsgi.py'
+  - 'manage.py'
+  - 'shop/**/*.py'
+  - 'requirements.txt'
+
+frontend:
+  - 'app/**/*'
+  - 'components/**/*'
+  - 'lib/**/*'
+  - 'public/**/*'
+  - '*.tsx'
+  - '*.ts'
+  - '*.jsx'
+  - '*.js'
+  - 'package.json'
+  - 'next.config.js'
+  - 'tailwind.config.ts'
+
+database:
+  - 'settings.py'
+  - '**/migrations/**'
+  - 'scripts/check_db_connection.py'
+
+scripts:
+  - 'scripts/**/*'
+
+ci:
+  - '.github/**/*'
+  - 'scripts/ci_local.sh'
+  - '.gitlab-ci.yml'
+
+documentation:
+  - 'docs/**/*'
+  - '*.md'
+  - 'README.md'
+
+configuration:
+  - '.env.example'
+  - '.env.production.template'
+  - 'docker-compose*.yml'
+  - '.gitignore'
