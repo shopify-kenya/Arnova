@@ -3,6 +3,7 @@
 Payment GraphQL Test Script
 Tests payment-related GraphQL operations
 """
+
 import requests
 from urllib3.exceptions import InsecureRequestWarning
 

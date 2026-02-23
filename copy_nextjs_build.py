@@ -2,6 +2,7 @@
 """
 Copy Next.js build files to Django static directory
 """
+
 import shutil
 from pathlib import Path
 

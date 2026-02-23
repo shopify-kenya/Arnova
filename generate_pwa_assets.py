@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generate PWA icons and assets"""
+
 from pathlib import Path
 
 try:
