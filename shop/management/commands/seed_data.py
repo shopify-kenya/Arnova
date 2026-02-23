@@ -37,6 +37,4 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"📊 Total user profiles: {UserProfile.objects.count()}")
         )
-        self.stdout.write(
-            self.style.SUCCESS(f"📊 Total carts: {Cart.objects.count()}")
-        )
+        self.stdout.write(self.style.SUCCESS(f"📊 Total carts: {Cart.objects.count()}"))
