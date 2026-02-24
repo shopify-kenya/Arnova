@@ -11,12 +11,11 @@ sys.path.insert(0, str(project_root))
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
-import django
+import django  # noqa: E402
 
-django.setup()
+django.setup()  # noqa: E402
 
 from django.contrib.auth.models import User  # noqa: E402
-
 from shop.models import Cart, UserProfile  # noqa: E402
 
 

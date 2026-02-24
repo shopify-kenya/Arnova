@@ -52,7 +52,9 @@ def run_unified_server():
         print("📁 Copying build files...")
         try:
             subprocess.run(
-                [sys.executable, "scripts/copy_nextjs_build.py"], check=True, cwd=base_dir
+                [sys.executable, "scripts/copy_nextjs_build.py"],
+                check=True,
+                cwd=base_dir,
             )
             print("✅ Build files copied")
         except subprocess.CalledProcessError:
@@ -74,7 +76,9 @@ def run_unified_server():
         print("🎨 Generating PWA assets...")
         try:
             subprocess.run(
-                [sys.executable, "scripts/generate_pwa_assets.py"], check=True, cwd=base_dir
+                [sys.executable, "scripts/generate_pwa_assets.py"],
+                check=True,
+                cwd=base_dir,
             )
         except subprocess.CalledProcessError:
             print("⚠️  PWA asset generation failed, continuing...")
@@ -123,7 +127,8 @@ def run_unified_server():
     else:
         print("🔓 No SSL certificates found, starting HTTP server only...")
         print(
-            "💡 Run 'python scripts/generate_ssl.py' to generate SSL certificates " "for HTTPS"
+            "💡 Run 'python scripts/generate_ssl.py' to generate "
+            "SSL certificates for HTTPS"
         )
         start_http_server(base_dir)
 
