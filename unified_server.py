@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 # Set Django settings module
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
 
 def check_ssl_certificates():
@@ -52,7 +52,9 @@ def run_unified_server():
         print("📁 Copying build files...")
         try:
             subprocess.run(
-                [sys.executable, "copy_nextjs_build.py"], check=True, cwd=base_dir
+                [sys.executable, "scripts/copy_nextjs_build.py"],
+                check=True,
+                cwd=base_dir,
             )
             print("✅ Build files copied")
         except subprocess.CalledProcessError:
@@ -74,7 +76,9 @@ def run_unified_server():
         print("🎨 Generating PWA assets...")
         try:
             subprocess.run(
-                [sys.executable, "generate_pwa_assets.py"], check=True, cwd=base_dir
+                [sys.executable, "scripts/generate_pwa_assets.py"],
+                check=True,
+                cwd=base_dir,
             )
         except subprocess.CalledProcessError:
             print("⚠️  PWA asset generation failed, continuing...")
@@ -123,7 +127,8 @@ def run_unified_server():
     else:
         print("🔓 No SSL certificates found, starting HTTP server only...")
         print(
-            "💡 Run 'python generate_ssl.py' to generate SSL certificates " "for HTTPS"
+            "💡 Run 'python scripts/generate_ssl.py' to generate "
+            "SSL certificates for HTTPS"
         )
         start_http_server(base_dir)
 
@@ -138,7 +143,7 @@ def start_http_server(base_dir):
 
     try:
         env = os.environ.copy()
-        env["DJANGO_SETTINGS_MODULE"] = "settings"
+        env["DJANGO_SETTINGS_MODULE"] = "backend.settings"
         if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
             env["POSTGRES_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
         args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
@@ -157,7 +162,7 @@ def start_dual_servers(base_dir):
     def run_http():
         try:
             env = os.environ.copy()
-            env["DJANGO_SETTINGS_MODULE"] = "settings"
+            env["DJANGO_SETTINGS_MODULE"] = "backend.settings"
             if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
                 env["POSTGRES_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
             args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
@@ -170,7 +175,7 @@ def start_dual_servers(base_dir):
     def run_https():
         try:
             env = os.environ.copy()
-            env["DJANGO_SETTINGS_MODULE"] = "settings"
+            env["DJANGO_SETTINGS_MODULE"] = "backend.settings"
             subprocess.run(
                 [
                     sys.executable,

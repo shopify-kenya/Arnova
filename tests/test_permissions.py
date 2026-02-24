@@ -2,11 +2,18 @@
 """Test user permissions and roles"""
 
 import os
+import sys
+from pathlib import Path
 
-import django
+# Add project root to path
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
-django.setup()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
+
+import django  # noqa: E402
+
+django.setup()  # noqa: E402
 
 from django.contrib.auth.models import User  # noqa: E402
 

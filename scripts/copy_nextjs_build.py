@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 def copy_nextjs_build():
-    base_dir = Path(__file__).parent
+    base_dir = Path(__file__).parent.parent
     out_dir = base_dir / "out"  # Next.js export creates 'out' directory
     build_dir = base_dir / "build"
     next_static = base_dir / ".next" / "static"

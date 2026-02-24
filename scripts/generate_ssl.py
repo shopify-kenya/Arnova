@@ -10,7 +10,9 @@ import sys
 
 def generate_ssl_cert():
     """Generate self-signed SSL certificate for localhost"""
-    cert_dir = "ssl"
+    # Get project root (parent of scripts directory)
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    cert_dir = os.path.join(project_root, "ssl")
 
     # Create ssl directory if it doesn't exist
     if not os.path.exists(cert_dir):
