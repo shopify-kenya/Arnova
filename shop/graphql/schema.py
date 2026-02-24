@@ -792,5 +792,5 @@ schema = strawberry.Schema(
     query=Query,
     mutation=Mutation,
     config=StrawberryConfig(auto_camel_case=True),
-    extensions=schema_extensions or None,
+    extensions=schema_extensions if schema_extensions else [],
 )
