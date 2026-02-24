@@ -1,10 +1,10 @@
 import os
 
+import views
 from django.conf import settings
 from django.urls import include, path, re_path
 from django.views.static import serve
 
-import views
 from shop import (
     admin_auth_views,
     admin_views,

@@ -16,6 +16,7 @@ import django  # noqa: E402
 django.setup()  # noqa: E402
 
 from django.contrib.auth.models import User  # noqa: E402
+
 from shop.models import Cart, UserProfile  # noqa: E402
 
 
