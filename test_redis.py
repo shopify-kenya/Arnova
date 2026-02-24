@@ -11,8 +11,8 @@ import django  # noqa: E402
 
 django.setup()  # noqa: E402
 
-from django.core.cache import cache  # noqa: E402
 from django.conf import settings  # noqa: E402
+from django.core.cache import cache  # noqa: E402
 
 
 def test_redis():

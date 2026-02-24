@@ -1,9 +1,10 @@
 """Redis cache utilities for GraphQL queries"""
 
-from django.core.cache import cache
-from functools import wraps
 import hashlib
 import json
+from functools import wraps
+
+from django.core.cache import cache
 
 
 def cache_query(timeout=300):
