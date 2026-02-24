@@ -413,5 +413,12 @@ def validate_card(request):
             card_type = "amex"
 
         return JsonResponse({"valid": is_valid, "card_type": card_type})
-    except Exception as e:
-        return JsonResponse({"valid": False, "error": str(e)}, status=500)
+    except Exception:
+        logger.exception("Error while validating card details")
+        return JsonResponse(
+            {
+                "valid": False,
+                "error": "An internal error occurred while validating the card.",
+            },
+            status=500,
+        )
