@@ -30,11 +30,15 @@ class SecurityHeadersMiddleware:
         # Content Security Policy
         response["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+            "https://cdn.jsdelivr.net https://cdn.tailwindcss.com "
+            "https://unpkg.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com "
+            "https://unpkg.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: https: blob:; "
-            "connect-src 'self' https://api.unsplash.com https://api.exchangerate-api.com; "
+            "connect-src 'self' https://api.unsplash.com "
+            "https://api.exchangerate-api.com; "
             "frame-ancestors 'none'; "
             "base-uri 'self'; "
             "form-action 'self'"

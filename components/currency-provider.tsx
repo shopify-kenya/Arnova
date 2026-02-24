@@ -45,8 +45,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   }
 
   const formatPrice = (price: number): string => {
-    const converted = price * currency.rate
-    return `${currency.symbol} ${converted.toFixed(2)}`
+    return `KES ${price.toFixed(2)}`
   }
 
   return (
