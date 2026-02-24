@@ -1,7 +1,8 @@
 /* global process */
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  trailingSlash: true,
+  output: "standalone",
+  trailingSlash: false,
   images: {
     unoptimized: true,
     formats: ["image/webp"],
@@ -13,11 +14,11 @@ const nextConfig = {
     return [
       {
         source: "/_next/static/:path*",
-        headers: [{ key: "Cache-Control", value: "no-store" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
         source: "/fonts/:path*",
-        headers: [{ key: "Cache-Control", value: "no-store" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
     ]
   },

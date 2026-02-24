@@ -13,6 +13,7 @@ from strawberry.types import Info
 
 from shop import payment_views
 from shop.api_views import get_coordinates, get_exchange_rate
+from shop.cache_utils import cache_query, invalidate_cache
 from shop.forms import ProfileForm, RegistrationForm
 from shop.models import (
     Cart,
@@ -115,14 +116,9 @@ class AdminCreateProductInput:
     currency: Optional[str] = "KES"
 
 
-def _product_to_type(p: Product, target_currency: str = "USD") -> ProductType:
+def _product_to_type(p: Product) -> ProductType:
     price = float(p.price)
     sale_price = float(p.sale_price) if p.sale_price else None
-    if target_currency != p.currency:
-        rate = get_exchange_rate(p.currency, target_currency)
-        price = price * rate
-        if sale_price is not None:
-            sale_price = sale_price * rate
 
     images = p.images if p.images is not None else []
     if not images:
@@ -134,7 +130,7 @@ def _product_to_type(p: Product, target_currency: str = "USD") -> ProductType:
         description=p.description,
         price=round(price, 2),
         salePrice=round(sale_price, 2) if sale_price else None,
-        currency=target_currency,
+        currency=p.currency,
         baseCurrency=p.currency,
         category=p.category.name if p.category else None,
         sizes=p.sizes or [],
@@ -180,20 +176,23 @@ class Query:
         )
 
     @strawberry.field
-    def products(self, info: Info, currency: str = "USD") -> List[ProductType]:
+    @cache_query(timeout=300)
+    def products(self, info: Info) -> List[ProductType]:
         products = (
             Product.objects.select_related("category")
             .prefetch_related("product_reviews")
             .order_by("-created_at")
         )
-        return [_product_to_type(p, currency) for p in products]
+        return [_product_to_type(p) for p in products]
 
     @strawberry.field
-    def product(self, info: Info, id: int, currency: str = "USD") -> ProductType:
+    @cache_query(timeout=600)
+    def product(self, info: Info, id: int) -> ProductType:
         product = Product.objects.get(id=id)
-        return _product_to_type(product, currency)
+        return _product_to_type(product)
 
     @strawberry.field
+    @cache_query(timeout=600)
     def categories(self, info: Info) -> List[CategoryType]:
         return [
             CategoryType(
@@ -337,26 +336,9 @@ class Query:
         return NotificationsPayload(items=items, unreadCount=unread_count)
 
     @strawberry.field
-    def exchange_rates(self, info: Info, base: str = "USD") -> ExchangeRates:
-        import requests
-
-        try:
-            url = f"https://api.exchangerate-api.com/v4/latest/{base}"
-            response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                return ExchangeRates(
-                    base=data.get("base", base), rates=data.get("rates", {})
-                )
-        except Exception:
-            pass
-
-        fallback_data = {
-            "USD": 1.0 if base == "USD" else 0.0067,
-            "KES": 150.0 if base == "USD" else 1.0,
-            "EUR": 0.85 if base == "USD" else 0.0057,
-        }
-        return ExchangeRates(base=base, rates=fallback_data)
+    def exchange_rates(self, info: Info, base: str = "KES") -> ExchangeRates:
+        # Always return KES as the only currency
+        return ExchangeRates(base="KES", rates={"KES": 1.0})
 
     @strawberry.field
     def admin_analytics(self, info: Info) -> AdminAnalytics:
@@ -797,6 +779,8 @@ class Mutation:
             images=input.images,
             in_stock=input.inStock,
         )
+        # Invalidate product cache
+        invalidate_cache("products")
         return AdminCreateProductPayload(success=True, productId=product.id)
 
 

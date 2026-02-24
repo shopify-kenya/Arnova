@@ -1,6 +1,11 @@
 "use client"
 
-import { getAccessToken, getRefreshToken, setTokens, clearTokens } from "./token-store"
+import {
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+  clearTokens,
+} from "./token-store"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 const isLocalhost =
@@ -31,6 +36,7 @@ export async function graphqlRequest<T>(
     method: "POST",
     headers,
     body: JSON.stringify({ query, variables }),
+    cache: "no-store",
   })
 
   const payload: GraphQLResponse<T> = await response.json()
@@ -79,7 +85,10 @@ async function tryRefreshToken(): Promise<boolean> {
   }> = await response.json()
 
   if (payload.data?.refresh?.accessToken) {
-    setTokens(payload.data.refresh.accessToken, payload.data.refresh.refreshToken)
+    setTokens(
+      payload.data.refresh.accessToken,
+      payload.data.refresh.refreshToken
+    )
     return true
   }
 

@@ -58,7 +58,11 @@ export default function RootLayout({
     <html lang="en" className="antialiased" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin=""
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap"
           rel="stylesheet"
@@ -67,47 +71,15 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Arnova" />
-        <meta name="msapplication-TileImage" content="/icon-512x512.jpg" />
-        <meta name="msapplication-TileColor" content="#606c38" />
-
         <link rel="apple-touch-icon" href="/apple-touch-icon.jpg" />
         <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.jpg" />
         <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.jpg" />
-
-        <link
-          rel="apple-touch-startup-image"
-          href="/icon-512x512.jpg"
-          media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/icon-512x512.jpg"
-          media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/icon-512x512.jpg"
-          media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
-        />
-
         <link rel="manifest" href="/manifest.json" />
         <link
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossOrigin=""
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator && window.location.protocol === 'http:') {
-                window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/service-worker.js')
-                    .catch(() => {});
-                });
-              }
-            `,
-          }}
         />
       </head>
       <body suppressHydrationWarning>
