@@ -3,14 +3,16 @@
 
 import os
 import sys
-import django
 
 # Setup Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
-django.setup()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")  # noqa: E402
 
-from django.core.cache import cache
-from django.conf import settings
+import django  # noqa: E402
+
+django.setup()  # noqa: E402
+
+from django.core.cache import cache  # noqa: E402
+from django.conf import settings  # noqa: E402
 
 
 def test_redis():
@@ -24,7 +26,7 @@ def test_redis():
 
         if value == "test_value":
             print("✅ Redis connection successful!")
-            print(f"✅ Cache set/get working")
+            print("✅ Cache set/get working")
 
             # Test delete
             cache.delete("test_key")
@@ -33,9 +35,10 @@ def test_redis():
 
             # Show cache stats
             from django_redis import get_redis_connection
+
             conn = get_redis_connection("default")
             info = conn.info()
-            print(f"\n📊 Redis Stats:")
+            print("\n📊 Redis Stats:")
             print(f"   Connected clients: {info.get('connected_clients', 'N/A')}")
             print(f"   Used memory: {info.get('used_memory_human', 'N/A')}")
             print(f"   Total keys: {conn.dbsize()}")

@@ -12,7 +12,7 @@ from strawberry.schema.config import StrawberryConfig
 from strawberry.types import Info
 
 from shop import payment_views
-from shop.api_views import get_coordinates, get_exchange_rate
+from shop.api_views import get_coordinates
 from shop.cache_utils import cache_query, invalidate_cache
 from shop.forms import ProfileForm, RegistrationForm
 from shop.models import (

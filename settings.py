@@ -248,10 +248,12 @@ if not IS_TESTING:
     DATABASES["default"]["CONN_MAX_AGE"] = 600
     DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
     DATABASES["default"]["OPTIONS"] = DATABASES["default"].get("OPTIONS", {})
-    DATABASES["default"]["OPTIONS"].update({
-        "connect_timeout": 10,
-        "options": "-c statement_timeout=30000",
-    })
+    DATABASES["default"]["OPTIONS"].update(
+        {
+            "connect_timeout": 10,
+            "options": "-c statement_timeout=30000",
+        }
+    )
 
 # Session security
 SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", default=not DEBUG, cast=bool)

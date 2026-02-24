@@ -62,6 +62,7 @@ def index(request):
             return HttpResponse(f.read(), content_type="text/html")
 
     from django.shortcuts import render
+
     return render(request, "home.html")
 
 
