@@ -8,11 +8,11 @@ services:
     branch: main
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: settings
+        value: backend.settings
       - key: NODE_ENV
         value: production
       - key: PYTHONUNBUFFERED
         value: "1"
     healthCheckPath: /health/
-    startCommand: ". /opt/render/project/src/.venv/bin/activate && gunicorn wsgi:application"
+    startCommand: ". /opt/render/project/src/.venv/bin/activate && gunicorn backend.wsgi:application"
     preDeployCommand: "pip install -r requirements.txt && python manage.py migrate"

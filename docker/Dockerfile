@@ -3,7 +3,7 @@ FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=settings
+ENV DJANGO_SETTINGS_MODULE=backend.settings
 ENV NEXT_TELEMETRY_DISABLED=1
 
 WORKDIR /app
@@ -28,7 +28,7 @@ RUN npm ci --include=dev --legacy-peer-deps
 COPY .. .
 
 # Entrypoint for runtime migrations
-COPY entrypoint.sh /entrypoint.sh
+COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Build Next.js frontend
@@ -56,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["gunicorn", "wsgi:application"]
+CMD ["gunicorn", "backend.wsgi:application"]
