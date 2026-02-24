@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 # Set Django settings module
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
 
 def check_ssl_certificates():
@@ -143,7 +143,7 @@ def start_http_server(base_dir):
 
     try:
         env = os.environ.copy()
-        env["DJANGO_SETTINGS_MODULE"] = "settings"
+        env["DJANGO_SETTINGS_MODULE"] = "backend.settings"
         if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
             env["POSTGRES_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
         args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
@@ -162,7 +162,7 @@ def start_dual_servers(base_dir):
     def run_http():
         try:
             env = os.environ.copy()
-            env["DJANGO_SETTINGS_MODULE"] = "settings"
+            env["DJANGO_SETTINGS_MODULE"] = "backend.settings"
             if os.environ.get("ARNOVA_FORCE_SQLITE") == "1":
                 env["POSTGRES_URL"] = f"sqlite:///{base_dir / 'db.sqlite3'}"
             args = [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"]
@@ -175,7 +175,7 @@ def start_dual_servers(base_dir):
     def run_https():
         try:
             env = os.environ.copy()
-            env["DJANGO_SETTINGS_MODULE"] = "settings"
+            env["DJANGO_SETTINGS_MODULE"] = "backend.settings"
             subprocess.run(
                 [
                     sys.executable,

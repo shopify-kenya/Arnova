@@ -79,7 +79,7 @@ MIDDLEWARE = [
     "shop.middleware.security_headers.SecurityHeadersMiddleware",
 ]
 
-ROOT_URLCONF = "urls"
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
@@ -97,7 +97,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "wsgi.application"
+WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # Database
