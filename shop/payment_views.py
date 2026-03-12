@@ -6,14 +6,65 @@ from decimal import Decimal
 
 import requests
 from django.conf import settings
+from django.db import transaction
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django_ratelimit.decorators import ratelimit
 
-from .models import MpesaPayment, Payment
+from .models import MpesaPayment, Order, OrderItem, Payment, Product
 
 logger = logging.getLogger("shop")
+
+
+def create_order_and_payment(
+    data, request, amount, payment_method, payment_status="pending"
+):
+    """Create order + payment records when order payload is available."""
+    order_data = data.get("order_data") or {}
+    shipping_address = order_data.get("shippingAddress") or {}
+
+    if not shipping_address:
+        return None
+
+    user = getattr(request, "user", None)
+    if not user or not getattr(user, "is_authenticated", False):
+        return None
+
+    with transaction.atomic():
+        order = Order.objects.create(
+            user=user,
+            order_id=f"ARNOVA{timezone.now().strftime('%Y%m%d%H%M%S%f')}",
+            total_amount=amount,
+            shipping_address=json.dumps(shipping_address),
+            status="pending",
+        )
+
+        for item in order_data.get("items", []):
+            product_id = item.get("productId")
+            if not product_id:
+                continue
+
+            product = Product.objects.filter(id=product_id).first()
+            if not product:
+                continue
+
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=max(1, int(item.get("quantity", 1))),
+                price=Decimal(str(item.get("price", product.price))),
+                selected_size=item.get("size", ""),
+                selected_color=item.get("color", ""),
+            )
+
+        return Payment.objects.create(
+            order=order,
+            payment_method=payment_method,
+            amount=amount,
+            currency="KES" if payment_method == "mpesa" else "USD",
+            status=payment_status,
+        )
 
 
 def get_mpesa_access_token():
@@ -80,7 +131,7 @@ def process_payment(request):
         elif payment_method == "paypal":
             return process_paypal_payment(data, amount)
         elif payment_method == "mpesa":
-            return process_mpesa_payment(data, amount)
+            return process_mpesa_payment(data, amount, request)
         else:
             return JsonResponse(
                 {"success": False, "error": "Invalid payment method"},
@@ -88,10 +139,14 @@ def process_payment(request):
             )
 
     except Exception as e:
-        return JsonResponse({"success": False, "error": str(e)}, status=500)
+        logger.exception("Payment processing failed: %s", e)
+        return JsonResponse(
+            {"success": False, "error": "Unable to process payment at this time"},
+            status=500,
+        )
 
 
-def process_mpesa_payment(data, amount):
+def process_mpesa_payment(data, amount, request):
     """Process M-Pesa STK Push payment"""
     try:
         phone_number = data.get("phone_number")
@@ -146,29 +201,24 @@ def process_mpesa_payment(data, amount):
         result = response.json()
 
         if result.get("ResponseCode") == "0":
-            # Create payment record
             try:
-                # Create a temporary order for tracking
-                order_id = f"ARNOVA{timezone.now().strftime('%Y%m%d%H%M%S')}"
-
-                # Create payment record
-                payment = Payment.objects.create(
-                    order_id=order_id,  # This should be actual order ID
+                payment = create_order_and_payment(
+                    data,
+                    request,
+                    amount,
                     payment_method="mpesa",
-                    amount=amount,
-                    currency="KES",
-                    status="processing",
+                    payment_status="processing",
                 )
 
-                # Create M-Pesa payment record
-                MpesaPayment.objects.create(
-                    payment=payment,
-                    phone_number=phone_number,
-                    checkout_request_id=result.get("CheckoutRequestID"),
-                    merchant_request_id=result.get("MerchantRequestID"),
-                )
+                if payment is not None:
+                    MpesaPayment.objects.create(
+                        payment=payment,
+                        phone_number=phone_number,
+                        checkout_request_id=result.get("CheckoutRequestID"),
+                        merchant_request_id=result.get("MerchantRequestID"),
+                    )
             except Exception as e:
-                logger.error(f"Error creating payment record: {str(e)}")
+                logger.exception("Error creating M-Pesa payment records: %s", e)
 
             return JsonResponse(
                 {
@@ -188,8 +238,9 @@ def process_mpesa_payment(data, amount):
             )
 
     except Exception as e:
+        logger.exception("M-Pesa payment failed: %s", e)
         return JsonResponse(
-            {"success": False, "error": f"M-Pesa payment failed: {str(e)}"},
+            {"success": False, "error": "M-Pesa payment failed"},
             status=500,
         )
 

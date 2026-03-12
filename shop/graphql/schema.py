@@ -738,6 +738,7 @@ class Mutation:
                 "cardName": input.cardData.cardName,
             }
         request = info.context.request
+        request.user = info.context.user
         request._body = json.dumps(payload).encode()
         result = payment_views.process_payment(request)
         data = json.loads(result.content.decode())

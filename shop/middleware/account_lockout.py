@@ -26,21 +26,26 @@ class AccountLockoutMiddleware:
             # Check if account is locked
             if cache.get(lockout_key):
                 logger.warning(f"Login attempt on locked account: {identifier}")
-                return JsonResponse(
-                    {
-                        "error": (
-                            "Account temporarily locked due to multiple failed login "
-                            "attempts. Try again in 15 minutes."
-                        )
-                    },
-                    status=429,
+                message = (
+                    "Account temporarily locked due to multiple failed login "
+                    "attempts. Try again in 15 minutes."
                 )
+                if request.path == "/admin/login/":
+                    from django.shortcuts import render
+
+                    return render(
+                        request,
+                        "admin/login.html",
+                        {"error": message, "next": request.POST.get("next", "/admin/")},
+                        status=429,
+                    )
+                return JsonResponse({"error": message}, status=429)
 
         response = self.get_response(request)
 
         # Track failed login attempts
         if is_login_attempt:
-            if self.is_login_failure(response):
+            if self.is_login_failure(request, response):
                 self.record_failed_attempt(request)
             else:
                 self.clear_attempts(request)
@@ -48,29 +53,43 @@ class AccountLockoutMiddleware:
         return response
 
     def is_login_attempt(self, request) -> bool:
-        """Detect GraphQL login attempts."""
-        if request.path != "/graphql/" or request.method != "POST":
-            return False
-        try:
-            import json
-            import re
-
-            payload = json.loads(request.body or "{}")
-            query = payload.get("query", "") or ""
-            return bool(
-                re.search(r"\bmutation\b", query) and re.search(r"\blogin\s*\(", query)
-            )
-        except Exception:
+        """Detect GraphQL, REST and admin login attempts."""
+        if request.method != "POST":
             return False
 
-    def is_login_failure(self, response) -> bool:
+        if request.path == "/graphql/":
+            try:
+                import json
+                import re
+
+                payload = json.loads(request.body or "{}")
+                query = payload.get("query", "") or ""
+                return bool(
+                    re.search(r"\bmutation\b", query)
+                    and re.search(r"\blogin\s*\(", query)
+                )
+            except Exception:
+                return False
+
+        return request.path in {"/api/login/", "/admin/login/"}
+
+    def is_login_failure(self, request, response) -> bool:
+        if request.path == "/admin/login/":
+            # Successful form login redirects to admin pages.
+            return response.status_code != 302
+
         try:
             import json
 
             payload = json.loads(response.content.decode() or "{}")
-            return bool(payload.get("errors"))
+            if request.path == "/graphql/":
+                return bool(payload.get("errors"))
+            if request.path == "/api/login/":
+                return response.status_code >= 400 or not payload.get("success", False)
         except Exception:
-            return True
+            return response.status_code >= 400
+
+        return response.status_code >= 400
 
     def get_identifier(self, request):
         """Get identifier for tracking (IP + username if available)"""
