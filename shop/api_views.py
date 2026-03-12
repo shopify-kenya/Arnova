@@ -223,7 +223,8 @@ def api_products(request):
                     "sale_price": round(sale_price, 2) if sale_price else None,
                     "currency": target_currency,
                     "base_currency": p.currency,
-                    "category": p.category.name if p.category else None,
+                    "category": p.category.slug if p.category else None,
+                    "category_name": p.category.name if p.category else None,
                     "sizes": p.sizes if p.sizes is not None else [],
                     "colors": p.colors if p.colors is not None else [],
                     "images": images,
@@ -434,7 +435,8 @@ def api_product_detail(request, product_id):
             "description": product.description,
             "price": float(product.price),
             "salePrice": (float(product.sale_price) if product.sale_price else None),
-            "category": product.category.name,
+            "category": product.category.slug if product.category else None,
+            "categoryName": product.category.name if product.category else None,
             "sizes": product.sizes,
             "colors": product.colors,
             "images": product.images,
@@ -570,7 +572,9 @@ def api_admin_orders(request):
 @staff_member_required
 def api_admin_products(request):
     if request.method == "GET":
-        products = Product.objects.all()
+        products = Product.objects.select_related("category").prefetch_related(
+            "product_reviews"
+        )
         data = [
             {
                 "id": p.id,
@@ -579,13 +583,13 @@ def api_admin_products(request):
                 "price": float(p.price),
                 "sale_price": float(p.sale_price) if p.sale_price else None,
                 "currency": p.currency,
-                "category": p.category.name,
-                "category_id": p.category.id,
+                "category": p.category.name if p.category else None,
+                "category_id": p.category.id if p.category else None,
                 "in_stock": p.in_stock,
                 "is_new": p.is_new,
                 "on_sale": p.on_sale,
-                "rating": float(p.rating),
-                "reviews": p.reviews,
+                "rating": p.average_rating,
+                "reviews": p.review_count,
                 "sizes": p.sizes,
                 "colors": p.colors,
                 "images": p.images,
@@ -607,7 +611,6 @@ def api_admin_products(request):
             with transaction.atomic():
                 category = Category.objects.get(id=data["category_id"])
                 product = Product.objects.create(
-                    id=data["id"],
                     name=data["name"],
                     description=data["description"],
                     price=data["price"],
