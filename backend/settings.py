@@ -223,26 +223,37 @@ USE_ETAGS = True
 USE_GZIP = True
 
 # Redis Cache Configuration
-REDIS_URL = config("REDIS_URL", default="redis://127.0.0.1:6379/1")
+REDIS_URL = config("REDIS_URL", default="")
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PARSER_CLASS": "redis.connection.HiredisParser",
-            "CONNECTION_POOL_KWARGS": {"max_connections": 50},
-            "SOCKET_CONNECT_TIMEOUT": 5,
-            "SOCKET_TIMEOUT": 5,
-        },
-        "KEY_PREFIX": "arnova",
-        "TIMEOUT": 300,
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "CONNECTION_POOL_KWARGS": {"max_connections": 50},
+                "SOCKET_CONNECT_TIMEOUT": 5,
+                "SOCKET_TIMEOUT": 5,
+            },
+            "KEY_PREFIX": "arnova",
+            "TIMEOUT": 300,
+        }
     }
-}
 
-# Session backend using Redis
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    # Session backend using Redis cache when available
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+else:
+    # Fallback for environments without Redis (e.g., preview/review apps)
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "arnova-local-cache",
+            "TIMEOUT": 300,
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
 SESSION_CACHE_ALIAS = "default"
 
 # Database connection pooling

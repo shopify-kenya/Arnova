@@ -87,8 +87,15 @@ def api_login(request):
         logger.warning("Login attempt with invalid JSON")
         return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-    username = data.get("username") or data.get("email")
-    password = data.get("password")
+    username = (data.get("username") or data.get("email") or "").strip()
+    password = data.get("password") or ""
+
+    if not username or not password:
+        logger.warning("Login attempt missing username/email or password")
+        return JsonResponse(
+            {"error": "Username/email and password are required"},
+            status=400,
+        )
 
     # Try to authenticate by email first, then username
     user = None
