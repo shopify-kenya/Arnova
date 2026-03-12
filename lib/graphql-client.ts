@@ -20,34 +20,56 @@ type GraphQLResponse<T> = {
   errors?: { message: string }[]
 }
 
+async function parseGraphQLResponse<T>(
+  response: Response,
+  fallbackMessage: string
+): Promise<GraphQLResponse<T>> {
+  const contentType = response.headers.get("content-type") || ""
+  const isJsonResponse = contentType.includes("application/json")
+
+  if (isJsonResponse) {
+    return response.json()
+  }
+
+  const text = await response.text()
+  return {
+    errors: [{ message: text || fallbackMessage }],
+  }
+}
+
+function buildHeaders(accessToken?: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
+  }
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`
+  }
+
+  return headers
+}
+
 export async function graphqlRequest<T>(
   query: string,
   variables?: Record<string, any>
 ): Promise<T> {
   const accessToken = getAccessToken()
-  const headers: Record<string, string> = {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest",
-  }
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`
-  }
 
   const response = await fetch(GRAPHQL_URL, {
     method: "POST",
     mode: "cors",
     credentials: "include",
-    headers,
+    headers: buildHeaders(accessToken || undefined),
     body: JSON.stringify({ query, variables }),
     cache: "no-store",
   })
 
-  const contentType = response.headers.get("content-type") || ""
-  const isJsonResponse = contentType.includes("application/json")
-  const payload: GraphQLResponse<T> = isJsonResponse
-    ? await response.json()
-    : { errors: [{ message: await response.text() || "Unexpected server response" }] }
+  const payload = await parseGraphQLResponse<T>(
+    response,
+    "Unexpected server response"
+  )
 
   if (!response.ok && (!payload.errors || payload.errors.length === 0)) {
     throw new Error(`GraphQL request failed with status ${response.status}`)
@@ -90,21 +112,13 @@ async function tryRefreshToken(): Promise<boolean> {
     method: "POST",
     mode: "cors",
     credentials: "include",
-    headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json",
-      "X-Requested-With": "XMLHttpRequest",
-    },
+    headers: buildHeaders(),
     body: JSON.stringify({ query, variables: { refreshToken } }),
   })
 
-  const contentType = response.headers.get("content-type") || ""
-  const isJsonResponse = contentType.includes("application/json")
-  const payload: GraphQLResponse<{
+  const payload = await parseGraphQLResponse<{
     refresh: { accessToken: string; refreshToken: string }
-  }> = isJsonResponse
-    ? await response.json()
-    : { errors: [{ message: await response.text() || "Unexpected refresh response" }] }
+  }>(response, "Unexpected refresh response")
 
   if (payload.data?.refresh?.accessToken) {
     setTokens(
