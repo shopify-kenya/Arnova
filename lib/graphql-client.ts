@@ -26,7 +26,9 @@ export async function graphqlRequest<T>(
 ): Promise<T> {
   const accessToken = getAccessToken()
   const headers: Record<string, string> = {
+    "Accept": "application/json",
     "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest",
   }
   if (accessToken) {
     headers.Authorization = `Bearer ${accessToken}`
@@ -34,12 +36,22 @@ export async function graphqlRequest<T>(
 
   const response = await fetch(GRAPHQL_URL, {
     method: "POST",
+    mode: "cors",
+    credentials: "include",
     headers,
     body: JSON.stringify({ query, variables }),
     cache: "no-store",
   })
 
-  const payload: GraphQLResponse<T> = await response.json()
+  const contentType = response.headers.get("content-type") || ""
+  const isJsonResponse = contentType.includes("application/json")
+  const payload: GraphQLResponse<T> = isJsonResponse
+    ? await response.json()
+    : { errors: [{ message: await response.text() || "Unexpected server response" }] }
+
+  if (!response.ok && (!payload.errors || payload.errors.length === 0)) {
+    throw new Error(`GraphQL request failed with status ${response.status}`)
+  }
 
   if (payload.errors && payload.errors.length > 0) {
     const authError = payload.errors.find(err =>
@@ -76,13 +88,23 @@ async function tryRefreshToken(): Promise<boolean> {
 
   const response = await fetch(GRAPHQL_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    mode: "cors",
+    credentials: "include",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest",
+    },
     body: JSON.stringify({ query, variables: { refreshToken } }),
   })
 
+  const contentType = response.headers.get("content-type") || ""
+  const isJsonResponse = contentType.includes("application/json")
   const payload: GraphQLResponse<{
     refresh: { accessToken: string; refreshToken: string }
-  }> = await response.json()
+  }> = isJsonResponse
+    ? await response.json()
+    : { errors: [{ message: await response.text() || "Unexpected refresh response" }] }
 
   if (payload.data?.refresh?.accessToken) {
     setTokens(

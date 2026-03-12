@@ -40,10 +40,12 @@ class CorsMiddleware(MiddlewareMixin):
             response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Credentials"] = "true"
 
+        response["Vary"] = "Origin"
         response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response["Access-Control-Allow-Headers"] = (
             "Accept, Content-Type, X-CSRFToken, Authorization, X-Requested-With"
         )
+        response["Access-Control-Expose-Headers"] = "Content-Type, X-Request-ID"
         response["Access-Control-Max-Age"] = "3600"
 
         return response
