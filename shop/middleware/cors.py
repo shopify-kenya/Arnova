@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.http import JsonResponse
+from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 
 
@@ -36,14 +37,19 @@ class CorsMiddleware(MiddlewareMixin):
         ]
 
         # Allow all Vercel preview and production domains
-        if origin and (origin in allowed_origins or origin.endswith(".vercel.app")):
+        is_allowed = bool(
+            origin and (origin in allowed_origins or origin.endswith(".vercel.app"))
+        )
+        if is_allowed:
             response["Access-Control-Allow-Origin"] = origin
             response["Access-Control-Allow-Credentials"] = "true"
 
+        patch_vary_headers(response, ["Origin"])
         response["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         response["Access-Control-Allow-Headers"] = (
             "Accept, Content-Type, X-CSRFToken, Authorization, X-Requested-With"
         )
+        response["Access-Control-Expose-Headers"] = "Content-Type, X-Request-ID"
         response["Access-Control-Max-Age"] = "3600"
 
         return response
