@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 
 
 def admin_login(request):
@@ -9,9 +10,25 @@ def admin_login(request):
         return redirect("/admin/")
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        username = (request.POST.get("username") or "").strip()
+        password = request.POST.get("password") or ""
         next_url = request.POST.get("next", "/admin/")
+        if not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = "/admin/"
+
+        if not username or not password:
+            return render(
+                request,
+                "admin/login.html",
+                {
+                    "error": "Username/email and password are required",
+                    "next": next_url,
+                },
+            )
 
         # Try email login first
         if "@" in username:

@@ -132,7 +132,7 @@ def _product_to_type(p: Product) -> ProductType:
         salePrice=round(sale_price, 2) if sale_price else None,
         currency=p.currency,
         baseCurrency=p.currency,
-        category=p.category.name if p.category else None,
+        category=p.category.slug if p.category else None,
         sizes=p.sizes or [],
         colors=p.colors or [],
         images=images,
@@ -738,6 +738,7 @@ class Mutation:
                 "cardName": input.cardData.cardName,
             }
         request = info.context.request
+        request.user = info.context.user
         request._body = json.dumps(payload).encode()
         result = payment_views.process_payment(request)
         data = json.loads(result.content.decode())
