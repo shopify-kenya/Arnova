@@ -2,7 +2,7 @@
 import React from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Facebook, Instagram, Twitter, Mail } from "lucide-react"
+import { Mail } from "lucide-react"
 import { GlassCard } from "@/components/glass-card"
 import { useLanguage } from "@/components/language-provider"
 
@@ -34,6 +34,12 @@ export function Footer() {
     ],
   }
 
+  const socialLinks = [
+    { href: "https://facebook.com", label: "Facebook", symbol: "Fb" },
+    { href: "https://instagram.com", label: "Instagram", symbol: "Ig" },
+    { href: "https://twitter.com", label: "Twitter", symbol: "X" },
+  ]
+
   return (
     <footer className="mt-20 border-t border-border">
       <GlassCard className="rounded-none border-0" hover={false}>
@@ -49,33 +55,19 @@ export function Footer() {
                 Quality craftsmanship meets timeless design.
               </p>
               <div className="flex space-x-4">
-                <motion.a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1 }}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Facebook className="h-5 w-5" />
-                </motion.a>
-                <motion.a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1 }}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Instagram className="h-5 w-5" />
-                </motion.a>
-                <motion.a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.1 }}
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Twitter className="h-5 w-5" />
-                </motion.a>
+                {socialLinks.map(link => (
+                  <motion.a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.1 }}
+                    className="flex h-5 w-5 items-center justify-center text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
+                    aria-label={link.label}
+                  >
+                    <span aria-hidden="true">{link.symbol}</span>
+                  </motion.a>
+                ))}
                 <motion.a
                   href="mailto:hello@arnova.com"
                   whileHover={{ scale: 1.1 }}
