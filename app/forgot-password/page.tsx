@@ -21,7 +21,9 @@ export default function ForgotPasswordPage() {
       {submitted ? (
         <div className="space-y-4 rounded-lg border p-4">
           <p className="text-sm">
-            If an account exists for <span className="font-medium">{email}</span>, a reset link will be sent.
+            If an account exists for{" "}
+            <span className="font-medium">{email}</span>, a reset link will be
+            sent.
           </p>
           <Link href="/login" className="text-sm underline">
             Back to login
@@ -30,7 +32,7 @@ export default function ForgotPasswordPage() {
       ) : (
         <form
           className="space-y-4"
-          onSubmit={(event) => {
+          onSubmit={event => {
             event.preventDefault()
             setSubmitted(true)
           }}
@@ -42,7 +44,7 @@ export default function ForgotPasswordPage() {
               type="email"
               required
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={event => setEmail(event.target.value)}
               placeholder="you@example.com"
             />
           </div>

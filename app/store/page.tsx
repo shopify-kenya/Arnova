@@ -26,17 +26,13 @@ export default function StorePage() {
   const categories = ["all", "clothing", "accessories", "shoes", "bags"]
 
   // Fetch products with SWR for auto-refresh
-  const { data, isLoading } = useSWR(
-    "graphql:products",
-    fetchProducts,
-    {
-      refreshInterval: 30000,
-      revalidateOnFocus: true,
-      dedupingInterval: 10000,
-      revalidateOnMount: true,
-      fallbackData: [],
-    }
-  )
+  const { data, error, isLoading } = useSWR("graphql:products", fetchProducts, {
+    refreshInterval: 30000,
+    revalidateOnFocus: true,
+    dedupingInterval: 10000,
+    revalidateOnMount: true,
+    fallbackData: [],
+  })
 
   const products = data || []
 
@@ -128,6 +124,11 @@ export default function StorePage() {
           {/* Products Grid */}
           {isLoading ? (
             <ProductGridSkeleton count={viewMode === "grid" ? 8 : 4} />
+          ) : error ? (
+            <ProductGridEmpty
+              title="Unable to load products"
+              description="The store could not fetch products right now. Please try again shortly."
+            />
           ) : filteredProducts.length === 0 ? (
             <ProductGridEmpty
               title="No products found"

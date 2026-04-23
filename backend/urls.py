@@ -5,7 +5,13 @@ from django.urls import include, path, re_path
 from django.views.static import serve
 
 from backend import views
-from shop import api_views, admin_auth_views, admin_views, payment_views, static_views
+from shop import (
+    admin_auth_views,
+    admin_views,
+    api_views,
+    payment_views,
+    static_views,
+)
 from shop.admin import admin_site
 from shop.error_handlers import handler400, handler403, handler404, handler500
 from shop.graphql.context import get_context
