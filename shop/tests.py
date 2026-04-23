@@ -53,8 +53,7 @@ class SmokeTests(TestCase):
             is_new=True,
             on_sale=True,
         )
-        payload = {
-            "query": """
+        payload = {"query": """
                 query {
                   products {
                     id
@@ -62,8 +61,7 @@ class SmokeTests(TestCase):
                     category
                   }
                 }
-            """
-        }
+            """}
 
         first_response = self.client.post(
             "/graphql/",
