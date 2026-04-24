@@ -6,7 +6,7 @@
 <div class="space-y-8">
     <!-- Header -->
     <div>
-        <h1 class="text-5xl font-bold text-foreground mb-2">Analytics</h1>
+        <h1 class="text-3xl sm:text-5xl font-bold text-foreground mb-2">Analytics</h1>
         <p class="text-muted-foreground">Business insights and performance metrics</p>
     </div>
 
@@ -38,7 +38,7 @@
                     <h4 class="font-medium text-foreground">{{ category.name }}</h4>
                     <span class="text-sm text-muted-foreground">Score: {{ category.popularity_score }}</span>
                 </div>
-                <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
                         <span class="text-muted-foreground">Products:</span>
                         <span class="font-medium text-foreground">{{ category.saved_items }}</span>

@@ -5,7 +5,7 @@
 {% block content %}
 <div class="space-y-6">
     <!-- Header with Add Button -->
-    <div class="glass-strong rounded-xl p-6 flex justify-between items-center">
+    <div class="glass-strong rounded-xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
             <h2 class="text-2xl font-bold mb-2">Products</h2>
             <p class="text-white/70">Manage your product catalog</p>
@@ -113,7 +113,7 @@
                     <label class="block text-sm font-medium mb-1">Description *</label>
                     <textarea name="description" rows="3" required placeholder="Product description" class="form-input w-full px-3 py-2 rounded-lg"></textarea>
                 </div>
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Price *</label>
                         <input type="number" name="price" step="0.01" required placeholder="0.00" class="form-input w-full px-3 py-2 rounded-lg">
@@ -142,7 +142,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Sizes</label>
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
                         <label class="flex items-center"><input type="checkbox" name="sizes" value="XS" class="mr-2"><span class="text-sm">XS</span></label>
                         <label class="flex items-center"><input type="checkbox" name="sizes" value="S" class="mr-2"><span class="text-sm">S</span></label>
                         <label class="flex items-center"><input type="checkbox" name="sizes" value="M" class="mr-2"><span class="text-sm">M</span></label>
@@ -154,7 +154,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Colors</label>
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         <label class="flex items-center"><input type="checkbox" name="colors" value="Black" class="mr-2"><span class="text-sm">Black</span></label>
                         <label class="flex items-center"><input type="checkbox" name="colors" value="White" class="mr-2"><span class="text-sm">White</span></label>
                         <label class="flex items-center"><input type="checkbox" name="colors" value="Red" class="mr-2"><span class="text-sm">Red</span></label>

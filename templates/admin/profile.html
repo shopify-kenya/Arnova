@@ -5,14 +5,14 @@
 {% block content %}
 <div class="space-y-8">
     <div>
-        <h1 class="text-5xl font-bold text-foreground mb-2">My Profile</h1>
+        <h1 class="text-3xl sm:text-5xl font-bold text-foreground mb-2">My Profile</h1>
         <p class="text-muted-foreground">Manage your account information</p>
     </div>
 
     <div class="glass-strong rounded-2xl p-8 acrylic-card max-w-3xl">
         <form id="profileForm" class="space-y-6">
             {% csrf_token %}
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-2">First Name</label>
                     <input type="text" name="first_name" id="first_name"
@@ -49,7 +49,7 @@
                           class="form-input w-full px-4 py-2 rounded-lg"></textarea>
             </div>
 
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium mb-2">City</label>
                     <input type="text" name="city" id="city"

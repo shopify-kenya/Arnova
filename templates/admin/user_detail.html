@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <p class="text-sm text-white/70">Username</p>
                         <p class="font-medium">{{ user.username }}</p>
@@ -70,7 +70,7 @@
                     <p class="text-sm text-white/70">Address</p>
                     <p class="font-medium">{{ profile.address|default:"Not provided" }}</p>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <p class="text-sm text-white/70">City</p>
                         <p class="font-medium">{{ profile.city|default:"Not provided" }}</p>
