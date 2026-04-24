@@ -17,6 +17,7 @@ import {
   LoaderCircle,
 } from "lucide-react"
 import { Footer } from "@/components/footer"
+import { Navbar } from "@/components/navbar"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -226,6 +227,7 @@ export default function RegisterPage() {
   return (
     <CurrencyProvider>
       <div className="min-h-screen">
+        <Navbar />
         <main className="container mx-auto px-4 py-20">
           <div className="max-w-2xl mx-auto">
             <motion.div

@@ -5,6 +5,7 @@ import useSWR from "swr"
 import { motion } from "framer-motion"
 import { BuyerNavbar } from "@/components/buyer-navbar"
 import { BuyerFilterSidebar } from "@/components/buyer-filter-sidebar"
+import { Footer } from "@/components/footer"
 import { Search, Filter, Grid, List } from "lucide-react"
 import { GlassCard } from "@/components/glass-card"
 import { Button } from "@/components/ui/button"
@@ -159,6 +160,7 @@ export default function StorePage() {
           )}
         </motion.div>
       </div>
+      <Footer />
     </div>
   )
 }
