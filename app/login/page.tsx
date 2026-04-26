@@ -4,6 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Mail, Lock, ArrowRight, Eye, EyeOff, LoaderCircle } from "lucide-react"
 import { Home } from "lucide-react"
 import { GlassCard } from "@/components/glass-card"
@@ -20,6 +21,7 @@ import { toast } from "sonner"
 
 export default function LoginPage() {
   const { setUser } = useAuth()
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [rememberMe, setRememberMe] = useState(false)
@@ -57,8 +59,7 @@ export default function LoginPage() {
       if (user) {
         setUser(user)
         toast.success("Welcome back!")
-        // Use window.location for immediate redirect
-        window.location.href = user.role === "admin" ? "/admin" : "/store"
+        router.push(user.role === "admin" ? "/admin" : "/store")
       } else {
         setErrors({ ...errors, general: "Invalid email or password" })
       }

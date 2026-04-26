@@ -1,7 +1,14 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react"
+import { useRouter } from "next/navigation"
 import type { User } from "@/lib/auth"
 import {
   getCurrentUser,
@@ -22,40 +29,31 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUserState] = useState<User | null>(null)
-  const [mounted, setMounted] = useState(false)
+  const [user, setUserState] = useState<User | null>(() => {
+    if (typeof window === "undefined") return null
+    return getCurrentUser()
+  })
+  const router = useRouter()
 
   useEffect(() => {
-    setMounted(true)
-    // First check localStorage
-    const currentUser = getCurrentUser()
-    if (currentUser) {
-      setUserState(currentUser)
-      return
-    }
+    if (user) return
     if (hasToken()) {
       checkAuthStatus().then(sessionUser => {
-        if (sessionUser) {
-          setUserState(sessionUser)
-        }
+        if (sessionUser) setUserState(sessionUser)
       })
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const setUser = (user: User | null) => {
-    setUserState(user)
-    saveUser(user)
+  const setUser = (newUser: User | null) => {
+    setUserState(newUser)
+    saveUser(newUser)
   }
 
-  const logout = () => {
+  const logout = useCallback(() => {
     performLogout()
     setUserState(null)
-    window.location.href = "/"
-  }
-
-  if (!mounted) {
-    return null
-  }
+    router.push("/")
+  }, [router])
 
   return (
     <AuthContext.Provider
