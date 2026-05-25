@@ -3,58 +3,60 @@
 
 @layer base {
   :root {
-    --background: 60 9% 98%;
-    --foreground: 24 10% 10%;
-    --card: 60 9% 98%;
-    --card-foreground: 24 10% 10%;
-    --popover: 60 9% 98%;
-    --popover-foreground: 24 10% 10%;
-    --primary: 24 45% 20%;
-    --primary-foreground: 60 9% 98%;
-    --secondary: 60 5% 96%;
-    --secondary-foreground: 24 10% 10%;
-    --muted: 60 5% 96%;
-    --muted-foreground: 25 5% 45%;
-    --accent: 36 64% 57%;
-    --accent-foreground: 24 10% 10%;
+    --background: 0 0% 98%;
+    --foreground: 210 29% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 29% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 29% 15%;
+    --primary: 210 100% 30%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 210 29% 15%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 24 100% 50%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 60 9% 98%;
-    --border: 20 6% 90%;
-    --input: 20 6% 90%;
-    --ring: 24 45% 20%;
-    --radius: 0.5rem;
-    --arnova-olive: 24 45% 20%;
-    --arnova-dark-olive: 24 60% 11%;
-    --arnova-cream: 60 100% 94%;
-    --arnova-gold: 36 64% 57%;
-    --arnova-bronze: 36 65% 44%;
-  }
-
-  body {
-    font-family: "Space Grotesk", "Inter", "Segoe UI", system-ui,
-      -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 210 100% 30%;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 24 60% 11%;
-    --foreground: 60 100% 94%;
-    --card: 24 60% 11%;
-    --card-foreground: 60 100% 94%;
-    --popover: 24 60% 11%;
-    --popover-foreground: 60 100% 94%;
-    --primary: 60 100% 94%;
-    --primary-foreground: 24 60% 11%;
-    --secondary: 24 45% 20%;
-    --secondary-foreground: 60 100% 94%;
-    --muted: 24 45% 20%;
-    --muted-foreground: 60 20% 70%;
-    --accent: 36 64% 57%;
-    --accent-foreground: 24 60% 11%;
+    --background: 210 29% 10%;
+    --foreground: 0 0% 92%;
+    --card: 210 25% 14%;
+    --card-foreground: 0 0% 92%;
+    --popover: 210 25% 14%;
+    --popover-foreground: 0 0% 92%;
+    --primary: 0 0% 92%;
+    --primary-foreground: 210 29% 10%;
+    --secondary: 210 20% 20%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 210 20% 20%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 24 100% 50%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 63% 31%;
-    --destructive-foreground: 60 100% 94%;
-    --border: 24 45% 20%;
-    --input: 24 45% 20%;
-    --ring: 60 100% 94%;
+    --destructive-foreground: 0 0% 92%;
+    --border: 210 20% 22%;
+    --input: 210 20% 22%;
+    --ring: 0 0% 92%;
+  }
+
+  body {
+    font-family:
+      "Space Grotesk",
+      "Inter",
+      "Segoe UI",
+      system-ui,
+      -apple-system,
+      "Helvetica Neue",
+      Arial,
+      sans-serif;
   }
 }
 
@@ -115,39 +117,27 @@
 }
 
 .glass {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: hsl(var(--card) / 0.8);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid hsl(var(--border) / 0.5);
 }
 
 .glass-strong {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: hsl(var(--card) / 0.95);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid hsl(var(--border) / 0.6);
 }
 
 .dark .glass {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: hsl(var(--card) / 0.7);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid hsl(var(--border) / 0.4);
 }
 
 .dark .glass-strong {
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: hsl(var(--card) / 0.9);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.acrylic-card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid hsl(var(--accent) / 0.9);
-}
-
-.acrylic-button {
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid hsl(var(--accent) / 0.7);
+  border: 1px solid hsl(var(--border) / 0.5);
 }
 
 @keyframes fadeInUp {
@@ -158,18 +148,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes glow {
-  0% {
-    box-shadow: 0 0 5px rgba(5, 150, 105, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(5, 150, 105, 0.8);
-  }
-  100% {
-    box-shadow: 0 0 5px rgba(5, 150, 105, 0.5);
   }
 }
 
@@ -184,29 +162,10 @@
   }
 }
 
-@keyframes scale-in {
-  0% {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
 .animate-fadeInUp {
-  animation: fadeInUp 0.8s ease-out forwards;
-}
-
-.animate-glow {
-  animation: glow 1.5s infinite;
+  animation: fadeInUp 0.6s ease-out forwards;
 }
 
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
-}
-
-.animate-scale-in {
-  animation: scale-in 0.2s ease-out;
 }

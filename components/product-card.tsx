@@ -4,10 +4,8 @@ import type React from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { Heart, ShoppingCart, Star } from "lucide-react"
-import { GlassCard } from "@/components/glass-card"
+import { Heart, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import type { Product } from "@/lib/products"
 import { useCurrency } from "@/components/currency-provider"
 import { useCart } from "@/components/cart-provider"
@@ -34,13 +32,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-
     if (!isAuthenticated) {
       toast.error("Please login to save items")
       router.push("/login")
       return
     }
-
     if (isSaved) {
       await removeSavedItem(product.id)
     } else {
@@ -51,21 +47,16 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-
     if (!isAuthenticated) {
       toast.error("Please login to add items to cart")
       router.push("/login")
       return
     }
-
-    // If product has multiple sizes or colors, redirect to product page for selection
     if (product.sizes.length > 1 || product.colors.length > 1) {
       router.push(`/product/${product.id}`)
       toast.info("Please select size and color")
       return
     }
-
-    // Add with default size and color
     addItem({
       product,
       quantity: 1,
@@ -76,88 +67,64 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.4 }}
+      transition={{ delay: index * 0.03, duration: 0.3 }}
     >
-      <Link href={`/product/${product.id}`}>
-        <GlassCard className="group overflow-hidden h-full">
-          <div className="relative aspect-square overflow-hidden">
-            <Image
-              src={getProductImageUrl(product.images[0])}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-            <div className="absolute top-3 left-3 flex flex-col gap-2">
-              {product.isNew && (
-                <Badge className="bg-primary text-primary-foreground">
-                  New
-                </Badge>
-              )}
-              {product.onSale && (
-                <Badge className="bg-accent text-accent-foreground">Sale</Badge>
-              )}
-            </div>
-            <div className="absolute top-3 right-3 flex flex-col gap-2">
-              <Button
-                size="icon"
-                variant="secondary"
-                className="rounded-full glass-strong"
-                onClick={handleSave}
-              >
-                <Heart
-                  className={`h-4 w-4 ${
-                    isSaved ? "fill-current text-red-500" : ""
-                  }`}
-                />
-              </Button>
-            </div>
-            <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                size="icon"
-                className="rounded-full"
-                onClick={handleAddToCart}
-              >
-                <ShoppingCart className="h-4 w-4" />
-              </Button>
-            </div>
+      <Link href={`/product/${product.id}`} className="group block">
+        {/* Image */}
+        <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-muted mb-3">
+          <Image
+            src={getProductImageUrl(product.images[0])}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          {/* Hover actions */}
+          <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8 rounded-full bg-card/90 backdrop-blur-sm shadow-sm"
+              onClick={handleSave}
+            >
+              <Heart
+                className={`h-3.5 w-3.5 ${isSaved ? "fill-current text-red-500" : "text-foreground"}`}
+              />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8 rounded-full bg-card/90 backdrop-blur-sm shadow-sm"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart className="h-3.5 w-3.5 text-foreground" />
+            </Button>
           </div>
+        </div>
 
-          <div className="p-4">
-            <h3 className="font-semibold text-foreground mb-1 line-clamp-1">
-              {product.name}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-              {product.description}
-            </p>
-
-            <div className="flex items-center gap-1 mb-2">
-              <Star className="h-4 w-4 fill-current text-yellow-500" />
-              <span className="text-sm font-medium">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">
-                ({product.reviews})
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {product.onSale && product.salePrice ? (
-                <>
-                  <span className="text-lg font-bold text-accent">
-                    {formatPrice(product.salePrice)}
-                  </span>
-                  <span className="text-sm text-muted-foreground line-through">
-                    {formatPrice(product.price)}
-                  </span>
-                </>
-              ) : (
-                <span className="text-lg font-bold text-foreground">
+        {/* Info */}
+        <div className="space-y-1">
+          <h3 className="font-medium text-sm text-foreground line-clamp-1">
+            {product.name}
+          </h3>
+          <div className="flex items-center gap-2">
+            {product.onSale && product.salePrice ? (
+              <>
+                <span className="font-bold text-foreground">
+                  {formatPrice(product.salePrice)}
+                </span>
+                <span className="text-xs text-muted-foreground line-through">
                   {formatPrice(product.price)}
                 </span>
-              )}
-            </div>
+              </>
+            ) : (
+              <span className="font-bold text-foreground">
+                {formatPrice(product.price)}
+              </span>
+            )}
           </div>
-        </GlassCard>
+        </div>
       </Link>
     </motion.div>
   )

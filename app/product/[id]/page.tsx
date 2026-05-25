@@ -6,7 +6,6 @@ import Image from "next/image"
 import { Heart, ShoppingCart, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { GlassCard } from "@/components/glass-card"
 import { useCurrency } from "@/components/currency-provider"
 import { useCart } from "@/components/cart-provider"
 import { useAuth } from "@/components/auth-provider"
@@ -33,24 +32,10 @@ export default function ProductPage() {
   const router = useRouter()
 
   const fetchReviews = () => {
-    graphqlRequest<{
-      productReviews: {
-        reviews: any[]
-      }
-    }>(
-      `
-      query ProductReviews($id: Int!) {
-        productReviews(id: $id) {
-          reviews {
-            id
-            user
-            rating
-            comment
-            createdAt
-          }
-        }
-      }
-      `,
+    graphqlRequest<{ productReviews: { reviews: any[] } }>(
+      `query ProductReviews($id: Int!) {
+        productReviews(id: $id) { reviews { id user rating comment createdAt } }
+      }`,
       { id: Number(params.id) }
     )
       .then(data => setReviews(data.productReviews.reviews || []))
@@ -58,31 +43,13 @@ export default function ProductPage() {
   }
 
   useEffect(() => {
-    graphqlRequest<{
-      product: Product
-    }>(
-      `
-      query Product($id: Int!) {
+    graphqlRequest<{ product: Product }>(
+      `query Product($id: Int!) {
         product(id: $id) {
-          id
-          name
-          description
-          price
-          salePrice
-          currency
-          baseCurrency
-          category
-          sizes
-          colors
-          images
-          inStock
-          isNew
-          onSale
-          rating
-          reviews
+          id name description price salePrice currency baseCurrency
+          category sizes colors images inStock isNew onSale rating reviews
         }
-      }
-      `,
+      }`,
       { id: Number(params.id) }
     )
       .then(data => {
@@ -95,7 +62,23 @@ export default function ProductPage() {
     fetchReviews()
   }, [params.id])
 
-  if (!product) return <div className="container py-20">Loading...</div>
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container pt-28 pb-12">
+          <div className="animate-pulse grid md:grid-cols-2 gap-10">
+            <div className="aspect-[4/5] bg-muted rounded-2xl" />
+            <div className="space-y-4 pt-8">
+              <div className="h-8 bg-muted rounded w-2/3" />
+              <div className="h-6 bg-muted rounded w-1/3" />
+              <div className="h-20 bg-muted rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const isSaved = isProductSaved(product.id)
 
@@ -105,11 +88,8 @@ export default function ProductPage() {
       router.push("/login")
       return
     }
-    if (isSaved) {
-      await removeSavedItem(product.id)
-    } else {
-      await addSavedItem(product.id)
-    }
+    if (isSaved) await removeSavedItem(product.id)
+    else await addSavedItem(product.id)
   }
 
   const handleAddToCart = () => {
@@ -126,109 +106,133 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container py-20">
-        <div className="grid md:grid-cols-2 gap-8">
+
+      <main className="container mx-auto px-4 pt-28 pb-12">
+        <div className="grid md:grid-cols-2 gap-10 lg:gap-16">
+          {/* Images */}
           <div>
-            <GlassCard className="mb-4 overflow-hidden">
-              <div className="relative aspect-square">
-                <Image
-                  src={product.images[selectedImage] || "/placeholder.svg"}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </GlassCard>
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImage(idx)}
-                  className={`relative aspect-square rounded-lg overflow-hidden border-2 ${
-                    selectedImage === idx
-                      ? "border-primary"
-                      : "border-transparent"
-                  }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.name} ${idx + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
+              <Image
+                src={product.images[selectedImage] || "/placeholder.svg"}
+                alt={product.name}
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
+            {product.images.length > 1 && (
+              <div className="flex gap-3 mt-4">
+                {product.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(idx)}
+                    className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                      selectedImage === idx
+                        ? "border-accent"
+                        : "border-transparent hover:border-border"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${product.name} ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-current text-yellow-500" />
-                    <span className="font-medium">{product.rating}</span>
-                  </div>
-                  <span className="text-muted-foreground">
-                    ({product.reviews} reviews)
-                  </span>
-                </div>
-              </div>
-              <Button size="icon" variant="outline" onClick={handleSave}>
+          {/* Details */}
+          <div className="flex flex-col pt-2">
+            <div className="flex items-start justify-between">
+              <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
+                {product.name}
+              </h1>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full"
+                onClick={handleSave}
+              >
                 <Heart
-                  className={`h-5 w-5 ${isSaved ? "fill-current text-red-500" : ""}`}
+                  className={`h-5 w-5 ${isSaved ? "fill-current text-red-500" : "text-muted-foreground"}`}
                 />
               </Button>
             </div>
 
-            <div className="flex items-center gap-3 mb-6">
+            {/* Rating */}
+            <div className="flex items-center gap-2 mt-2">
+              <Star className="h-4 w-4 fill-current text-amber-500" />
+              <span className="font-medium text-sm">{product.rating}</span>
+              <span className="text-sm text-muted-foreground">
+                ({product.reviews} reviews)
+              </span>
+            </div>
+
+            {/* Price */}
+            <div className="flex items-baseline gap-3 mt-6">
               {product.onSale && product.salePrice ? (
                 <>
-                  <span className="text-3xl font-bold text-accent">
+                  <span className="text-3xl font-bold text-foreground">
                     {formatPrice(product.salePrice)}
                   </span>
-                  <span className="text-xl text-muted-foreground line-through">
+                  <span className="text-lg text-muted-foreground line-through">
                     {formatPrice(product.price)}
                   </span>
                 </>
               ) : (
-                <span className="text-3xl font-bold">
+                <span className="text-3xl font-bold text-foreground">
                   {formatPrice(product.price)}
                 </span>
               )}
             </div>
 
-            <div className="flex gap-2 mb-6">
-              {product.isNew && <Badge>New</Badge>}
-              {product.onSale && <Badge variant="secondary">Sale</Badge>}
+            {/* Badges */}
+            <div className="flex gap-2 mt-4">
+              {product.onSale && (
+                <Badge className="bg-foreground text-background">Sale</Badge>
+              )}
               {product.inStock ? (
-                <Badge variant="outline" className="text-green-600">
+                <Badge
+                  variant="outline"
+                  className="text-green-600 border-green-600/30"
+                >
                   In Stock
                 </Badge>
               ) : (
-                <Badge variant="outline" className="text-red-600">
+                <Badge
+                  variant="outline"
+                  className="text-red-600 border-red-600/30"
+                >
                   Out of Stock
                 </Badge>
               )}
             </div>
 
-            <p className="text-muted-foreground mb-6">{product.description}</p>
+            {/* Description */}
+            <p className="text-muted-foreground mt-6 leading-relaxed">
+              {product.description}
+            </p>
 
+            {/* Color */}
             {product.colors.length > 0 && (
-              <div className="mb-6">
-                <label className="block font-medium mb-2">Color</label>
-                <div className="flex gap-2">
+              <div className="mt-8">
+                <label className="block font-semibold text-sm mb-3">
+                  Color
+                </label>
+                <div className="flex flex-wrap gap-2">
                   {product.colors.map(color => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
-                      className={`px-4 py-2 rounded-lg border-2 ${
+                      className={`px-4 py-2 rounded-lg border text-sm font-medium transition-all ${
                         selectedColor === color
-                          ? "border-primary bg-primary/10"
-                          : "border-border"
+                          ? "border-accent bg-accent/10 text-foreground"
+                          : "border-border text-muted-foreground hover:border-foreground/30"
                       }`}
                     >
                       {color}
@@ -238,18 +242,19 @@ export default function ProductPage() {
               </div>
             )}
 
+            {/* Size */}
             {product.sizes.length > 0 && (
-              <div className="mb-6">
-                <label className="block font-medium mb-2">Size</label>
-                <div className="flex gap-2">
+              <div className="mt-6">
+                <label className="block font-semibold text-sm mb-3">Size</label>
+                <div className="flex flex-wrap gap-2">
                   {product.sizes.map(size => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
-                      className={`px-4 py-2 rounded-lg border-2 ${
+                      className={`w-12 h-12 rounded-lg border text-sm font-medium transition-all flex items-center justify-center ${
                         selectedSize === size
-                          ? "border-primary bg-primary/10"
-                          : "border-border"
+                          ? "border-accent bg-accent/10 text-foreground"
+                          : "border-border text-muted-foreground hover:border-foreground/30"
                       }`}
                     >
                       {size}
@@ -259,10 +264,10 @@ export default function ProductPage() {
               </div>
             )}
 
+            {/* Add to Cart */}
             <Button
-              variant="gradient"
               size="lg"
-              className="w-full"
+              className="w-full mt-8 bg-accent hover:bg-accent/90 text-accent-foreground font-semibold rounded-xl h-14 text-base"
               onClick={handleAddToCart}
               disabled={!product.inStock}
             >
@@ -272,7 +277,8 @@ export default function ProductPage() {
           </div>
         </div>
 
-        <div className="mt-12">
+        {/* Reviews */}
+        <div className="mt-16">
           <ProductReviews
             productId={params.id as string}
             reviews={reviews}
@@ -281,7 +287,8 @@ export default function ProductPage() {
             onReviewAdded={fetchReviews}
           />
         </div>
-      </div>
+      </main>
+
       <Footer />
     </div>
   )
