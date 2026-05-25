@@ -124,7 +124,7 @@ export function HeroSection() {
               size="lg"
               className="px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg rounded-full"
             >
-              <Link href="/clothing">View All</Link>
+              <Link href="/store">View All</Link>
             </Button>
           </motion.div>
         </motion.div>

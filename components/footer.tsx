@@ -11,12 +11,12 @@ export function Footer() {
 
   const footerLinks = {
     shop: [
-      { label: t("nav.newArrivals"), href: "/new-arrivals" },
-      { label: t("nav.clothing"), href: "/clothing" },
-      { label: t("nav.shoes"), href: "/shoes" },
-      { label: t("nav.bags"), href: "/bags" },
-      { label: t("nav.accessories"), href: "/accessories" },
-      { label: t("nav.sale"), href: "/sale" },
+      { label: t("nav.newArrivals"), href: "/store?filter=new" },
+      { label: t("nav.clothing"), href: "/store?category=clothing" },
+      { label: t("nav.shoes"), href: "/store?category=shoes" },
+      { label: t("nav.bags"), href: "/store?category=bags" },
+      { label: t("nav.accessories"), href: "/store?category=accessories" },
+      { label: t("nav.sale"), href: "/store?filter=sale" },
     ],
     customer: [
       { label: "Contact Us", href: "/contact" },

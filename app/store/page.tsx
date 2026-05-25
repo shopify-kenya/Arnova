@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import useSWR from "swr"
 import { motion } from "framer-motion"
 import { BuyerNavbar } from "@/components/buyer-navbar"
@@ -19,14 +20,21 @@ import type { Product } from "@/lib/products"
 import { fetchProducts } from "@/lib/products"
 
 export default function StorePage() {
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get("category") || "all"
+  const filterParam = searchParams.get("filter") // "new" or "sale"
+
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam)
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
+  useEffect(() => {
+    setSelectedCategory(categoryParam)
+  }, [categoryParam])
+
   const categories = ["all", "clothing", "accessories", "shoes", "bags"]
 
-  // Fetch products with SWR for auto-refresh
   const { data, error, isLoading } = useSWR("graphql:products", fetchProducts, {
     refreshInterval: 30000,
     revalidateOnFocus: true,
@@ -43,14 +51,34 @@ export default function StorePage() {
       .includes(searchTerm.toLowerCase())
     const matchesCategory =
       selectedCategory === "all" || product.category === selectedCategory
-    return matchesSearch && matchesCategory
+    const matchesFilter =
+      !filterParam ||
+      (filterParam === "new" && product.isNew) ||
+      (filterParam === "sale" && product.onSale)
+    return matchesSearch && matchesCategory && matchesFilter
   })
+
+  const title =
+    filterParam === "new"
+      ? "New Arrivals"
+      : filterParam === "sale"
+        ? "Deals"
+        : selectedCategory !== "all"
+          ? selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)
+          : "Store"
+
+  const subtitle =
+    filterParam === "new"
+      ? "Latest fashion trends"
+      : filterParam === "sale"
+        ? "Special offers and discounts"
+        : "Browse all products"
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <BuyerNavbar
-        title="Store"
-        subtitle="Browse all products"
+        title={title}
+        subtitle={subtitle}
         onMenuToggle={() => setIsFilterOpen(true)}
       />
 

@@ -29,7 +29,7 @@ export function FinalCTASection() {
               size="lg"
               className="group bg-accent hover:bg-accent/90 text-accent-foreground"
             >
-              <Link href="/clothing">
+              <Link href="/store">
                 Explore Collection
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>

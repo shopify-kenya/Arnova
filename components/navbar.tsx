@@ -52,12 +52,12 @@ export function Navbar() {
   }, [])
 
   const navLinks = [
-    { href: "/new-arrivals", label: t("nav.newArrivals") },
-    { href: "/clothing", label: t("nav.clothing") },
-    { href: "/shoes", label: t("nav.shoes") },
-    { href: "/bags", label: t("nav.bags") },
-    { href: "/accessories", label: t("nav.accessories") },
-    { href: "/sale", label: t("nav.sale") },
+    { href: "/store?filter=new", label: t("nav.newArrivals") },
+    { href: "/store?category=clothing", label: t("nav.clothing") },
+    { href: "/store?category=shoes", label: t("nav.shoes") },
+    { href: "/store?category=bags", label: t("nav.bags") },
+    { href: "/store?category=accessories", label: t("nav.accessories") },
+    { href: "/store?filter=sale", label: t("nav.sale") },
   ]
 
   return (
