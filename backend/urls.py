@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 from django.urls import include, path, re_path
+from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
 
 from backend import views
@@ -120,10 +121,12 @@ urlpatterns = [
     # GraphQL API endpoint
     path(
         "graphql/",
-        CSRFExemptGraphQLView.as_view(
-            schema=schema,
-            graphql_ide="graphiql" if settings.GRAPHQL_GRAPHIQL else None,
-            get_context=get_context,
+        csrf_exempt(
+            CSRFExemptGraphQLView.as_view(
+                schema=schema,
+                graphql_ide="graphiql" if settings.GRAPHQL_GRAPHIQL else None,
+                get_context=get_context,
+            )
         ),
         name="graphql",
     ),
