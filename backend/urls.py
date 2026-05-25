@@ -102,25 +102,6 @@ api_patterns = [
         api_views.api_placeholder_image,
         name="api_placeholder_image",
     ),
-    path("admin/orders/", api_views.api_admin_orders, name="api_admin_orders"),
-    path("admin/products/", api_views.api_admin_products, name="api_admin_products"),
-    path(
-        "admin/products/<int:product_id>/",
-        api_views.api_admin_product_detail,
-        name="api_admin_product_detail",
-    ),
-    path("admin/users/", api_views.api_admin_users, name="api_admin_users"),
-    path(
-        "admin/users/<int:user_id>/",
-        api_views.api_admin_user_detail,
-        name="api_admin_user_detail",
-    ),
-    path(
-        "admin/analytics/",
-        api_views.api_admin_analytics,
-        name="api_admin_analytics",
-    ),
-    path("admin/settings/", api_views.api_admin_settings, name="api_admin_settings"),
     path(
         "payments/process/",
         payment_views.process_payment,
